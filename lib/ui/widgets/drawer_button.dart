@@ -1,0 +1,59 @@
+import 'package:flutter/material.dart';
+import 'package:jsvillela_app/infra/enums.dart';
+
+/// Cria um Item de Menu a ser utilizado no Drawer (menu) da aplicação.
+class ItemDeMenu extends StatelessWidget {
+
+  //#region Atributos
+
+  ///Ícone a ser exibido.
+  final IconData _icone;
+
+  ///Texto a ser exibido.
+  final String _texto;
+
+  /// PageController usado para troca de telas.
+  final PageController _pageController;
+
+  /// Define para qual página o aplicativo será direcionado após clicar no botão.
+  final AppPages _page;
+
+  //#endregion Atributos
+
+  //#region Construtores
+
+  ItemDeMenu(this._icone, this._texto, this._pageController, this._page);
+
+  //#endregion Construtores
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(5),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: (){
+
+          },
+          child: Container(
+            padding: EdgeInsets.only(left: 20),
+            height: 50,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Icon(_icone, size: 20, color: Color.fromARGB(100, 255, 255, 255)),
+                SizedBox(width: 32),
+                Text(_texto.toUpperCase(),
+                    style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.white
+                    ))
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
