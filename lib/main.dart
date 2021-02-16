@@ -1,10 +1,12 @@
-import 'package:jsvillela_app/models/user_model.dart';
+import 'package:jsvillela_app/models/usuario_model.dart';
 import 'package:flutter/material.dart';
 import 'package:jsvillela_app/ui/tela_de_login.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:firebase_core/firebase_core.dart';
 
-void main() {
+void main() async{
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(MyApp());
 }
 
