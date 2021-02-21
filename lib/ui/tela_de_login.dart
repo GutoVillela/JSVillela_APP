@@ -16,6 +16,7 @@ class TelaDeLogin extends StatefulWidget {
 
 class _TelaDeLoginState extends State<TelaDeLogin> {
 
+  //#region Atributos
   /// Estado atual da página.
   EstadoDaPaginaDeLogin _estadoDaPagina = EstadoDaPaginaDeLogin.inicio;
 
@@ -54,14 +55,7 @@ class _TelaDeLoginState extends State<TelaDeLogin> {
 
   /// Chave de Scaffold.
   final _chaveScaffold = GlobalKey<ScaffoldState>();
-
-  //#region Constantes
-  /// Deslocamento dos formulários quando estão visíveis (em primeiro plano).
-  static const double DESLOCAMENTO_FORMS_PRIMEIRO_PLANO = 300;
-
-  /// Deslocamento dos formulários quando estão visíveis (em segundo plano).
-  static const double DESLOCAMENTO_FORMS_SEGUNDO_PLANO = 250;
-  //#endregion Constantes
+  //#endregion Atributos
 
   @override
   void initState() {
@@ -84,166 +78,191 @@ class _TelaDeLoginState extends State<TelaDeLogin> {
   @override
   Widget build(BuildContext context) {
 
-    // Obter largura e altura da tela.
-    larguraDaTela = MediaQuery.of(context).size.width;
-    alturaDaTela = MediaQuery.of(context).size.height;
-
-    // Definir cor de fundo da página atual segundo estado atual da página
-    switch(_estadoDaPagina){
-      case EstadoDaPaginaDeLogin.inicio:
-        _loginDeslocamentoY = alturaDaTela;
-        _loginDeslocamentoX = 0;
-        _loginLargura = larguraDaTela;
-        _loginOpacidade = 1;
-
-        _esqueciASenhaDeslocamentoY = alturaDaTela;
-        break;
-      case EstadoDaPaginaDeLogin.login:
-        _loginDeslocamentoY = _tecladoVisivel ? 20 : DESLOCAMENTO_FORMS_PRIMEIRO_PLANO;
-        _loginDeslocamentoX = 0;
-        _loginLargura = larguraDaTela;
-        _loginOpacidade = 1;
-
-        _esqueciASenhaDeslocamentoY = alturaDaTela;
-        break;
-      case EstadoDaPaginaDeLogin.esqueciASenha:
-        _loginDeslocamentoY = DESLOCAMENTO_FORMS_SEGUNDO_PLANO;
-        _loginDeslocamentoX = 20;
-        _loginLargura = larguraDaTela - _loginDeslocamentoX * 2;
-        _loginOpacidade = .7;
-
-        _esqueciASenhaDeslocamentoY = _tecladoVisivel ? 20 : DESLOCAMENTO_FORMS_PRIMEIRO_PLANO;
-        break;
-    }
-
     return Scaffold(
       key: _chaveScaffold,
-      body: Stack(
-          children: [
-            AnimatedContainer(
-              curve: Curves.fastLinearToSlowEaseIn,
-              duration: Duration(
-                  milliseconds: 800
-              ),
-              color: Colors.white,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Container(
+      body: Container(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+
+            // Obter largura e altura da tela.
+            larguraDaTela = constraints.maxWidth;
+            alturaDaTela = constraints.maxHeight;
+
+            // Deslocamento dos formulários quando estão visíveis (em primeiro plano).
+            double deslocamentoFormsPrimeiroPlano = alturaDaTela * .3;
+
+            // Deslocamento dos formulários quando estão visíveis (em segundo plano).
+            double deslocamentoFormsSegundoPlano = alturaDaTela * .25;
+
+            // Definir cor de fundo da página atual segundo estado atual da página
+            switch(_estadoDaPagina){
+              case EstadoDaPaginaDeLogin.inicio:
+                _loginDeslocamentoY = alturaDaTela;
+                _loginDeslocamentoX = 0;
+                _loginLargura = larguraDaTela;
+                _loginOpacidade = 1;
+
+                _esqueciASenhaDeslocamentoY = alturaDaTela;
+                break;
+              case EstadoDaPaginaDeLogin.login:
+                _loginDeslocamentoY = _tecladoVisivel ? 20 : deslocamentoFormsPrimeiroPlano;
+                _loginDeslocamentoX = 0;
+                _loginLargura = larguraDaTela;
+                _loginOpacidade = 1;
+
+                _esqueciASenhaDeslocamentoY = alturaDaTela;
+                break;
+              case EstadoDaPaginaDeLogin.esqueciASenha:
+                _loginDeslocamentoY = deslocamentoFormsSegundoPlano;
+                _loginDeslocamentoX = 20;
+                _loginLargura = larguraDaTela - _loginDeslocamentoX * 2;
+                _loginOpacidade = .7;
+
+                _esqueciASenhaDeslocamentoY = _tecladoVisivel ? 20 : deslocamentoFormsPrimeiroPlano;
+                break;
+            }
+
+            return Stack(
+              children: [
+                AnimatedContainer(
+                  height: alturaDaTela * .3,
+                  curve: Curves.fastLinearToSlowEaseIn,
+                  duration: Duration(
+                      milliseconds: 800
+                  ),
+                  color: Colors.white,
+                  child: Container(
                     padding: EdgeInsets.all(50),
                     child: Center(
-                        child: Image.asset("assets/imagens/logo_JS_VILLELA.png")
+                        child: Image.asset("assets/imagens/logo_js_villela.png", fit: BoxFit.fill)
                     ),
                   )
-                ],
-              ),
-            ),
-            AnimatedContainer(
-                width: _loginLargura,
-                curve: Curves.fastLinearToSlowEaseIn,
-                duration: Duration(
-                  milliseconds: 1000
                 ),
-                transform: Matrix4.translationValues(_loginDeslocamentoX, _loginDeslocamentoY, 0),
-                decoration: BoxDecoration(
-                  color: PaletaDeCor.ROXO_CLARO.withOpacity(_loginOpacidade),
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(50),
-                    topRight: Radius.circular(50)
-                  )
-                ),
-                child: Column(
-                  children: [
-                    Container(
-                      padding: EdgeInsets.only(top: 20),
-                      child: Center(
-                          child: Text(
-                              "Entre para continuar",
-                            style: TextStyle(
-                              fontSize: 20
-                            ),
-                          )
-                      ),
+                GestureDetector(
+                  onTap: (){
+                    setState(() {
+                      if(_estadoDaPagina != EstadoDaPaginaDeLogin.login)
+                        _estadoDaPagina = EstadoDaPaginaDeLogin.login;
+                    });
+                  },
+                  child: AnimatedContainer(
+                    height: alturaDaTela,
+                    width: _loginLargura,
+                    curve: Curves.fastLinearToSlowEaseIn,
+                    duration: Duration(
+                        milliseconds: 1000
                     ),
-                    ScopedModelDescendant<UsuarioModel>(
-                      builder: (context, child, model){
-                        if(model.estaCarregando)
-                          return Center(child: CircularProgressIndicator());
+                    transform: Matrix4.translationValues(_loginDeslocamentoX, _loginDeslocamentoY, 0),
+                    decoration: BoxDecoration(
+                        color: PaletaDeCor.ROXO_CLARO.withOpacity(_loginOpacidade),
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(50),
+                            topRight: Radius.circular(50)
+                        )
+                    ),
+                    child: Column(
+                      children: [
+                        Container(
+                          padding: EdgeInsets.only(top: 20),
+                          child: Center(
+                              child: Text(
+                                "Entre para continuar",
+                                style: TextStyle(
+                                    fontSize: 20
+                                ),
+                              )
+                          ),
+                        ),
+                        ScopedModelDescendant<UsuarioModel>(
+                            builder: (context, child, model){
+                              if(model.estaCarregando)
+                                return Center(child: CircularProgressIndicator());
 
-                        return Form(
-                            key: _chaveFormulario,
-                            child: Column(
-                              children: [
-                                Container(
-                                  padding: EdgeInsets.all(32),
-                                  child: CampoDeTextoComIcone(
-                                    texto: "Usuário ou código",
-                                    icone: Icon(Icons.person, color: PaletaDeCor.AZUL_ESCURO),
-                                    cor: PaletaDeCor.AZUL_ESCURO,
-                                    campoDeSenha: false,
-                                    controller: _usuarioController,
-                                    regraDeValidacao: (texto){
-                                      if(texto.isEmpty)
-                                        return "Este campo é obrigatório";
-                                      return null;
-                                    },
-                                  ),
-                                ),
-                                Container(
-                                  padding: EdgeInsets.symmetric(horizontal: 32),
-                                  child: CampoDeTextoComIcone(
-                                    texto: "Senha",
-                                    icone: Icon(Icons.lock, color: PaletaDeCor.AZUL_ESCURO),
-                                    cor: PaletaDeCor.AZUL_ESCURO,
-                                    campoDeSenha: true,
-                                    controller: _senhaController,
-                                    regraDeValidacao: (texto){
-                                      if(texto.isEmpty)
-                                        return "Este campo é obrigatório";
-                                      return null;
-                                    },
-                                  ),
-                                ),
-                                Container(
-                                  padding: EdgeInsets.all(32),
-                                  child: GestureDetector(
-                                      onTap: (){
-                                        if(_chaveFormulario.currentState.validate()){
-                                          model.logar(
-                                              email: _usuarioController.text,
-                                              senha: _senhaController.text,
-                                              onSuccess: _logarUsuario,
-                                              onFail: _informarErroDeLogin
-                                          );
-                                        }
-                                      },
-                                      child: BotaoArredondado(
-                                          textoDoBotao: "ENTRAR"
+                              return Form(
+                                  key: _chaveFormulario,
+                                  child: Column(
+                                    children: [
+                                      SizedBox(
+                                        height: 236,
+                                        child: Column(
+                                          children: [
+                                            Container(
+                                              padding: EdgeInsets.all(32),
+                                              child: CampoDeTextoComIcone(
+                                                texto: "Usuário ou código",
+                                                icone: Icon(Icons.person, color: PaletaDeCor.AZUL_ESCURO),
+                                                cor: PaletaDeCor.AZUL_ESCURO,
+                                                campoDeSenha: false,
+                                                controller: _usuarioController,
+                                                regraDeValidacao: (texto){
+                                                  if(texto.isEmpty)
+                                                    return "Este campo é obrigatório";
+                                                  return null;
+                                                },
+                                              ),
+                                            ),
+                                            Container(
+                                              padding: EdgeInsets.symmetric(horizontal: 32),
+                                              child: CampoDeTextoComIcone(
+                                                texto: "Senha",
+                                                icone: Icon(Icons.lock, color: PaletaDeCor.AZUL_ESCURO),
+                                                cor: PaletaDeCor.AZUL_ESCURO,
+                                                campoDeSenha: true,
+                                                controller: _senhaController,
+                                                regraDeValidacao: (texto){
+                                                  if(texto.isEmpty)
+                                                    return "Este campo é obrigatório";
+                                                  return null;
+                                                },
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Container(
+                                        padding: EdgeInsets.all(32),
+                                        child: Column(
+                                          children: [
+                                            GestureDetector(
+                                                onTap: (){
+                                                  if(_chaveFormulario.currentState.validate()){
+                                                    model.logar(
+                                                        email: _usuarioController.text,
+                                                        senha: _senhaController.text,
+                                                        onSuccess: _logarUsuario,
+                                                        onFail: _informarErroDeLogin
+                                                    );
+                                                  }
+                                                },
+                                                child: BotaoArredondado(
+                                                    textoDoBotao: "ENTRAR"
+                                                )
+                                            ),
+                                            SizedBox(height: 10),
+                                            GestureDetector(
+                                                onTap: (){
+                                                  setState(() {
+                                                    FocusScope.of(context).unfocus();// Remover foco do campo atual
+                                                    _estadoDaPagina = EstadoDaPaginaDeLogin.esqueciASenha;
+                                                  });
+                                                },
+                                                child: BotaoSemPreenchimento(
+                                                    textoDoBotao:"ESQUECI A SENHA"
+                                                )
+                                            )
+                                          ],
+                                        ),
                                       )
-                                  ),
-                                )
-                              ],
-                            )
-                        );
-                      }
+                                    ],
+                                  )
+                              );
+                            }
+                        )
+                      ],
                     ),
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 32),
-                      child: GestureDetector(
-                          onTap: (){
-                            setState(() {
-                              _estadoDaPagina = EstadoDaPaginaDeLogin.esqueciASenha;
-                            });
-                          },
-                          child: BotaoSemPreenchimento(
-                              textoDoBotao:"ESQUECI A SENHA"
-                          )
-                      ),
-                    )
-                  ],
+                  ),
                 ),
-              ),
-            AnimatedContainer(
+                AnimatedContainer(
                   curve: Curves.fastLinearToSlowEaseIn,
                   duration: Duration(
                       milliseconds: 1000
@@ -265,7 +284,7 @@ class _TelaDeLoginState extends State<TelaDeLogin> {
                               "Recuperar senha",
                               style: TextStyle(
                                   fontSize: 20,
-                                fontWeight: FontWeight.bold
+                                  fontWeight: FontWeight.bold
                               ),
                             )
                         ),
@@ -297,6 +316,7 @@ class _TelaDeLoginState extends State<TelaDeLogin> {
                         child: GestureDetector(
                             onTap: (){
                               setState(() {
+                                FocusScope.of(context).unfocus();// Remover foco do campo atual
                                 _estadoDaPagina = EstadoDaPaginaDeLogin.login;
                               });
                             },
@@ -307,8 +327,11 @@ class _TelaDeLoginState extends State<TelaDeLogin> {
                       )
                     ],
                   ),
-              )
-          ],
+                )
+              ],
+            );
+          }
+        ),
       ),
     );
   }

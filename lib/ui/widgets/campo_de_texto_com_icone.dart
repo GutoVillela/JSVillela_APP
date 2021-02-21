@@ -34,27 +34,23 @@ class _CampoDeTextoComIconeState extends State<CampoDeTextoComIcone> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: Container(
-        //height: 60,
-        child: TextFormField(
-          controller: widget.controller,
-          obscureText: widget.campoDeSenha,
-          obscuringCharacter: '•',
-          enableSuggestions: !widget.campoDeSenha,
-          autocorrect: !widget.campoDeSenha,
-          decoration: InputDecoration(
-            prefixIcon: widget.icone,
-            contentPadding: EdgeInsets.symmetric(vertical: 20),
-            isDense: true,
-            //border: InputBorder.none,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(50)
-              ),
-            hintText: widget.texto
+      child: TextFormField(
+        controller: widget.controller,
+        obscureText: widget.campoDeSenha,
+        obscuringCharacter: '•',
+        enableSuggestions: !widget.campoDeSenha,
+        autocorrect: !widget.campoDeSenha,
+        decoration: InputDecoration(
+          prefixIcon: widget.icone,
+          contentPadding: EdgeInsets.symmetric(vertical: 20),
+          isDense: true,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(50)
           ),
-          validator: widget.regraDeValidacao,
+          hintText: widget.texto
         ),
-      )
+        validator: widget.regraDeValidacao,
+      ),
     );
   }
 }

@@ -14,11 +14,22 @@ class UsuarioModel extends Model{
   User usuario;
 
   /// Mapa contendo informações do usuário logado.
-  Map<String, dynamic> dadosDoUsuario;
+  Map<String, dynamic> dadosDoUsuario = Map();
 
   /// Indica que existe um processo em execução a partir desta classe.
   bool estaCarregando = false;
   //#endregion Atributos
+
+  //#region Constantes
+  /// Nome do identificador para a coleção "usuarios" utilizado no Firebase.
+  static const String NOME_COLECAO = "usuarios";
+
+  /// Nome do identificador para o campo "nome" utilizado na collection do Firebase.
+  static const String CAMPO_NOME = "nome";
+
+  /// Nome do identificador para o campo "ativo" utilizado na collection do Firebase.
+  static const String CAMPO_ATIVO = "ativo";
+  //#endregion Constantes
 
   //#region Métodos
   @override
@@ -54,16 +65,17 @@ class UsuarioModel extends Model{
     });
   }
 
+  ///Carrega as informações do usuário atual a partir do login.
   Future<Null> _carregarUsuarioAtual() async{
     if(usuario == null)
       usuario = _autenticacao.currentUser;
 
-    /*if(usuario != null){
-      if(dadosDoUsuario["name"] == null){
-        DocumentSnapshot docUser = await FirebaseFirestore.instance.collection("users").doc(usuario.uid).get();
+    if(usuario != null){
+      if(dadosDoUsuario[CAMPO_NOME] == null){
+        DocumentSnapshot docUser = await FirebaseFirestore.instance.collection(NOME_COLECAO).doc(usuario.uid).get();
         dadosDoUsuario = docUser.data();
       }
-    }*/
+    }
     notifyListeners();
   }
   //#endregion Métodos

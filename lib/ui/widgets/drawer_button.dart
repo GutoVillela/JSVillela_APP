@@ -34,7 +34,30 @@ class ItemDeMenu extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: (){
+            int pagina;
 
+            switch(_page){
+              case AppPages.inicio:
+                pagina = 0;
+                break;
+              case AppPages.agendarRecolhimento:
+                pagina = 1;
+                break;
+              case AppPages.consultarRecolhimentos:
+                pagina = 2;
+                break;
+              case AppPages.notificacoes:
+                pagina = 3;
+                break;
+              case AppPages.cadastroDeRedeiros:
+                pagina = 4;
+                break;
+              default:
+                pagina = 0;
+                break;
+            }
+            Navigator.of(context).pop();
+            _pageController.jumpToPage(pagina);
           },
           child: Container(
             padding: EdgeInsets.only(left: 20),
