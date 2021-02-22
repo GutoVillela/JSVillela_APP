@@ -14,10 +14,10 @@ class RedeModel extends Model{
   static const String NOME_COLECAO = "rede";
 
   /// Nome do identificador para o campo "nome_rede" utilizado na collection.
-  static const String CAMPO_REDE = "default";
+  static const String CAMPO_REDE = "nome_rede";
 
   /// Nome do identificador para o campo "nome" utilizado na collection do Firebase.
-  static const String CAMPO_VALOR_UNITARIO = "0";
+  static const String CAMPO_VALOR_UNITARIO = "vlr_unitario";
 
     //#region Métodos
   ///Cadastra um redeiro no Firebase.
