@@ -22,6 +22,7 @@ class RedeModel extends Model{
     //#region Métodos
   ///Cadastra um redeiro no Firebase.
   void cadastrarRede({@required Map<String, dynamic> dadosDaRede, @required VoidCallback onSuccess, @required VoidCallback onFail}){
+    print(dadosDaRede[CAMPO_REDE] + ";" + dadosDaRede[CAMPO_VALOR_UNITARIO]);
     FirebaseFirestore.instance.collection(NOME_COLECAO).add({
       CAMPO_REDE : dadosDaRede[CAMPO_REDE],
       CAMPO_VALOR_UNITARIO : dadosDaRede[CAMPO_VALOR_UNITARIO]
