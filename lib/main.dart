@@ -1,6 +1,6 @@
 import 'package:jsvillela_app/models/usuario_model.dart';
 import 'package:flutter/material.dart';
-import 'package:jsvillela_app/ui/tela_de_login.dart';
+import 'package:jsvillela_app/ui/tela_cadastrar_nova_rede.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:firebase_core/firebase_core.dart';
 
@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
           home: Scaffold(
             resizeToAvoidBottomInset: false,
             body: Container(
-              child: TelaDeLogin(),
+              child: TelaCadastrarNovaRede(),
             ),
           )
         )
