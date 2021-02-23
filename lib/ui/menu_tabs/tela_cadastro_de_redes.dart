@@ -62,7 +62,7 @@ class _TelaCadastroDeRedesState extends State<TelaCadastroDeRedes> {
                               itemBuilder: (context, index){
                                 return ListViewItemPesquisa(
                                     textoPrincipal: snapshot.data.docs[index][RedeModel.CAMPO_REDE],
-                                    textoSecundario: snapshot.data.docs[index][RedeModel.CAMPO_VALOR_UNITARIO],
+                                    textoSecundario: "R\$ " + snapshot.data.docs[index][RedeModel.CAMPO_VALOR_UNITARIO].toString(),
                                     iconeEsquerda: Icons.person,
                                     iconeDireita: Icons.search
                                 );

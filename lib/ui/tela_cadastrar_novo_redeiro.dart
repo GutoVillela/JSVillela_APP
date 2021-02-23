@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jsvillela_app/models/redeiro_model.dart';
 import 'package:jsvillela_app/ui/widgets/list_view_item_pesquisa.dart';
+import 'package:jsvillela_app/ui/widgets/tela_busca_grupos_de_redeiros.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
@@ -130,7 +131,12 @@ class _TelaCadastrarNovoRedeiroState extends State<TelaCadastrarNovoRedeiro> {
                     iconeEsquerda: Icons.people_sharp,
                     iconeDireita: Icons.arrow_forward_ios_sharp,
                     acaoAoClicar: (){
-
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context){
+                            return TelaBuscaGruposDeRedeiros();
+                        }
+                      );
                     },
                   ),
                   SizedBox(height: 20),
