@@ -25,54 +25,63 @@ class _TelaCadastroDeRedeirosState extends State<TelaCadastroDeRedeiros> {
       child:
       LayoutBuilder(
           builder: (context, constraints){
-            return Column(
-              children: [
-                Container(
-                  padding: EdgeInsets.all(12),
-                  child: CampoDeTextoComIcone(
-                    texto: "Nome do redeiro",
-                    icone: Icon(Icons.search, color: PaletaDeCor.AZUL_ESCURO),
-                    cor: PaletaDeCor.AZUL_ESCURO,
-                    campoDeSenha: false,
-                    controller: _buscaController,
-                    regraDeValidacao: (texto){
-                      return null;
-                    },
+            return Container(
+              height: constraints.maxHeight,
+              child: Column(
+                children: [
+                  Container(
+                    color: Colors.white,
+                    padding: EdgeInsets.all(12),
+                    child: CampoDeTextoComIcone(
+                      texto: "Nome do redeiro",
+                      icone: Icon(Icons.search, color: PaletaDeCor.AZUL_ESCURO),
+                      cor: PaletaDeCor.AZUL_ESCURO,
+                      campoDeSenha: false,
+                      controller: _buscaController,
+                      regraDeValidacao: (texto){
+                        return null;
+                      },
+                    ),
                   ),
-                ),
-                FutureBuilder<QuerySnapshot>(
-                future: FirebaseFirestore.instance.collection(RedeiroModel.NOME_COLECAO).orderBy(RedeiroModel.CAMPO_NOME).get(),
-                builder: (context, snapshot){
-                  if(!snapshot.hasData)
-                    return Container(
-                      height: 200,
-                      alignment: Alignment.center,
-                      child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
-                      ),
-                    );
-                  else{
-                    return Container(
-                      padding: EdgeInsets.all(10),
-                      child: ListView.builder(
-                          scrollDirection: Axis.vertical,
-                          shrinkWrap: true,
-                          padding: EdgeInsets.only(top: 10),
-                          itemCount: snapshot.data.docs.length,
-                          itemBuilder: (context, index){
-                            return ListViewItemPesquisa(
-                              textoPrincipal: snapshot.data.docs[index][RedeiroModel.CAMPO_NOME],
-                              textoSecundario: "",
-                              iconeEsquerda: Icons.person,
-                              iconeDireita: Icons.search
-                            );
-                          }
-                      ),
-                    );
-                  }
-                },
-              )
-              ]
+                  FutureBuilder<QuerySnapshot>(
+                  future: FirebaseFirestore.instance.collection(RedeiroModel.NOME_COLECAO).orderBy(RedeiroModel.CAMPO_NOME).get(),
+                  builder: (context, snapshot){
+                    if(!snapshot.hasData)
+                      return Container(
+                        height: 200,
+                        alignment: Alignment.center,
+                        child: CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
+                        ),
+                      );
+                    else{
+                      return Expanded(
+                        child: Container(
+                          padding: EdgeInsets.all(10),
+                          child: ListView.builder(
+                              scrollDirection: Axis.vertical,
+                              shrinkWrap: true,
+                              padding: EdgeInsets.only(top: 10),
+                              itemCount: snapshot.data.docs.length,
+                              itemBuilder: (context, index){
+                                return ListViewItemPesquisa(
+                                  textoPrincipal: snapshot.data.docs[index][RedeiroModel.CAMPO_NOME],
+                                  textoSecundario: snapshot.data.docs[index][RedeiroModel.CAMPO_ENDERECO],
+                                  iconeEsquerda: Icons.person,
+                                  iconeDireita: Icons.search,
+                                  acaoAoClicar: (){
+
+                                  },
+                                );
+                              }
+                          ),
+                        ),
+                      );
+                    }
+                  },
+                )
+                ]
+              ),
             );
           },
         )

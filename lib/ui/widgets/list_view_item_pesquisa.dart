@@ -28,18 +28,26 @@ class ListViewItemPesquisa extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(bottom: 10),
-      child: ListTile(
-        contentPadding: EdgeInsets.all(10),
-        tileColor: PaletaDeCor.AZUL_MARINHO,
-        leading: Icon(iconeEsquerda, color: Theme.of(context).primaryColor),
-        title: Text(
-            textoPrincipal,
-          style: TextStyle(
-            fontWeight: FontWeight.bold
+      child: Ink(
+        color: PaletaDeCor.AZUL_MARINHO,
+        child: ListTile(
+          contentPadding: EdgeInsets.all(10),
+          //tileColor: PaletaDeCor.AZUL_MARINHO,
+          leading: Icon(
+              iconeEsquerda,
+              color: Theme.of(context).primaryColor,
+            size: 40,
           ),
+          title: Text(
+              textoPrincipal,
+            style: TextStyle(
+              fontWeight: FontWeight.bold
+            ),
+          ),
+          subtitle: Text(textoSecundario),
+          trailing: Icon(iconeDireita, color: Theme.of(context).primaryColor),
+          onTap: acaoAoClicar
         ),
-        trailing: Icon(iconeDireita, color: Theme.of(context).primaryColor),
-        onTap: acaoAoClicar
       ),
     );
   }
