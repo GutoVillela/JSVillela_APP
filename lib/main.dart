@@ -1,5 +1,7 @@
 import 'package:jsvillela_app/models/usuario_model.dart';
 import 'package:flutter/material.dart';
+import 'package:jsvillela_app/ui/menu_tabs/tela_cadastro_de_mat_prima.dart';
+import 'package:jsvillela_app/ui/menu_tabs/tela_cadastro_de_redeiros.dart';
 import 'package:jsvillela_app/ui/menu_tabs/tela_cadastro_de_redes.dart';
 import 'package:jsvillela_app/ui/tela_cadastrar_nova_rede.dart';
 import 'package:jsvillela_app/ui/tela_cadastrar_novo_redeiro.dart';
@@ -31,7 +33,7 @@ class MyApp extends StatelessWidget {
           home: Scaffold(
             resizeToAvoidBottomInset: false,
             body: Container(
-              child: TelaDeLogin(),
+              child: TelaCadastroDeMateriaPrima(),
             ),
           )
         )
