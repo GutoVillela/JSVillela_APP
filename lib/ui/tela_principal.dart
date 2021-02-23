@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:jsvillela_app/ui/menu_tabs/home_tab.dart';
 import 'package:jsvillela_app/ui/menu_tabs/tela_agendar_recolhimento.dart';
+import 'package:jsvillela_app/ui/menu_tabs/tela_cadastro_de_redes.dart';
 import 'package:jsvillela_app/ui/menu_tabs/tela_consultar_recolhimento.dart';
 import 'package:jsvillela_app/ui/menu_tabs/tela_notificacoes.dart';
+import 'package:jsvillela_app/ui/tela_cadastrar_nova_rede.dart';
 import 'package:jsvillela_app/ui/widgets/custom_drawer.dart';
 import 'package:jsvillela_app/ui/tela_cadastrar_novo_redeiro.dart';
 
@@ -18,6 +20,9 @@ class _TelaPrincipalState extends State<TelaPrincipal> {
   //#region Constantes
   /// Constante que define o nome do botão para a ação de Cadastrar novo Redeiro na barra de ações.
   static const String OPCAO_CADASTRAR_REDEIRO = "Cadastrar novo redeiro";
+
+  /// Constante que define o nome do botão para a ação de Cadastrar nova Rede na barra de ações.
+  static const String OPCAO_CADASTRAR_REDE = "Cadastrar nova rede";
   //#endregion Constantes
 
   //#region Atributos
@@ -25,8 +30,11 @@ class _TelaPrincipalState extends State<TelaPrincipal> {
   ///Page controller usado para alternar páginas dentro do aplicativo.
   final _homeScreenPageController = PageController();
 
-  /// Lista contento as opções que serão exibidas na barra de ação.
-  final List<String> opcoesListaDeAcao = [OPCAO_CADASTRAR_REDEIRO];
+  /// Lista contento as opções que serão exibidas na barra de ação da tela "Cadastro de Redeiros".
+  final List<String> opcoesListaDeAcaoTelaCadastroRedeiros = [OPCAO_CADASTRAR_REDEIRO];
+
+  /// Lista contento as opções que serão exibidas na barra de ação da tela "Cadastro de Redes".
+  final List<String> opcoesListaDeAcaoTelaCadastroRedes = [OPCAO_CADASTRAR_REDE];
 
   //#endregion Atributos
 
@@ -79,7 +87,7 @@ class _TelaPrincipalState extends State<TelaPrincipal> {
                       }
                     },
                     itemBuilder: (BuildContext context) {
-                      return opcoesListaDeAcao.map((e) => PopupMenuItem<String>(
+                      return opcoesListaDeAcaoTelaCadastroRedeiros.map((e) => PopupMenuItem<String>(
                           value: e,
                           child: Text(e)
                       )).toList();
@@ -89,6 +97,59 @@ class _TelaPrincipalState extends State<TelaPrincipal> {
             ),
             drawer: CustomDrawer(_homeScreenPageController),
             body: TelaCadastroDeRedeiros()
+        ),
+        Scaffold(
+            appBar: AppBar(
+              title: Text("GRUPO DE REDEIROS"),
+              centerTitle: true,
+            ),
+            drawer: CustomDrawer(_homeScreenPageController),
+            body: TelaAgendarRecolhimento()
+        ),
+        Scaffold(
+            appBar: AppBar(
+              title: Text("SOLICITAÇÕES DOS REDEIROS"),
+              centerTitle: true,
+            ),
+            drawer: CustomDrawer(_homeScreenPageController),
+            body: TelaAgendarRecolhimento()
+        ),
+        Scaffold(
+            appBar: AppBar(
+              title: Text("CADASTRO DE MATÉRIA-PRIMA"),
+              centerTitle: true,
+            ),
+            drawer: CustomDrawer(_homeScreenPageController),
+            body: TelaAgendarRecolhimento()
+        ),
+        Scaffold(
+            appBar: AppBar(
+              title: Text("CADASTRO DE REDES"),
+              centerTitle: true,
+              actions: [
+                PopupMenuButton<String>(
+                    onSelected: (opcaoSelecionada){
+                      print(opcaoSelecionada);
+                      // Quando a opção de "Cadastrar nova rede" é selecionada na barra ação
+                      if(opcaoSelecionada == OPCAO_CADASTRAR_REDE){
+                        Navigator.of(context).push(
+                            MaterialPageRoute(builder: (context) => TelaCadastrarNovaRede())
+                        ).then((value){
+                          setState(() {});// Atualizar estado da tela para recarregar as redes após cadastro.
+                        });
+                      }
+                    },
+                    itemBuilder: (BuildContext context) {
+                      return opcoesListaDeAcaoTelaCadastroRedes.map((e) => PopupMenuItem<String>(
+                          value: e,
+                          child: Text(e)
+                      )).toList();
+                    }
+                )
+              ],
+            ),
+            drawer: CustomDrawer(_homeScreenPageController),
+            body: TelaCadastroDeRedes()
         ),
       ],
     );

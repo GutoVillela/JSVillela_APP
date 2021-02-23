@@ -40,7 +40,7 @@ class _TelaCadastrarNovaRedeState extends State<TelaCadastrarNovaRede> {
                     TextFormField(
                       controller: _nomeRedeController,
                       decoration: InputDecoration(
-                          prefixIcon: Icon(Icons.add_box_outlined),
+                          prefixIcon: Icon(Icons.grid_on),
                           contentPadding: EdgeInsets.symmetric(vertical: 20),
                           isDense: true,
                           border: OutlineInputBorder(),

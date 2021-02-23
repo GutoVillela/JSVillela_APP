@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
           home: Scaffold(
             resizeToAvoidBottomInset: false,
             body: Container(
-              child: TelaCadastroDeRedes(),
+              child: TelaDeLogin(),
             ),
           )
         )

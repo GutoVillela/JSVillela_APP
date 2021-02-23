@@ -25,6 +25,9 @@ class RedeiroModel extends Model{
   /// Nome do identificador para o campo "whatsapp" utilizado na collection do Firebase.
   static const String CAMPO_WHATSAPP = "whatsapp";
 
+  /// Nome do identificador para o campo "endereco" utilizado na collection do Firebase.
+  static const String CAMPO_ENDERECO = "endereco";
+
   /// Nome do identificador para o campo "ativo" utilizado na collection do Firebase.
   static const String CAMPO_ATIVO = "ativo";
   //#endregion Constantes
@@ -37,6 +40,7 @@ class RedeiroModel extends Model{
       CAMPO_CELULAR : dadosDoRedeiro[CAMPO_CELULAR],
       CAMPO_EMAIL : dadosDoRedeiro[CAMPO_EMAIL],
       CAMPO_WHATSAPP : dadosDoRedeiro[CAMPO_WHATSAPP],
+      CAMPO_ENDERECO : dadosDoRedeiro[CAMPO_ENDERECO],
       CAMPO_ATIVO : dadosDoRedeiro[CAMPO_ATIVO]
     }).then((value) => onSuccess()).catchError((e){
       onFail();
