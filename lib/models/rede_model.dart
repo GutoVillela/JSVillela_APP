@@ -2,20 +2,20 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:scoped_model/scoped_model.dart';
 
-/// Model para redeiros.
+/// Model para rede.
 class RedeModel extends Model{
 
   //#region Atributos
   //#endregion Atributos
 
   //#region Constantes
-  /// Nome do identificador para a coleção "redeiros" utilizado no Firebase.
+  /// Nome do identificador para a coleção "redes" utilizado no Firebase.
   static const String NOME_COLECAO = "redes";
 
   /// Nome do identificador para o campo "nome_rede" utilizado na collection.
   static const String CAMPO_REDE = "nome_rede";
 
-  /// Nome do identificador para o campo "nome" utilizado na collection do Firebase.
+  /// Nome do identificador para o campo "vlr_unitario" utilizado na collection do Firebase.
   static const String CAMPO_VALOR_UNITARIO = "vlr_unitario";
 
   //#region Métodos
