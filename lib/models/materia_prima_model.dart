@@ -2,15 +2,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:scoped_model/scoped_model.dart';
 
-/// Model para materias primas.
+/// Model para matérias-primas.
 class MateriaPrimaModel extends Model{
 
   //#region Atributos
   //#endregion Atributos
 
   //#region Constantes
-  /// Nome do identificador para a coleção "materia_prima" utilizado no Firebase.
-  static const String NOME_COLECAO = "materia_prima";
+  /// Nome do identificador para a coleção "materias_primas" utilizado no Firebase.
+  static const String NOME_COLECAO = "materias_primas";
 
   /// Nome do identificador para o campo "nome_materia_prima" utilizado na collection.
   static const String CAMPO_NM_MAT_PRIMA = "nome_materia_prima";

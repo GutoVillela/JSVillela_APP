@@ -52,8 +52,23 @@ class ItemDeMenu extends StatelessWidget {
               case AppPages.cadastroDeRedeiros:
                 pagina = 4;
                 break;
+              case AppPages.gruposDeRedeiros:
+                pagina = 5;
+                break;
+              case AppPages.solicitacoesDosRedeiros:
+                pagina = 6;
+                break;
+              case AppPages.cadastroDeMateriaPrima:
+                pagina = 7;
+                break;
               case AppPages.cadastroDeRedes:
                 pagina = 8;
+                break;
+              case AppPages.relatorios:
+                pagina = 9;
+                break;
+              case AppPages.preferencias:
+                pagina = 10;
                 break;
               default:
                 pagina = 0;

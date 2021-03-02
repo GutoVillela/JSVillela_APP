@@ -8,6 +8,8 @@ class TelaCadastrarMateriaPrima extends StatefulWidget {
 }
 
 class _TelaCadastrarMateriaPrimaState extends State<TelaCadastrarMateriaPrima> {
+
+  //#region Atributos
   /// Chave global para o formulário de cadastro.
   final _formKey = GlobalKey<FormState>();
 
@@ -19,6 +21,7 @@ class _TelaCadastrarMateriaPrimaState extends State<TelaCadastrarMateriaPrima> {
 
   ///Controller utilizado no campo de texto "Icone".
   final _iconeController = TextEditingController();
+  //#endregion Atributos
 
   @override
   Widget build(BuildContext context) {

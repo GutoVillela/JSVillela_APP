@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:jsvillela_app/models/checklist_item_model.dart';
+import 'package:jsvillela_app/models/grupo_de_redeiros_model.dart';
 import 'package:jsvillela_app/models/redeiro_model.dart';
 import 'package:jsvillela_app/ui/widgets/list_view_item_pesquisa.dart';
 import 'package:jsvillela_app/ui/widgets/tela_busca_grupos_de_redeiros.dart';
@@ -33,7 +35,11 @@ class _TelaCadastrarNovoRedeiroState extends State<TelaCadastrarNovoRedeiro> {
 
   /// Define se usuário marcou a checkbox "WhatsApp" para este redeiro.
   bool _whatsApp = true;
+
+  /// Model de CheckListItem usado para demarcar os grupos de redeiros selecionados.
+  List<Map> gruposDeRedeiros = new List<Map>();
   //#endregion Atributos
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -127,16 +133,24 @@ class _TelaCadastrarNovoRedeiroState extends State<TelaCadastrarNovoRedeiro> {
                   SizedBox(height: 20),
                   ListViewItemPesquisa(
                     textoPrincipal: "Grupo do Redeiro",
-                    textoSecundario: "Nenhum grupo selecionado",
+                    textoSecundario: gruposDeRedeiros == null || gruposDeRedeiros.isEmpty ?
+                    "Nenhum grupo selecionado" :
+                    gruposDeRedeiros.first[GrupoDeRedeirosModel.CAMPO_NOME] +
+                        (gruposDeRedeiros.length - 1 == 0 ? "" : " e mais ${gruposDeRedeiros.length - 1}."),
                     iconeEsquerda: Icons.people_sharp,
                     iconeDireita: Icons.arrow_forward_ios_sharp,
                     acaoAoClicar: (){
                       showDialog(
                         context: context,
                         builder: (BuildContext context){
-                            return TelaBuscaGruposDeRedeiros();
+                            return TelaBuscaGruposDeRedeiros(gruposJaSelecionados: gruposDeRedeiros);
                         }
-                      );
+                      ).then((gruposSelecionados) {
+                        setState(() {
+                          if(gruposSelecionados != null)
+                            gruposDeRedeiros = gruposSelecionados;
+                        });
+                      });
                     },
                   ),
                   SizedBox(height: 20),
@@ -158,7 +172,9 @@ class _TelaCadastrarNovoRedeiroState extends State<TelaCadastrarNovoRedeiro> {
                               RedeiroModel.CAMPO_CELULAR : _celularController.text,
                               RedeiroModel.CAMPO_EMAIL : _emailController.text,
                               RedeiroModel.CAMPO_WHATSAPP : _whatsApp,
+                              RedeiroModel.CAMPO_ENDERECO : _enderecoController.text,
                               RedeiroModel.CAMPO_ATIVO : true,
+                              RedeiroModel.SUBCOLECAO_GRUPOS : gruposDeRedeiros
                             };
 
                             model.cadastrarRedeiro(
