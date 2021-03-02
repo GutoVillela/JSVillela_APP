@@ -30,6 +30,9 @@ class RedeiroModel extends Model{
 
   /// Nome do identificador para o campo "ativo" utilizado na collection do Firebase.
   static const String CAMPO_ATIVO = "ativo";
+
+  /// Nome do identificador para a subcoleção "grupos" utilizado na collection do Firebase.
+  static const String SUBCOLECAO_GRUPOS = "grupos_do_redeiro";
   //#endregion Constantes
 
   //#region Métodos
@@ -41,7 +44,8 @@ class RedeiroModel extends Model{
       CAMPO_EMAIL : dadosDoRedeiro[CAMPO_EMAIL],
       CAMPO_WHATSAPP : dadosDoRedeiro[CAMPO_WHATSAPP],
       CAMPO_ENDERECO : dadosDoRedeiro[CAMPO_ENDERECO],
-      CAMPO_ATIVO : dadosDoRedeiro[CAMPO_ATIVO]
+      CAMPO_ATIVO : dadosDoRedeiro[CAMPO_ATIVO],
+      SUBCOLECAO_GRUPOS : dadosDoRedeiro[SUBCOLECAO_GRUPOS]
     }).then((value) => onSuccess()).catchError((e){
       onFail();
     });

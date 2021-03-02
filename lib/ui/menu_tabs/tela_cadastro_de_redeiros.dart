@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:jsvillela_app/infra/paleta_de_cores.dart';
 import 'package:jsvillela_app/models/redeiro_model.dart';
+import 'package:jsvillela_app/ui/tela_informacoes_do_redeiro.dart';
 import 'package:jsvillela_app/ui/widgets/campo_de_texto_com_icone.dart';
 import 'package:jsvillela_app/ui/widgets/list_view_item_pesquisa.dart';
 
@@ -70,7 +71,9 @@ class _TelaCadastroDeRedeirosState extends State<TelaCadastroDeRedeiros> {
                                   iconeEsquerda: Icons.person,
                                   iconeDireita: Icons.search,
                                   acaoAoClicar: (){
-
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(builder: (context) => TelaInformacoesDoRedeiro(snapshot.data.docs[index]))
+                                    );
                                   },
                                 );
                               }

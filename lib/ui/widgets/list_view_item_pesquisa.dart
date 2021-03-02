@@ -29,7 +29,7 @@ class ListViewItemPesquisa extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.only(bottom: 10),
       child: Ink(
-        color: PaletaDeCor.AZUL_MARINHO,
+        color: PaletaDeCor.AZUL_BEM_CLARO,
         child: ListTile(
           contentPadding: EdgeInsets.all(10),
           //tileColor: PaletaDeCor.AZUL_MARINHO,

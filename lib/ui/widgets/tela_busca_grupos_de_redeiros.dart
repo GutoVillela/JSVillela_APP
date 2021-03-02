@@ -1,10 +1,26 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:jsvillela_app/infra/paleta_de_cores.dart';
+import 'package:jsvillela_app/models/checklist_item_model.dart';
 import 'package:jsvillela_app/models/grupo_de_redeiros_model.dart';
+import 'package:jsvillela_app/ui/widgets/checklist_item.dart';
 import 'campo_de_texto_com_icone.dart';
 import 'list_view_item_pesquisa.dart';
 
 class TelaBuscaGruposDeRedeiros extends StatefulWidget {
+
+  //#region Atributos
+
+  /// Define quais são os grupos que já serão marcados por padrão.
+  List<Map> gruposJaSelecionados = List<Map>();
+  //#endregion Atributos
+
+  //#region Contrutor(es)
+  TelaBuscaGruposDeRedeiros({@required this.gruposJaSelecionados});
+  //#endregion Contrutor(es)
+
   @override
   _TelaBuscaGruposDeRedeirosState createState() => _TelaBuscaGruposDeRedeirosState();
 }
@@ -16,6 +32,8 @@ class _TelaBuscaGruposDeRedeirosState extends State<TelaBuscaGruposDeRedeiros> {
   /// Controller utilizado no campo de texto de Busca.
   final _buscaController = TextEditingController();
 
+  /// Model de CheckListItem usado para demarcar os grupos de redeiros selecionados.
+  List<CheckListItemModel> gruposDeRedeiros = List<CheckListItemModel>();
   //#endregion Atributos
 
   @override
@@ -80,36 +98,81 @@ class _TelaBuscaGruposDeRedeirosState extends State<TelaBuscaGruposDeRedeiros> {
                               ),
                             );
                           else{
+
+                            // Limpar e popular lista de Grupos de Redeiros
+                            gruposDeRedeiros = [];
+                            snapshot.data.docs.forEach((grupo) {
+
+                              bool checarGrupo = widget.gruposJaSelecionados != null &&
+                                  widget.gruposJaSelecionados.isNotEmpty &&
+                                  widget.gruposJaSelecionados.any((elemento) => elemento['id'].toString() == grupo.id);
+
+                              gruposDeRedeiros.add(CheckListItemModel(
+                                  texto: grupo[GrupoDeRedeirosModel.CAMPO_NOME],
+                                  checado: checarGrupo,
+                                  id: grupo.id)
+                              );
+                            });
+
                             return Expanded(
                               child: Container(
                                 padding: EdgeInsets.all(10),
-                                child: ListView.builder(
+                                child: ListView(
                                     scrollDirection: Axis.vertical,
                                     shrinkWrap: true,
                                     padding: EdgeInsets.only(top: 10),
-                                    itemCount: snapshot.data.docs.length,
-                                    itemBuilder: (context, index){
-                                      return ListViewItemPesquisa(
-                                        textoPrincipal: snapshot.data.docs[index][GrupoDeRedeirosModel.CAMPO_NOME],
-                                        textoSecundario: "",
-                                        iconeEsquerda: Icons.people_sharp,
-                                        iconeDireita: Icons.search,
-                                        acaoAoClicar: (){
-
-                                        },
-                                      );
-                                    }
+                                    children: [
+                                      ...gruposDeRedeiros.map((item) => ChecklistItem(
+                                          checkListItemModel: item
+                                      )).toList()
+                                    ],
                                 ),
                               ),
                             );
                           }
                         },
                       ),
-                      FlatButton(
-                          onPressed: (){
-                            
-                          },
-                          child: Text("Concluir")
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          FlatButton(
+                            onPressed: (){
+                              Navigator.of(context).pop();
+                            },
+                            child: Text(
+                              "Cancelar",
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold
+                              ),
+                            ),
+                            color: Colors.red,
+                          ),
+                          SizedBox(width: 10),
+                          FlatButton(
+                            color: Theme.of(context).primaryColor,
+                              onPressed: (){
+                                List<Map> gruposChecados = new List<Map>();
+                                gruposDeRedeiros.forEach((grupo) {
+                                  if(grupo.checado){
+                                    Map novoItem = new Map();
+                                    novoItem['id'] = grupo.id;
+                                    novoItem[GrupoDeRedeirosModel.CAMPO_NOME] = grupo.texto;
+                                    gruposChecados.add(novoItem);
+                                  }
+                                });
+
+                                Navigator.of(context).pop(gruposChecados);
+                              },
+                              child: Text(
+                                  "Concluir",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold
+                                  ),
+                              )
+                          )
+                        ],
                       )
                     ],
                   ),

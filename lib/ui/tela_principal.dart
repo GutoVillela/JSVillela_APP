@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:jsvillela_app/ui/menu_tabs/home_tab.dart';
 import 'package:jsvillela_app/ui/menu_tabs/tela_agendar_recolhimento.dart';
+import 'package:jsvillela_app/ui/menu_tabs/tela_cadastro_de_mat_prima.dart';
 import 'package:jsvillela_app/ui/menu_tabs/tela_cadastro_de_redes.dart';
 import 'package:jsvillela_app/ui/menu_tabs/tela_consultar_recolhimento.dart';
 import 'package:jsvillela_app/ui/menu_tabs/tela_notificacoes.dart';
+import 'package:jsvillela_app/ui/tela_cadastrar_nova_materia_prima.dart';
 import 'package:jsvillela_app/ui/tela_cadastrar_nova_rede.dart';
 import 'package:jsvillela_app/ui/widgets/custom_drawer.dart';
 import 'package:jsvillela_app/ui/tela_cadastrar_novo_redeiro.dart';
@@ -23,6 +25,9 @@ class _TelaPrincipalState extends State<TelaPrincipal> {
 
   /// Constante que define o nome do botão para a ação de Cadastrar nova Rede na barra de ações.
   static const String OPCAO_CADASTRAR_REDE = "Cadastrar nova rede";
+
+  /// Constante que define o nome do botão para a ação de Cadastrar nova Matéria-Prima na barra de ações.
+  static const String OPCAO_CADASTRAR_MATERIA_PRIMA = "Cadastrar nova matéria-prima";
   //#endregion Constantes
 
   //#region Atributos
@@ -35,6 +40,9 @@ class _TelaPrincipalState extends State<TelaPrincipal> {
 
   /// Lista contento as opções que serão exibidas na barra de ação da tela "Cadastro de Redes".
   final List<String> opcoesListaDeAcaoTelaCadastroRedes = [OPCAO_CADASTRAR_REDE];
+
+  /// Lista contento as opções que serão exibidas na barra de ação da tela "Cadastro de Matéria-Prima".
+  final List<String> opcoesListaDeAcaoTelaCadastroMateriaPrima = [OPCAO_CADASTRAR_MATERIA_PRIMA];
 
   //#endregion Atributos
 
@@ -118,9 +126,30 @@ class _TelaPrincipalState extends State<TelaPrincipal> {
             appBar: AppBar(
               title: Text("CADASTRO DE MATÉRIA-PRIMA"),
               centerTitle: true,
+              actions: [
+                PopupMenuButton<String>(
+                    onSelected: (opcaoSelecionada){
+                      print(opcaoSelecionada);
+                      // Quando a opção de "Cadastrar nova matéria-prima" é selecionada na barra ação
+                      if(opcaoSelecionada == OPCAO_CADASTRAR_MATERIA_PRIMA){
+                        Navigator.of(context).push(
+                            MaterialPageRoute(builder: (context) => TelaCadastrarMateriaPrima())
+                        ).then((value){
+                          setState(() {});// Atualizar estado da tela para recarregar as matérias-primas após cadastro.
+                        });
+                      }
+                    },
+                    itemBuilder: (BuildContext context) {
+                      return opcoesListaDeAcaoTelaCadastroMateriaPrima.map((e) => PopupMenuItem<String>(
+                          value: e,
+                          child: Text(e)
+                      )).toList();
+                    }
+                )
+              ],
             ),
             drawer: CustomDrawer(_homeScreenPageController),
-            body: TelaAgendarRecolhimento()
+            body: TelaCadastroDeMateriaPrima()
         ),
         Scaffold(
             appBar: AppBar(

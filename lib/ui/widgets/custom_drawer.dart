@@ -30,7 +30,7 @@ class CustomDrawer extends StatelessWidget {
             children: [
               Container(
                 padding: EdgeInsets.all(32),
-                color: PaletaDeCor.AZUL_MARINHO,
+                color: PaletaDeCor.AZUL_BEM_CLARO,
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
