@@ -9,6 +9,7 @@ import 'package:jsvillela_app/ui/tela_cadastrar_nova_materia_prima.dart';
 import 'package:jsvillela_app/ui/tela_cadastrar_nova_rede.dart';
 import 'package:jsvillela_app/ui/widgets/custom_drawer.dart';
 import 'package:jsvillela_app/ui/tela_cadastrar_novo_redeiro.dart';
+import 'package:jsvillela_app/ui/tela_consultar_solicitacoes_redeiros.dart';
 
 import 'menu_tabs/tela_cadastro_de_redeiros.dart';
 
@@ -28,6 +29,10 @@ class _TelaPrincipalState extends State<TelaPrincipal> {
 
   /// Constante que define o nome do botão para a ação de Cadastrar nova Matéria-Prima na barra de ações.
   static const String OPCAO_CADASTRAR_MATERIA_PRIMA = "Cadastrar nova matéria-prima";
+
+  /// Constante que define o nome do botão para a ação de Consultar as Solicitações dos Redeiros na barra de ações.
+  static const String OPCAO_SOLICITACOES_DOS_REDEIROS = "Solicitações dos Redeiros";
+
   //#endregion Constantes
 
   //#region Atributos
@@ -43,6 +48,9 @@ class _TelaPrincipalState extends State<TelaPrincipal> {
 
   /// Lista contento as opções que serão exibidas na barra de ação da tela "Cadastro de Matéria-Prima".
   final List<String> opcoesListaDeAcaoTelaCadastroMateriaPrima = [OPCAO_CADASTRAR_MATERIA_PRIMA];
+
+  /// Lista contento as opções que serão exibidas na barra de ação da tela "Cadastro de Matéria-Prima".
+  final List<String> opcoesListaDeAcaoTelaConsultarSolicitacoesRedeiros = [OPCAO_SOLICITACOES_DOS_REDEIROS];
 
   //#endregion Atributos
 
@@ -120,7 +128,7 @@ class _TelaPrincipalState extends State<TelaPrincipal> {
               centerTitle: true,
             ),
             drawer: CustomDrawer(_homeScreenPageController),
-            body: TelaAgendarRecolhimento()
+            body: TelaConsultarSolicitacoesRedeiros()
         ),
         Scaffold(
             appBar: AppBar(
@@ -129,7 +137,6 @@ class _TelaPrincipalState extends State<TelaPrincipal> {
               actions: [
                 PopupMenuButton<String>(
                     onSelected: (opcaoSelecionada){
-                      print(opcaoSelecionada);
                       // Quando a opção de "Cadastrar nova matéria-prima" é selecionada na barra ação
                       if(opcaoSelecionada == OPCAO_CADASTRAR_MATERIA_PRIMA){
                         Navigator.of(context).push(

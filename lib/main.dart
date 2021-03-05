@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:jsvillela_app/ui/menu_tabs/tela_cadastro_de_mat_prima.dart';
 import 'package:jsvillela_app/ui/menu_tabs/tela_cadastro_de_redeiros.dart';
 import 'package:jsvillela_app/ui/menu_tabs/tela_cadastro_de_redes.dart';
+import 'package:jsvillela_app/ui/tela_consultar_solicitacoes_redeiros.dart';
 import 'package:jsvillela_app/ui/tela_cadastrar_nova_rede.dart';
 import 'package:jsvillela_app/ui/tela_cadastrar_novo_redeiro.dart';
 import 'package:jsvillela_app/ui/tela_de_login.dart';
