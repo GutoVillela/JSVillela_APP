@@ -33,6 +33,9 @@ class RedeiroModel extends Model{
 
   /// Nome do identificador para a subcoleção "grupos" utilizado na collection do Firebase.
   static const String SUBCOLECAO_GRUPOS = "grupos_do_redeiro";
+
+  /// Nome do identificador para a subcoleção "caderno" utilizado na collection do Firebase.
+  static const String SUBCOLECAO_CADERNO = "caderno";
   //#endregion Constantes
 
   //#region Métodos

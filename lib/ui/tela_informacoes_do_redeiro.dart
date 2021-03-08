@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:jsvillela_app/infra/paleta_de_cores.dart';
 import 'package:jsvillela_app/models/redeiro_model.dart';
+import 'package:jsvillela_app/ui/tela_caderno_do_redeiro.dart';
 import 'package:jsvillela_app/ui/widgets/botao_quadrado.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -19,78 +20,6 @@ class TelaInformacoesDoRedeiro extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // return Container(
-    //     child: LayoutBuilder(
-    //       builder: (context, constraints){
-    //
-    //         // Pixels de overflow do ícone de Perfil
-    //         double overflowIconePerfil = 50;
-    //
-    //         return Container(
-    //           color: Colors.blue,
-    //           width: constraints.maxWidth,
-    //           height: constraints.maxHeight,
-    //           child: Stack(
-    //             alignment: Alignment.center,
-    //             children: [
-    //               CustomScrollView(
-    //                 slivers: [
-    //                   SliverAppBar(
-    //                     floating: true,
-    //                     snap: true,
-    //                     backgroundColor: Colors.transparent,
-    //                     elevation: 0,
-    //                     flexibleSpace: FlexibleSpaceBar(
-    //                       title: Text(redeiro[RedeiroModel.CAMPO_NOME]),
-    //                       centerTitle: true,
-    //                     ),
-    //                   ),
-    //                   SliverToBoxAdapter(
-    //                     child: Column(
-    //                       children: [
-    //                         Stack(
-    //                           overflow: Overflow.visible,
-    //                           alignment: Alignment.center,
-    //                           children: [
-    //                             Container(
-    //                               height: constraints.maxHeight * .2,
-    //                               color: Colors.grey,
-    //                             ),
-    //                             Positioned(
-    //                               bottom: 0 - overflowIconePerfil,
-    //                                 child: ClipOval(
-    //                                   child: Material(
-    //                                     color: Colors.white,
-    //                                     child: InkWell(
-    //                                       splashColor: Colors.red, // inkwell color
-    //                                       child: SizedBox(
-    //                                           width: constraints.maxWidth * .3,
-    //                                           height: constraints.maxWidth * .3,
-    //                                           child: Icon(
-    //                                               Icons.person,
-    //                                               size: 40,
-    //                                           )
-    //                                       ),
-    //                                     ),
-    //                                   ),
-    //                                 )
-    //                             )
-    //                           ],
-    //                         ),
-    //                         SizedBox(height: overflowIconePerfil + 20),
-    //                         Text(redeiro[RedeiroModel.CAMPO_NOME]),
-    //                         Text(redeiro[RedeiroModel.CAMPO_ENDERECO]),
-    //                       ],
-    //                     ),
-    //                   ),
-    //                 ],
-    //               )
-    //             ],
-    //           ),
-    //         );
-    //       }
-    //     ),
-    // );
 
     return Scaffold(
         extendBodyBehindAppBar: true,
@@ -215,6 +144,9 @@ class TelaInformacoesDoRedeiro extends StatelessWidget {
                           textoSecundario: "",
                           acaoAoClicar: (){
                             //TODO: Implementar ação de VER CADERNO
+                            Navigator.of(context).push(
+                                MaterialPageRoute(builder: (context) => TelaCadernoDoRedeiro(redeiro))
+                            );
                           }
                       ),
                       BotaoQuadrado(
@@ -235,4 +167,5 @@ class TelaInformacoesDoRedeiro extends StatelessWidget {
           }),
         ));
   }
+
 }

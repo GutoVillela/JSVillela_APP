@@ -39,7 +39,6 @@ class _TelaBuscaGruposDeRedeirosState extends State<TelaBuscaGruposDeRedeiros> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      //color: Theme.of(context).primaryColor.withOpacity(.9),
       color: Colors.black12.withOpacity(.6),
       child: LayoutBuilder(
           builder: (context, constraints) {
@@ -53,7 +52,7 @@ class _TelaBuscaGruposDeRedeirosState extends State<TelaBuscaGruposDeRedeiros> {
                   padding: EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(50)
+                    borderRadius: BorderRadius.circular(5)
                   ),
                   child: Column(
                     children: [

@@ -25,6 +25,6 @@ class GrupoDeRedeirosModel extends Model{
       onFail();
     });
   }
-//#endregion Métodos
+  //#endregion Métodos
 
 }
