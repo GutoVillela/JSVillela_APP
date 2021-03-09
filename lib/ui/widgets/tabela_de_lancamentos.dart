@@ -162,8 +162,8 @@ class _TabelaDeLancamentosState extends State<TabelaDeLancamentos> {
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(50)
                     ),
-                    icon: Icon(Icons.access_time_outlined, color: Colors.white),
-                    color: Theme.of(context).primaryColor,
+                    icon: Icon(Icons.attach_money, color: Colors.white),
+                    color: Colors.green[600],
                     height: alturaDoBotao,
                     minWidth: larguraDoBotao,
                     label: Text(

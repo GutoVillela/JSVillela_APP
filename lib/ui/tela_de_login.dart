@@ -8,6 +8,8 @@ import 'package:jsvillela_app/ui/widgets/botao_sem_preenchimento.dart';
 import 'package:jsvillela_app/ui/widgets/campo_de_texto_com_icone.dart';
 import 'package:keyboard_visibility/keyboard_visibility.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:jsvillela_app/infra/preferencias.dart';
 
 class TelaDeLogin extends StatefulWidget {
   @override
@@ -55,6 +57,12 @@ class _TelaDeLoginState extends State<TelaDeLogin> {
 
   /// Chave de Scaffold.
   final _chaveScaffold = GlobalKey<ScaffoldState>();
+
+  /// Define se usuário marcou a checkbox "Lembrar de mim".
+  bool _lembrarDeMim = true;
+
+  /// Define se existe um usuário logado.
+  String usuarioLogado;
   //#endregion Atributos
 
   @override
@@ -183,7 +191,6 @@ class _TelaDeLoginState extends State<TelaDeLogin> {
                                   child: Column(
                                     children: [
                                       SizedBox(
-                                        height: 236,
                                         child: Column(
                                           children: [
                                             Container(
@@ -216,6 +223,19 @@ class _TelaDeLoginState extends State<TelaDeLogin> {
                                                 },
                                               ),
                                             ),
+                                            Container(
+                                              padding: EdgeInsets.symmetric(horizontal: 32),
+                                              child: CheckboxListTile(
+                                                title: Text("Lembrar de mim"),
+                                                //secondary: Icon(Icons.),
+                                                value: _lembrarDeMim,
+                                                onChanged: (bool valor){
+                                                  setState(() {
+                                                    _lembrarDeMim = valor;
+                                                  });
+                                                },
+                                              ),
+                                            )
                                           ],
                                         ),
                                       ),
@@ -249,7 +269,8 @@ class _TelaDeLoginState extends State<TelaDeLogin> {
                                                 child: BotaoSemPreenchimento(
                                                     textoDoBotao:"ESQUECI A SENHA"
                                                 )
-                                            )
+                                            ),
+                                            SizedBox(height: 10)
                                           ],
                                         ),
                                       )
@@ -337,7 +358,7 @@ class _TelaDeLoginState extends State<TelaDeLogin> {
   }
 
   /// É chamado após o usuário ser autenticado com sucesso. Chama a tela principal.
-  void _logarUsuario(){
+  void _logarUsuario() async{
     _chaveScaffold.currentState.showSnackBar(
         SnackBar(
             content: Text("Login efetuado com sucesso!"),
@@ -345,7 +366,10 @@ class _TelaDeLoginState extends State<TelaDeLogin> {
             duration: Duration(seconds: 2))
     );
 
-    //TODO: Efetuar processo de login.
+    // Salvar preferência de "Manter Logado"
+    final SharedPreferences preferencias = await SharedPreferences.getInstance();
+    preferencias.setBool(Preferencias.PREF_MANTER_LOGADO, _lembrarDeMim);
+    Preferencias.manterUsuarioLogado = _lembrarDeMim;
     
     Navigator.pushReplacement(context, MaterialPageRoute(
         builder: (context) => TelaPrincipal())
