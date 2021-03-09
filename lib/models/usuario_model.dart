@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:jsvillela_app/infra/preferencias.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// Model para usuários.
 class UsuarioModel extends Model{
@@ -66,7 +68,7 @@ class UsuarioModel extends Model{
   }
 
   ///Carrega as informações do usuário atual a partir do login.
-  Future<Null> _carregarUsuarioAtual() async{
+  Future<bool> _carregarUsuarioAtual() async{
     if(usuario == null)
       usuario = _autenticacao.currentUser;
 
@@ -75,8 +77,45 @@ class UsuarioModel extends Model{
         DocumentSnapshot docUser = await FirebaseFirestore.instance.collection(NOME_COLECAO).doc(usuario.uid).get();
         dadosDoUsuario = docUser.data();
       }
+
+      final SharedPreferences preferencias = await SharedPreferences.getInstance();
+
+      // Salvar ID do Usuário caso preferência "Manter Usuário Logado" tenha sido selecionada.
+      if(Preferencias.manterUsuarioLogado)
+        preferencias.setString(Preferencias.PREF_USUARIO_LOGADO, usuario.uid);
+      // Senão, remover ID salvo
+      else
+        preferencias.setString(Preferencias.PREF_USUARIO_LOGADO, "");
+
+
     }
     notifyListeners();
+  }
+
+  ///Carrega as informações do usuário atual a partir das informações de login salvas na preferência.
+  Future<bool> autoLogarUsuario() async{
+
+    // Conferir preferências do usuário para então realizar login
+    if(Preferencias.manterUsuarioLogado && Preferencias.idUsuarioLogado != null && Preferencias.idUsuarioLogado.isNotEmpty){
+      DocumentSnapshot docUser = await FirebaseFirestore.instance.collection(NOME_COLECAO).doc(Preferencias.idUsuarioLogado).get();
+      dadosDoUsuario = docUser.data();
+      return Future<bool>.value(true);
+    }
+
+    notifyListeners();
+    return Future<bool>.value(false);
+
+  }
+
+  /// Desloga usuário.
+  void deslogarUsuario() async {
+    dadosDoUsuario = null;
+
+    // Salvar preferência de "Manter Logado" como false após processo de logout
+    final SharedPreferences preferencias = await SharedPreferences.getInstance();
+    preferencias.setBool(Preferencias.PREF_MANTER_LOGADO, false);
+    Preferencias.manterUsuarioLogado = false;
+
   }
   //#endregion Métodos
 

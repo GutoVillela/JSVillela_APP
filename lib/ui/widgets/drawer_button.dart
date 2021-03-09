@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jsvillela_app/infra/enums.dart';
+import 'package:jsvillela_app/models/usuario_model.dart';
+import 'package:jsvillela_app/ui/tela_de_login.dart';
 
 /// Cria um Item de Menu a ser utilizado no Drawer (menu) da aplicação.
 class ItemDeMenu extends StatelessWidget {
@@ -69,6 +71,11 @@ class ItemDeMenu extends StatelessWidget {
                 break;
               case AppPages.preferencias:
                 pagina = 10;
+                break;
+              case AppPages.login:
+                new UsuarioModel().deslogarUsuario();
+                Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (BuildContext context) => TelaDeLogin()), (route) => false);
+                return;
                 break;
               default:
                 pagina = 0;
