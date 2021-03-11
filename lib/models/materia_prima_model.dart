@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:jsvillela_app/infra/preferencias.dart';
 
 /// Model para matérias-primas.
 class MateriaPrimaModel extends Model{
@@ -28,6 +29,39 @@ class MateriaPrimaModel extends Model{
       onFail();
     });
   }
+
+  /// Carrega as mp de forma paginada
+  Future<QuerySnapshot> carregarMpPaginadas(DocumentSnapshot ultimaMp, String filtroPorNome) {
+
+    if(ultimaMp == null)
+      return FirebaseFirestore.instance.collection(NOME_COLECAO)
+          .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
+          .orderBy(CAMPO_NM_MAT_PRIMA).get();
+
+    if(filtroPorNome != null && filtroPorNome.isNotEmpty){
+      if(ultimaMp == null)
+        return FirebaseFirestore.instance.collection(NOME_COLECAO)
+            .orderBy(CAMPO_NM_MAT_PRIMA)
+            .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
+            .where(CAMPO_NM_MAT_PRIMA, isEqualTo: filtroPorNome)
+            .get();
+      else
+        return FirebaseFirestore.instance.collection(NOME_COLECAO)
+            .orderBy(CAMPO_NM_MAT_PRIMA)
+            .startAfterDocument(ultimaMp)
+            .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
+            .where(CAMPO_NM_MAT_PRIMA, isEqualTo: filtroPorNome)
+            .get();
+    }
+
+    return FirebaseFirestore.instance.collection(NOME_COLECAO)
+        .orderBy(CAMPO_NM_MAT_PRIMA)
+        .startAfterDocument(ultimaMp)
+        .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
+        .get();
+  }
+
+
 //#endregion Métodos
 
 }
