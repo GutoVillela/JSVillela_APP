@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:jsvillela_app/infra/paleta_de_cores.dart';
+import 'package:jsvillela_app/dml/grupo_de_redeiros_dmo.dart';
 import 'package:jsvillela_app/models/checklist_item_model.dart';
 import 'package:jsvillela_app/models/grupo_de_redeiros_model.dart';
 import 'package:jsvillela_app/ui/widgets/checklist_item.dart';
@@ -14,7 +14,7 @@ class TelaBuscaGruposDeRedeiros extends StatefulWidget {
   //#region Atributos
 
   /// Define quais são os grupos que já serão marcados por padrão.
-  List<Map> gruposJaSelecionados = List<Map>();
+  List<GrupoDeRedeirosDmo> gruposJaSelecionados = [];
   //#endregion Atributos
 
   //#region Contrutor(es)
@@ -33,7 +33,7 @@ class _TelaBuscaGruposDeRedeirosState extends State<TelaBuscaGruposDeRedeiros> {
   final _buscaController = TextEditingController();
 
   /// Model de CheckListItem usado para demarcar os grupos de redeiros selecionados.
-  List<CheckListItemModel> gruposDeRedeiros = List<CheckListItemModel>();
+  List<CheckListItemModel> gruposDeRedeiros = [];
   //#endregion Atributos
 
   @override
@@ -104,7 +104,7 @@ class _TelaBuscaGruposDeRedeirosState extends State<TelaBuscaGruposDeRedeiros> {
 
                               bool checarGrupo = widget.gruposJaSelecionados != null &&
                                   widget.gruposJaSelecionados.isNotEmpty &&
-                                  widget.gruposJaSelecionados.any((elemento) => elemento['id'].toString() == grupo.id);
+                                  widget.gruposJaSelecionados.any((elemento) => elemento.idGrupo == grupo.id);
 
                               gruposDeRedeiros.add(CheckListItemModel(
                                   texto: grupo[GrupoDeRedeirosModel.CAMPO_NOME],
@@ -151,12 +151,13 @@ class _TelaBuscaGruposDeRedeirosState extends State<TelaBuscaGruposDeRedeiros> {
                           FlatButton(
                             color: Theme.of(context).primaryColor,
                               onPressed: (){
-                                List<Map> gruposChecados = new List<Map>();
+                                List<GrupoDeRedeirosDmo> gruposChecados = [];
                                 gruposDeRedeiros.forEach((grupo) {
                                   if(grupo.checado){
-                                    Map novoItem = new Map();
-                                    novoItem['id'] = grupo.id;
-                                    novoItem[GrupoDeRedeirosModel.CAMPO_NOME] = grupo.texto;
+                                    GrupoDeRedeirosDmo novoItem = new GrupoDeRedeirosDmo(
+                                      idGrupo: grupo.id,
+                                      nomeGrupo: grupo.texto
+                                    );
                                     gruposChecados.add(novoItem);
                                   }
                                 });

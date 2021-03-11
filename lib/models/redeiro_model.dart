@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:jsvillela_app/infra/preferencias.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 /// Model para redeiros.
@@ -50,10 +51,41 @@ class RedeiroModel extends Model{
       CAMPO_ATIVO : dadosDoRedeiro[CAMPO_ATIVO],
       SUBCOLECAO_GRUPOS : dadosDoRedeiro[SUBCOLECAO_GRUPOS]
     }).then((value) => onSuccess()).catchError((e){
+      print(e);
       onFail();
     });
   }
 
+  /// Carrega os redeiros de forma paginada
+  Future<QuerySnapshot> carregarRedeirosPaginados(DocumentSnapshot ultimoRedeiro, String filtroPorNome) {
+
+    if(ultimoRedeiro == null)
+      return FirebaseFirestore.instance.collection(NOME_COLECAO)
+          .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
+          .orderBy(CAMPO_NOME).get();
+
+    if(filtroPorNome != null && filtroPorNome.isNotEmpty){
+      if(ultimoRedeiro == null)
+        return FirebaseFirestore.instance.collection(NOME_COLECAO)
+            .orderBy(CAMPO_NOME)
+            .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
+            .where(CAMPO_NOME, isEqualTo: filtroPorNome)
+            .get();
+      else
+        return FirebaseFirestore.instance.collection(NOME_COLECAO)
+            .orderBy(CAMPO_NOME)
+            .startAfterDocument(ultimoRedeiro)
+            .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
+            .where(CAMPO_NOME, isEqualTo: filtroPorNome)
+            .get();
+    }
+
+    return FirebaseFirestore.instance.collection(NOME_COLECAO)
+        .orderBy(CAMPO_NOME)
+        .startAfterDocument(ultimoRedeiro)
+        .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
+        .get();
+  }
   //#endregion Métodos
 
 }

@@ -9,6 +9,9 @@ class Preferencias{
 
   /// Constante que define nome da preferência que guarda a informação do usuário logado.
   static const String PREF_USUARIO_LOGADO = "PREF_USUARIO_LOGADO";
+
+  /// Define a quantidade de registros a ser carregado por vez, para Lazy Loading.
+  static const int QUANTIDADE_REGISTROS_LAZY_LOADING = 8;
   //#endregion Constantes
 
   //#region Atributos
@@ -17,7 +20,6 @@ class Preferencias{
 
   /// Define o ID do usuário logado.
   static String idUsuarioLogado;
-
 
   //#endregion Atributos
 
