@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:jsvillela_app/infra/preferencias.dart';
 
 /// Model para rede.
 class RedeModel extends Model{
@@ -28,6 +29,39 @@ class RedeModel extends Model{
       onFail();
     });
   }
-  //#endregion Métodos
+  /// Carrega as redes de forma paginada
+  Future<QuerySnapshot> carregarRedesPaginadas(DocumentSnapshot ultimaRede, String filtroPorNome) {
+
+    if(ultimaRede == null)
+      return FirebaseFirestore.instance.collection(NOME_COLECAO)
+          .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
+          .orderBy(CAMPO_REDE).get();
+
+    if(filtroPorNome != null && filtroPorNome.isNotEmpty){
+      if(ultimaRede == null)
+        return FirebaseFirestore.instance.collection(NOME_COLECAO)
+            .orderBy(CAMPO_REDE)
+            .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
+            .where(CAMPO_REDE, isEqualTo: filtroPorNome)
+            .get();
+      else
+        return FirebaseFirestore.instance.collection(NOME_COLECAO)
+            .orderBy(CAMPO_REDE)
+            .startAfterDocument(ultimaRede)
+            .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
+            .where(CAMPO_REDE, isEqualTo: filtroPorNome)
+            .get();
+    }
+
+    return FirebaseFirestore.instance.collection(NOME_COLECAO)
+        .orderBy(CAMPO_REDE)
+        .startAfterDocument(ultimaRede)
+        .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
+        .get();
+  }
+
+
+//#endregion Métodos
+
 
 }
