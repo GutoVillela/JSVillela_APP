@@ -9,11 +9,15 @@ class GrupoDeRedeirosModel extends Model{
   //#endregion Atributos
 
   //#region Constantes
-  /// Nome do identificador para a coleção "grupos_de_redeiros" utilizado no Firebase.
+
+/// Nome do identificador para a coleção "grupos_de_redeiros" utilizado no Firebase.
   static const String NOME_COLECAO = "grupos_de_redeiros";
 
   /// Nome do identificador para o campo "nome_grupo" utilizado na collection.
   static const String CAMPO_NOME = "nome_grupo";
+
+  /// Nome do identificador para o id do documento quando gravado em outras collections do Firebase.
+  static const String ID_COLECAO = "id";
   //#endregion Constantes
 
   //#region Métodos

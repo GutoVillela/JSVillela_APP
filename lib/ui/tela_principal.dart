@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jsvillela_app/infra/paleta_de_cores.dart';
 import 'package:jsvillela_app/ui/menu_tabs/home_tab.dart';
 import 'package:jsvillela_app/ui/menu_tabs/tela_agendar_recolhimento.dart';
 import 'package:jsvillela_app/ui/menu_tabs/tela_cadastro_de_mat_prima.dart';
@@ -70,8 +71,10 @@ class _TelaPrincipalState extends State<TelaPrincipal> {
             appBar: AppBar(
               title: Text("AGENDAR RECOLHIMENTO"),
               centerTitle: true,
+              backgroundColor: PaletaDeCor.AZUL_BEM_CLARO,
             ),
             drawer: CustomDrawer(_homeScreenPageController),
+            drawerScrimColor: PaletaDeCor.AZUL_BEM_CLARO,
             body: TelaAgendarRecolhimento()
         ),
         Scaffold(

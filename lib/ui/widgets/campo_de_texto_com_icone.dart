@@ -20,10 +20,13 @@ class CampoDeTextoComIcone extends StatefulWidget {
 
   /// Regra que será utilizada na validação do formulário.
   final Function regraDeValidacao;
+
+  /// Ação ao submeter o campo de texto (clicar com Enter).
+  final Function acaoAoSubmeter;
   //#endregion Atributos
 
   //#region Construtor(es)
-  CampoDeTextoComIcone({@required this.icone, @required this.texto, @required this.campoDeSenha, @required this.cor, @required this.controller, this.regraDeValidacao});
+  CampoDeTextoComIcone({@required this.icone, @required this.texto, @required this.campoDeSenha, @required this.cor, @required this.controller, this.regraDeValidacao, this.acaoAoSubmeter});
   //#endregion Construtor(es)
 
   @override
@@ -35,6 +38,7 @@ class _CampoDeTextoComIconeState extends State<CampoDeTextoComIcone> {
   Widget build(BuildContext context) {
     return Container(
       child: TextFormField(
+        onFieldSubmitted: widget.acaoAoSubmeter,
         controller: widget.controller,
         obscureText: widget.campoDeSenha,
         obscuringCharacter: '•',

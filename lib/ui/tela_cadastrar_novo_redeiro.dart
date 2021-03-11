@@ -1,4 +1,7 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
+import 'package:jsvillela_app/dml/grupo_de_redeiros_dmo.dart';
 import 'package:jsvillela_app/models/checklist_item_model.dart';
 import 'package:jsvillela_app/models/grupo_de_redeiros_model.dart';
 import 'package:jsvillela_app/models/redeiro_model.dart';
@@ -37,7 +40,7 @@ class _TelaCadastrarNovoRedeiroState extends State<TelaCadastrarNovoRedeiro> {
   bool _whatsApp = true;
 
   /// Model de CheckListItem usado para demarcar os grupos de redeiros selecionados.
-  List<Map> gruposDeRedeiros = new List<Map>();
+  List<GrupoDeRedeirosDmo> gruposDeRedeiros;
   //#endregion Atributos
 
   @override
@@ -135,7 +138,7 @@ class _TelaCadastrarNovoRedeiroState extends State<TelaCadastrarNovoRedeiro> {
                     textoPrincipal: "Grupo do Redeiro",
                     textoSecundario: gruposDeRedeiros == null || gruposDeRedeiros.isEmpty ?
                     "Nenhum grupo selecionado" :
-                    gruposDeRedeiros.first[GrupoDeRedeirosModel.CAMPO_NOME] +
+                    gruposDeRedeiros.first.nomeGrupo +
                         (gruposDeRedeiros.length - 1 == 0 ? "" : " e mais ${gruposDeRedeiros.length - 1}."),
                     iconeEsquerda: Icons.people_sharp,
                     iconeDireita: Icons.arrow_forward_ios_sharp,
@@ -166,7 +169,12 @@ class _TelaCadastrarNovoRedeiroState extends State<TelaCadastrarNovoRedeiro> {
                         textColor: Colors.white,
                         color: Theme.of(context).primaryColor,
                         onPressed: (){
+
                           if(_formKey.currentState.validate()){
+
+                            // Converter lista de grupos em um mapa
+                            var mapaDeGrupos = { for (var v in gruposDeRedeiros) { GrupoDeRedeirosModel.ID_COLECAO : v.idGrupo, GrupoDeRedeirosModel.CAMPO_NOME : v.nomeGrupo } };
+
                             Map<String, dynamic> dadosDoRedeiro = {
                               RedeiroModel.CAMPO_NOME : _nomeController.text,
                               RedeiroModel.CAMPO_CELULAR : _celularController.text,
@@ -174,8 +182,10 @@ class _TelaCadastrarNovoRedeiroState extends State<TelaCadastrarNovoRedeiro> {
                               RedeiroModel.CAMPO_WHATSAPP : _whatsApp,
                               RedeiroModel.CAMPO_ENDERECO : _enderecoController.text,
                               RedeiroModel.CAMPO_ATIVO : true,
-                              RedeiroModel.SUBCOLECAO_GRUPOS : gruposDeRedeiros
+                              RedeiroModel.SUBCOLECAO_GRUPOS : mapaDeGrupos.toList()
                             };
+
+                            print(dadosDoRedeiro);
 
                             model.cadastrarRedeiro(
                                 dadosDoRedeiro: dadosDoRedeiro,
