@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:jsvillela_app/dml/redeiro_dmo.dart';
 import 'package:jsvillela_app/infra/paleta_de_cores.dart';
 import 'package:jsvillela_app/infra/preferencias.dart';
 import 'package:jsvillela_app/models/redeiro_model.dart';
@@ -20,8 +21,11 @@ class _TelaCadastroDeRedeirosState extends State<TelaCadastroDeRedeiros> {
   /// Controller utilizado no campo de texto de Busca.
   final _buscaController = TextEditingController();
 
+  // /// Lista de redeiros a ser carregada no ListView
+  // List<DocumentSnapshot> _listaDeRedeiros = [];
+
   /// Lista de redeiros a ser carregada no ListView
-  List<DocumentSnapshot> _listaDeRedeiros = [];
+  List<RedeiroDmo> _listaDeRedeiros = [];
 
   /// Último redeiro carregado em tela.
   DocumentSnapshot _ultimoRedeiroCarregado;
@@ -80,6 +84,7 @@ class _TelaCadastroDeRedeirosState extends State<TelaCadastroDeRedeiros> {
                           print("Submeteu");
                           filtro = _buscaController.text;
                           resetarCamposDeBusca();
+                          _obterRegistros(true);
                         });
                       },
                       regraDeValidacao: (texto){
@@ -112,8 +117,8 @@ class _TelaCadastroDeRedeirosState extends State<TelaCadastroDeRedeiros> {
                             }
 
                             return ListViewItemPesquisa(
-                              textoPrincipal: _listaDeRedeiros[index][RedeiroModel.CAMPO_NOME],
-                              textoSecundario: _listaDeRedeiros[index][RedeiroModel.CAMPO_ENDERECO],
+                              textoPrincipal: _listaDeRedeiros[index].nome,
+                              textoSecundario: _listaDeRedeiros[index].endereco.toString(),
                               iconeEsquerda: Icons.person,
                               iconeDireita: Icons.search,
                               acaoAoClicar: (){
@@ -158,7 +163,7 @@ class _TelaCadastroDeRedeirosState extends State<TelaCadastroDeRedeiros> {
       // Adicionar na lista de redeiros elementos não repetidos
       snapshot.docs.toList().forEach((element) {
         if(!_listaDeRedeiros.any((redeiro) => redeiro.id == element.id))
-          _listaDeRedeiros.add(element);
+          _listaDeRedeiros.add(RedeiroModel().converterSnapshotEmRedeiro(element));
       });
 
       if(resetaLista)
@@ -176,7 +181,7 @@ class _TelaCadastroDeRedeirosState extends State<TelaCadastroDeRedeiros> {
     // setState(() {
     //
     // });
-  }
+  }/// Método que obtém registros.
 
   /// Reseta os campos de busca para iniciar nova busca.
   void resetarCamposDeBusca(){
