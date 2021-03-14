@@ -41,6 +41,9 @@ class LancamentoNoCadernoModel extends Model{
   //#region Métodos
   ///Cadastra um novo lançamento no caderno do Redeiro no Firebase.
   void cadastrarNovoLancamento({@required Map<String, dynamic> dadosDoLancamento, @required String idDoRedeiro, @required VoidCallback onSuccess, @required VoidCallback onFail}){
+
+    //TODO: Substituir o tipo do parâmetro "dadosDoLancamento" para List<LancamentoDoCadernoDmo>
+
     FirebaseFirestore.instance.collection(RedeiroModel.NOME_COLECAO).doc(idDoRedeiro).collection(NOME_COLECAO).add({
       CAMPO_ID_REDE : dadosDoLancamento[CAMPO_ID_REDE],
       CAMPO_NOME_REDE : dadosDoLancamento[CAMPO_NOME_REDE],

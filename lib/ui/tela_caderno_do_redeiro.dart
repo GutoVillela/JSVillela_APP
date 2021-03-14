@@ -6,12 +6,13 @@ import 'package:jsvillela_app/models/lancamento_no_caderno.dart';
 import 'package:jsvillela_app/models/redeiro_model.dart';
 import 'package:jsvillela_app/ui/widgets/tabela_de_lancamentos.dart';
 import 'package:jsvillela_app/ui/widgets/tela_novo_lancamento_no_caderno.dart';
+import 'package:jsvillela_app/dml/redeiro_dmo.dart';
 
 class TelaCadernoDoRedeiro extends StatelessWidget {
 
   //#region Atributos
   /// Informações do redeiro.
-  final DocumentSnapshot redeiro;
+  final RedeiroDmo redeiro;
 
   /// Constante que define o nome do botão para a ação de Novo Lançamento na barra de ações.
   static const String OPCAO_NOVO_LANCAMENTO = "Novo lançamento";
@@ -34,7 +35,7 @@ class TelaCadernoDoRedeiro extends StatelessWidget {
         appBar: AppBar(
             backgroundColor: Colors.transparent,
             elevation: 0,
-            title: Text(redeiro[RedeiroModel.CAMPO_NOME]),
+            title: Text(redeiro.nome),
             centerTitle: true,
             iconTheme: IconThemeData(color: Theme.of(context).primaryColor),
             actions: [
@@ -65,7 +66,7 @@ class TelaCadernoDoRedeiro extends StatelessWidget {
           child: LayoutBuilder(builder: (context, constraints) {
 
             return FutureBuilder<QuerySnapshot>(
-              future: redeiro.reference.collection(RedeiroModel.SUBCOLECAO_CADERNO).orderBy(LancamentoNoCadernoModel.CAMPO_DATA_LANCAMENTO, descending: true).get(),
+              future: RedeiroModel().carregarCadernoDoRedeiro(redeiro.id),
               builder: (context, snapshot){
                 if(!snapshot.hasData)
                   return Container(

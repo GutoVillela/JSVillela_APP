@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:jsvillela_app/dml/redeiro_dmo.dart';
 import 'package:jsvillela_app/infra/paleta_de_cores.dart';
-import 'package:jsvillela_app/models/redeiro_model.dart';
 import 'package:jsvillela_app/ui/tela_caderno_do_redeiro.dart';
 import 'package:jsvillela_app/ui/widgets/botao_quadrado.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -9,7 +9,7 @@ import 'package:url_launcher/url_launcher.dart';
 class TelaInformacoesDoRedeiro extends StatelessWidget {
   //#region Atributos
   /// Informações do redeiro.
-  final DocumentSnapshot redeiro;
+  final RedeiroDmo redeiro;
 
   //#endregion Atributos
 
@@ -36,7 +36,7 @@ class TelaInformacoesDoRedeiro extends StatelessWidget {
             double overflowIconePerfil = 50;
 
             // Recuperar informação se redeiro está ativo ou não
-            bool redeiroAtivo = redeiro[RedeiroModel.CAMPO_ATIVO];
+            bool redeiroAtivo = redeiro.ativo;
 
             return Container(
               width: constraints.maxWidth,
@@ -44,7 +44,7 @@ class TelaInformacoesDoRedeiro extends StatelessWidget {
               child: SingleChildScrollView(
                 child: Column(children: [
                   Stack(
-                    overflow: Overflow.visible,
+                    clipBehavior: Clip.none,
                     alignment: Alignment.center,
                     children: [
                       Container(
@@ -81,13 +81,13 @@ class TelaInformacoesDoRedeiro extends StatelessWidget {
                     ],
                   ),
                   SizedBox(height: overflowIconePerfil + 20),
-                  Text(redeiro[RedeiroModel.CAMPO_NOME],
+                  Text(redeiro.nome,
                   style: TextStyle(
                     color: Theme.of(context).primaryColor,
                     fontSize: 20,
                     fontWeight: FontWeight.bold
                   )),
-                  Text(redeiro[RedeiroModel.CAMPO_ENDERECO]),
+                  Text(redeiro.endereco.toString()),
                   SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -112,21 +112,21 @@ class TelaInformacoesDoRedeiro extends StatelessWidget {
                         altura: constraints.maxWidth * .5,
                         largura: constraints.maxWidth * .5,
                         textoPrincipal: "Ligar",
-                        textoSecundario: redeiro[RedeiroModel.CAMPO_CELULAR],
+                        textoSecundario: redeiro.celular,
                         icone: Icons.phone,
                         acaoAoClicar: (){
                           //Ligar para o número.
-                          launch("tel://${redeiro[RedeiroModel.CAMPO_CELULAR]}");
+                          launch("tel://${redeiro.celular}");
                         }
                       ),
                       BotaoQuadrado(
                         altura: constraints.maxWidth * .5,
                         largura: constraints.maxWidth * .5,
                         textoPrincipal: "WhatsApp",
-                        textoSecundario: redeiro[RedeiroModel.CAMPO_CELULAR],
+                        textoSecundario: redeiro.celular,
                         icone: Icons.chat,
                         acaoAoClicar: (){
-                          String numeroWpp = "55" + redeiro[RedeiroModel.CAMPO_CELULAR].toString().replaceAll(new RegExp(r'\('), '')
+                          String numeroWpp = "55" + redeiro.celular.replaceAll(new RegExp(r'\('), '')
                           .replaceAll(new RegExp(r'\)'), '').replaceAll(new RegExp(r'-'), '').replaceAll(' ', '');
 
                           launch("https://wa.me/${numeroWpp}?text=${"Boa tarde, tudo bem?"}");

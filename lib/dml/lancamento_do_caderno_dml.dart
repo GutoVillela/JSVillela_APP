@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:jsvillela_app/dml/base_dmo.dart';
 
 /// Classe modelo para lançamentos do caderno.
-class LancamentoDoCadernoDmo {
+class LancamentoDoCadernoDmo implements BaseDmo{
 
   //#region Atributos
 
@@ -37,5 +38,13 @@ class LancamentoDoCadernoDmo {
   //#region Construtor(es)
   LancamentoDoCadernoDmo({this.idLancamento, this.dataConfirmacaoPagamento, this.dataLancamento, this.dataPagamento, this.idRede, this.nomeRede, this.pago, this.quantidade, this.valorUnitario});
   //#endregion Construtor(es)
+
+  //#region Métodos
+  @override
+  Map<String, dynamic> converterParaMapa() {
+    // TODO: implement converterParaMapa
+    throw UnimplementedError();
+  }
+  //#endregion Métodos
 
 }

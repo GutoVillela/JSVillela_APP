@@ -1,3 +1,4 @@
+import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Classe que mantém as preferências do usuário salvas.
@@ -35,6 +36,42 @@ class Preferencias{
       idUsuarioLogado = preferencias.getString(PREF_USUARIO_LOGADO);
 
     print(manterUsuarioLogado);
+  }
+
+  /// Obtém localização atual do dispositivo do usuário
+  Future<Position> obterLocalizacaoAtual() async {
+
+    bool servicoAtivado;
+    LocationPermission permissao;
+
+    // Checar se serviço de localicação do usuário está ativado.
+    servicoAtivado = await Geolocator.isLocationServiceEnabled();
+    if (!servicoAtivado) {
+
+      // Serviço de localização do usuário não está ativo.
+      return Future.error('O serviço de localização está desativado.');
+    }
+
+    permissao = await Geolocator.checkPermission();
+    if (permissao == LocationPermission.denied) {
+      permissao = await Geolocator.requestPermission();
+      if (permissao == LocationPermission.deniedForever) {
+
+        // Permissão de localização está negada permanentemente.
+        return Future.error(
+            'Serviço de localização está permanentemente negado.');
+      }
+
+      if (permissao == LocationPermission.denied) {
+        // Permissão de localização negada.
+        return Future.error(
+            'Serviço de localização negado.');
+      }
+    }
+
+    // Todas as permissões de localização estão garantidas.
+    // Prosseguir obtendo localização do usuário.
+    return await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
   }
   //#endregion Métodos
 
