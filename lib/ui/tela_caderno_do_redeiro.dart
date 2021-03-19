@@ -84,7 +84,7 @@ class TelaCadernoDoRedeiro extends StatelessWidget {
                   //#region Tela caso EXISTA dados de caderno
                   if(snapshot.data.size > 0){
 
-                    caderno = new List<LancamentoDoCadernoDmo>();
+                    caderno = [];
 
                     snapshot.data.docs.forEach((element) {
 
@@ -107,7 +107,7 @@ class TelaCadernoDoRedeiro extends StatelessWidget {
 
                     //#region Agrupar lançamentos por data de pagamento
 
-                    var listaDeCadernos = List<List<LancamentoDoCadernoDmo>>();
+                    var listaDeCadernos = [];
 
                     while(caderno.isNotEmpty){
 

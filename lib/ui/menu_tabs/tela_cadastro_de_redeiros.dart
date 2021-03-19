@@ -36,9 +36,6 @@ class _TelaCadastroDeRedeirosState extends State<TelaCadastroDeRedeiros> {
   /// Indica que registros estão sendo carregados.
   bool _carregandoRegistros = false;
 
-  /// Filtro utilizado na busca
-  String filtro;
-
   /// ScrollController usado para saber se usuário scrollou a lista até o final.
   ScrollController _scrollController = ScrollController();
   //#endregion Atributos
@@ -81,8 +78,6 @@ class _TelaCadastroDeRedeirosState extends State<TelaCadastroDeRedeiros> {
                       controller: _buscaController,
                       acaoAoSubmeter: (String filtro){
                         setState(() {
-                          print("Submeteu");
-                          filtro = _buscaController.text;
                           resetarCamposDeBusca();
                           _obterRegistros(true);
                         });
@@ -150,7 +145,7 @@ class _TelaCadastroDeRedeirosState extends State<TelaCadastroDeRedeiros> {
     if(resetaLista)
       setState(() => _carregandoRegistros = true );
 
-    RedeiroModel().carregarRedeirosPaginados(_ultimoRedeiroCarregado, filtro).then((snapshot) {
+    RedeiroModel().carregarRedeirosPaginados(_ultimoRedeiroCarregado, _buscaController.text).then((snapshot) {
 
       // Obter e salvar último redeiro
       _ultimoRedeiroCarregado = snapshot.docs.isNotEmpty ? snapshot.docs.last : null;
@@ -178,10 +173,7 @@ class _TelaCadastroDeRedeirosState extends State<TelaCadastroDeRedeiros> {
         setState(() { });
     });
 
-    // setState(() {
-    //
-    // });
-  }/// Método que obtém registros.
+  }
 
   /// Reseta os campos de busca para iniciar nova busca.
   void resetarCamposDeBusca(){

@@ -105,7 +105,7 @@ class _TelaNovoLancamentoNoCadernoState
 
                           // Carregar redes somente uma vez
                           if(redes == null || redes.isEmpty){
-                            redes = new List<Map<String, String>>();
+                            redes = [];
                             snapshot.data.docs.forEach((element) {
 
                               var novaRede = Map<String, String>();
