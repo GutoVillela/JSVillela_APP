@@ -49,7 +49,7 @@ class _TelaCadastrarNovoRedeiroState extends State<TelaCadastrarNovoRedeiro> {
   /// Define se usuário marcou a checkbox "WhatsApp" para este redeiro.
   bool _whatsApp = true;
 
-  /// Model de CheckListItem usado para demarcar os grupos de redeiros selecionados.
+  /// Lista com os grupos de redeiros selecionados.
   List<GrupoDeRedeirosDmo> gruposDeRedeiros;
 
   /// Define o endereço formatado digitado em tela pelo usuário.
@@ -258,19 +258,6 @@ class _TelaCadastrarNovoRedeiroState extends State<TelaCadastrarNovoRedeiro> {
                         onPressed: (){
 
                           if(_formKey.currentState.validate() && validarGruposDeRedeiros(context)){
-
-                            // Converter lista de grupos em um mapa
-                            var mapaDeGrupos = { for (var v in gruposDeRedeiros) { GrupoDeRedeirosModel.ID_COLECAO : v.idGrupo, GrupoDeRedeirosModel.CAMPO_NOME : v.nomeGrupo } };
-
-                            // Map<String, dynamic> dadosDoRedeiro = {
-                            //   RedeiroModel.CAMPO_NOME : _nomeController.text,
-                            //   RedeiroModel.CAMPO_CELULAR : _celularController.text,
-                            //   RedeiroModel.CAMPO_EMAIL : _emailController.text,
-                            //   RedeiroModel.CAMPO_WHATSAPP : _whatsApp,
-                            //   RedeiroModel.CAMPO_ENDERECO : _enderecoController.text,
-                            //   RedeiroModel.CAMPO_ATIVO : true,
-                            //   RedeiroModel.SUBCOLECAO_GRUPOS : mapaDeGrupos.toList()
-                            // };
 
                             RedeiroDmo dadosDoRedeiro = RedeiroDmo(
                               nome: _nomeController.text,

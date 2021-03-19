@@ -71,13 +71,6 @@ class RedeiroModel extends Model{
   ///Cadastra um redeiro no Firebase.
   void cadastrarRedeiro({@required RedeiroDmo dadosDoRedeiro, @required VoidCallback onSuccess, @required VoidCallback onFail}){
 
-    // Converter lista de grupos do redeiro em mapa antes de gravar no Firebase.
-    Set<Map<String, dynamic>> mapaDeGrupos;
-
-    if(dadosDoRedeiro.gruposDoRedeiro != null && dadosDoRedeiro.gruposDoRedeiro.isNotEmpty)
-      // Converter lista de grupos em um mapa
-      mapaDeGrupos = { for (var v in dadosDoRedeiro.gruposDoRedeiro) { GrupoDeRedeirosModel.ID_COLECAO : v.idGrupo, GrupoDeRedeirosModel.CAMPO_NOME : v.nomeGrupo } };
-
     FirebaseFirestore.instance.collection(NOME_COLECAO).add({
       CAMPO_NOME : dadosDoRedeiro.nome,
       CAMPO_CELULAR : dadosDoRedeiro.celular,
@@ -85,7 +78,7 @@ class RedeiroModel extends Model{
       CAMPO_WHATSAPP : dadosDoRedeiro.whatsApp,
       CAMPO_ENDERECO : dadosDoRedeiro.endereco.converterParaMapa(),
       CAMPO_ATIVO : dadosDoRedeiro.ativo,
-      SUBCOLECAO_GRUPOS : mapaDeGrupos.toList()
+      SUBCOLECAO_GRUPOS : dadosDoRedeiro.gruposDoRedeiro.map((e) => e.idGrupo).toList()
     }).then((value) => onSuccess()).catchError((e){
       print(e.toString());
       onFail();
@@ -94,27 +87,31 @@ class RedeiroModel extends Model{
 
   /// Carrega os redeiros de forma paginada diretamente do Firebase.
   Future<QuerySnapshot> carregarRedeirosPaginados(DocumentSnapshot ultimoRedeiro, String filtroPorNome) {
+    
+    if(filtroPorNome != null && filtroPorNome.isNotEmpty){
+      if(ultimoRedeiro == null){
+        return FirebaseFirestore.instance.collection(NOME_COLECAO)
+            .orderBy(CAMPO_NOME)
+            .startAt([filtroPorNome])
+            .endAt([filtroPorNome + "\uf8ff"])
+            .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
+            .get();
+      }
+      else{
+        return FirebaseFirestore.instance.collection(NOME_COLECAO)
+            .orderBy(CAMPO_NOME)
+            .startAt([filtroPorNome])
+            .endAt([filtroPorNome + "\uf8ff"])
+            .startAfterDocument(ultimoRedeiro)
+            .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
+            .get();
+      }
+    }
 
     if(ultimoRedeiro == null)
       return FirebaseFirestore.instance.collection(NOME_COLECAO)
           .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
           .orderBy(CAMPO_NOME).get();
-
-    if(filtroPorNome != null && filtroPorNome.isNotEmpty){
-      if(ultimoRedeiro == null)
-        return FirebaseFirestore.instance.collection(NOME_COLECAO)
-            .orderBy(CAMPO_NOME)
-            .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
-            .where(CAMPO_NOME, isEqualTo: filtroPorNome)
-            .get();
-      else
-        return FirebaseFirestore.instance.collection(NOME_COLECAO)
-            .orderBy(CAMPO_NOME)
-            .startAfterDocument(ultimoRedeiro)
-            .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
-            .where(CAMPO_NOME, isEqualTo: filtroPorNome)
-            .get();
-    }
 
     return FirebaseFirestore.instance.collection(NOME_COLECAO)
         .orderBy(CAMPO_NOME)
@@ -125,6 +122,7 @@ class RedeiroModel extends Model{
 
   /// Converte um snapshot em um objeto RedeiroDmo.
   RedeiroDmo converterSnapshotEmRedeiro(DocumentSnapshot redeiro){
+
     return RedeiroDmo(
         id: redeiro.id,
         nome: redeiro[CAMPO_NOME],
@@ -146,8 +144,7 @@ class RedeiroModel extends Model{
         ativo: redeiro[CAMPO_ATIVO],
         gruposDoRedeiro: (redeiro[SUBCOLECAO_GRUPOS] as List)
             .map((e) => GrupoDeRedeirosDmo(
-            idGrupo: e[GrupoDeRedeirosModel.ID_COLECAO],
-            nomeGrupo: e[GrupoDeRedeirosModel.CAMPO_NOME])).toList()
+            idGrupo: e)).toList()
     );
   }
 
@@ -158,6 +155,15 @@ class RedeiroModel extends Model{
         .doc(idDoRedeiro)
         .collection(SUBCOLECAO_CADERNO)
         .orderBy(LancamentoNoCadernoModel.CAMPO_DATA_LANCAMENTO, descending: true)
+        .get();
+  }
+
+  /// Carrega os endereços de todos os redeiros dentro do grupo.
+  Future<QuerySnapshot> carregarRedeirosPorGrupos(List<String> idsDosGrupos){
+
+    return FirebaseFirestore.instance.collection(NOME_COLECAO)
+        .where(SUBCOLECAO_GRUPOS, arrayContainsAny: idsDosGrupos)
+        //.orderBy(CAMPO_NOME)
         .get();
   }
   //#endregion Métodos

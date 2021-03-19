@@ -18,7 +18,7 @@ class GooglePlaceServiceProvider {
   final sessionToken;
 
   /// Chave da API do Google para dispositivos Android.
-  static final String androidKey = 'AIzaSyAtsWz3hEnP-lEZtJaBaV9EktLweLajEp4';
+  static final String androidKey = '';
 
   /// Chave da API do Google para dispositivos IOS.
   static final String iosKey = 'YOUR_API_KEY_HERE';
@@ -69,8 +69,6 @@ class GooglePlaceServiceProvider {
   /// Método responsável por obter os detalhes do endereço com base no ID.
   Future<EnderecoDmo> obterDetalhesDoEndereco(String idEndereco) async {
 
-    // final uriRequisicao =
-    //     'https://maps.googleapis.com/maps/api/place/details/json?place_id=$idEndereco&fields=address_component&key=$apiKey&sessiontoken=$sessionToken';
     final uriRequisicao =
         'https://maps.googleapis.com/maps/api/geocode/json?place_id=$idEndereco&key=$apiKey';
 

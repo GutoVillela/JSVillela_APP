@@ -15,6 +15,16 @@ class Infraestrutura {
     );
   }
 
+  /// Exibe uma mensagem padrão de sucesso em forma de SnackBar.
+  static void mostrarMensagemDeSucesso(BuildContext context, String mensagem){
+    ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text(mensagem),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 2))
+    );
+  }
+
   // /**
   //  * Uses refection (mirrors) to produce a Map (array) from an object's
   //  * variables. Making the variable name the key, and it's value the
