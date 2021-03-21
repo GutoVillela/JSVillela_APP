@@ -38,7 +38,7 @@ class EnderecoDmo implements BaseDmo{
   //#region Métodos
   @override
   String toString() {
-    return '${logradouro ?? ""}, ${numero ?? "S/N"}, ${cidade ?? ""}${cep != null && cep.isNotEmpty ? " - " + cep : ""}';
+    return '${logradouro ?? ""}, ${numero ?? "S/N"}, ${bairro != null ? "$bairro," : ""} ${cidade ?? ""}${cep != null && cep.isNotEmpty ? " - " + cep : ""}';
   }
 
   @override

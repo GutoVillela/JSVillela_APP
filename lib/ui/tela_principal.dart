@@ -63,6 +63,11 @@ class _TelaPrincipalState extends State<TelaPrincipal> {
       controller: _homeScreenPageController,
       children: [
         Scaffold(
+            appBar: AppBar(
+              title: Text("RECOLHEDOR"),
+              centerTitle: true,
+              backgroundColor: PaletaDeCor.AZUL_BEM_CLARO,
+            ),
             body: HomeTab(),
             drawer: CustomDrawer(_homeScreenPageController),
             drawerScrimColor: Color.fromARGB(100, 100, 100, 100)

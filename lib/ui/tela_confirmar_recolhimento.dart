@@ -46,14 +46,7 @@ class TelaConfirmarRecolhimento extends StatelessWidget {
 
 
                 // Obter lista de cidades
-                List<String> listaDeCidades = [];
-                snapshot.data.docs.toList().forEach((element) {
-                  var redeiro = RedeiroModel().converterSnapshotEmRedeiro(element);
-                  if(redeiro.endereco != null &&
-                      redeiro.endereco.cidade != null &&
-                      !listaDeCidades.any((cidade) => cidade == redeiro.endereco.cidade))
-                    listaDeCidades.add(redeiro.endereco.cidade);
-                });
+                List<String> listaDeCidades = RedeiroModel().obterCidadesDosRedeiros(snapshot.data.docs.toList());
 
                 return Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -128,7 +121,6 @@ class TelaConfirmarRecolhimento extends StatelessWidget {
                     )
                   ],
                 );
-
               },
             ),
           );
@@ -140,8 +132,9 @@ class TelaConfirmarRecolhimento extends StatelessWidget {
   /// É chamado após o cadastro do Recolhimento ser efetuado com sucesso.
   void _finalizarAgendamento(BuildContext context){
     Infraestrutura.mostrarMensagemDeSucesso(context, "Recolhimento agendado com sucesso.");
-    Navigator.pushReplacement(context, MaterialPageRoute(
-        builder: (context) => TelaPrincipal())
+
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
+        builder: (context) => TelaPrincipal()), (route) => false
     );
   }
 

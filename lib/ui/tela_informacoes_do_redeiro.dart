@@ -82,12 +82,13 @@ class TelaInformacoesDoRedeiro extends StatelessWidget {
                   ),
                   SizedBox(height: overflowIconePerfil + 20),
                   Text(redeiro.nome,
+                  textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Theme.of(context).primaryColor,
                     fontSize: 20,
                     fontWeight: FontWeight.bold
                   )),
-                  Text(redeiro.endereco.toString()),
+                  Text(redeiro.endereco.toString(), textAlign: TextAlign.center),
                   SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -143,7 +144,6 @@ class TelaInformacoesDoRedeiro extends StatelessWidget {
                           icone: Icons.perm_contact_cal_sharp,
                           textoSecundario: "",
                           acaoAoClicar: (){
-                            //TODO: Implementar ação de VER CADERNO
                             Navigator.of(context).push(
                                 MaterialPageRoute(builder: (context) => TelaCadernoDoRedeiro(redeiro))
                             );

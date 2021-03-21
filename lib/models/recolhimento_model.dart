@@ -84,7 +84,7 @@ class RecolhimentoModel extends Model{
     }
     //#endregion Filtro com data inicial
 
-    // #region Filtro com data final
+    //#region Filtro com data final
     if(filtroDataFinal != null){
       if(ultimoRecolhimento == null){
         return FirebaseFirestore.instance.collection(NOME_COLECAO)
@@ -122,8 +122,8 @@ class RecolhimentoModel extends Model{
 
     return RecolhimentoDmo(
         id: recolhimento.id,
-        dataDoRecolhimento: new DateTime.fromMillisecondsSinceEpoch((recolhimento[CAMPO_DATA_RECOLHIMENTO] as Timestamp).millisecondsSinceEpoch).toLocal(),// Obter data e converter para o fuso horário local
-        dataFinalizado: new DateTime.fromMillisecondsSinceEpoch((recolhimento[CAMPO_DATA_FINALIZADO] as Timestamp).millisecondsSinceEpoch).toLocal(),// Obter data e converter para o fuso horário local
+        dataDoRecolhimento: recolhimento[CAMPO_DATA_RECOLHIMENTO] != null ? new DateTime.fromMillisecondsSinceEpoch((recolhimento[CAMPO_DATA_RECOLHIMENTO] as Timestamp).millisecondsSinceEpoch).toLocal() : null,// Obter data e converter para o fuso horário local
+        dataFinalizado:  recolhimento[CAMPO_DATA_FINALIZADO] != null ? new DateTime.fromMillisecondsSinceEpoch((recolhimento[CAMPO_DATA_FINALIZADO] as Timestamp).millisecondsSinceEpoch).toLocal() : null,// Obter data e converter para o fuso horário local
         gruposDoRecolhimento: (recolhimento[CAMPO_GRUPOS_DO_RECOLHIMENTO] as List)
             .map((e) => GrupoDeRedeirosDmo(
             idGrupo: e)).toList()
@@ -137,6 +137,23 @@ class RecolhimentoModel extends Model{
         .where(CAMPO_GRUPOS_DO_RECOLHIMENTO, arrayContainsAny: idsDosGrupos)
         .get();
   }
+
+  /// Carrega os recolhimentos agendados em uma data específica diretamente do Firebase.
+  Future<QuerySnapshot> carregarRecolhimentosAgendadosNaData(DateTime dataRecolhimento) {
+
+    return FirebaseFirestore.instance.collection(NOME_COLECAO)
+        .where(CAMPO_DATA_RECOLHIMENTO, isEqualTo: dataRecolhimento.toLocal())
+        .get();
+  }
+
+  /// Busca um recolhimento por ID.
+  Future<DocumentSnapshot> carregarRecolhimentoPorId(String idDoRecolhimento){
+
+    return FirebaseFirestore.instance.collection(NOME_COLECAO)
+        .doc(idDoRecolhimento)
+        .get();
+  }
+
 //#endregion Métodos
 
 }

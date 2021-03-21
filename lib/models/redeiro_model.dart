@@ -166,6 +166,21 @@ class RedeiroModel extends Model{
         //.orderBy(CAMPO_NOME)
         .get();
   }
+
+  /// Converte uma lista de redeiros em uma lista de cidades (sem repetição).
+  List<String> obterCidadesDosRedeiros(List<DocumentSnapshot> redeiros){
+    // Obter lista de cidades
+    List<String> listaDeCidades = [];
+    redeiros.forEach((element) {
+      var redeiro = RedeiroModel().converterSnapshotEmRedeiro(element);
+      if(redeiro.endereco != null &&
+          redeiro.endereco.cidade != null &&
+          !listaDeCidades.any((cidade) => cidade == redeiro.endereco.cidade))
+        listaDeCidades.add(redeiro.endereco.cidade);
+    });
+
+    return listaDeCidades;
+  }
   //#endregion Métodos
 
 }
