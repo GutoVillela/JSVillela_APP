@@ -18,7 +18,7 @@ class GooglePlaceServiceProvider {
   final sessionToken;
 
   /// Chave da API do Google para dispositivos Android.
-  static final String androidKey = 'AIzaSyAtsWz3hEnP-lEZtJaBaV9EktLweLajEp4';
+  static final String androidKey = '';
 
   /// Chave da API do Google para dispositivos IOS.
   static final String iosKey = 'YOUR_API_KEY_HERE';

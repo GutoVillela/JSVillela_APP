@@ -6,6 +6,7 @@ import 'package:jsvillela_app/models/rede_model.dart';
 import 'package:jsvillela_app/ui/widgets/campo_de_texto_com_icone.dart';
 import 'package:jsvillela_app/ui/widgets/list_view_item_pesquisa.dart';
 import 'package:jsvillela_app/infra/preferencias.dart';
+import 'package:jsvillela_app/dml/rede_dmo.dart';
 
 class TelaCadastroDeRedes extends StatefulWidget {
   @override
@@ -19,7 +20,9 @@ class _TelaCadastroDeRedesState extends State<TelaCadastroDeRedes> {
   /// Controller utilizado no campo de texto de Busca.
   final _buscaController = TextEditingController();
 
-  List<DocumentSnapshot> _listaDeRedes = [];
+  //List<DocumentSnapshot> _listaDeRedes = [];
+
+  List<RedeDmo> _listaDeRedes = [];
 
   /// Última rede carregada em tela.
   DocumentSnapshot _ultimaRedeCarregada;
@@ -29,9 +32,6 @@ class _TelaCadastroDeRedesState extends State<TelaCadastroDeRedes> {
 
   /// Indica que registros estão sendo carregados.
   bool _carregandoRegistros = false;
-
-  /// Filtro utilizado na busca
-  String filtro;
 
   /// ScrollController usado para saber se usuário scrollou a lista até o final.
   ScrollController _scrollController = ScrollController();
@@ -71,8 +71,10 @@ class _TelaCadastroDeRedesState extends State<TelaCadastroDeRedes> {
                   acaoAoSubmeter: (String filtro) {
                     setState(() {
                       print("Submeteu");
-                      filtro = _buscaController.text;
+                      //filtro = _buscaController.text;
+                      print(_buscaController.text);
                       resetarCamposDeBusca();
+                      _obterRegistros(true);
                     });
                   },
                   regraDeValidacao: (texto){
@@ -105,8 +107,8 @@ class _TelaCadastroDeRedesState extends State<TelaCadastroDeRedes> {
                           }
 
                           return ListViewItemPesquisa(
-                              textoPrincipal: _listaDeRedes[index][RedeModel.CAMPO_REDE],
-                              textoSecundario: "R\$ " + _listaDeRedes[index][RedeModel.CAMPO_VALOR_UNITARIO].toString(),
+                              textoPrincipal: _listaDeRedes[index].nome_rede,
+                              textoSecundario: "R\$ " + _listaDeRedes[index].valor_unitario_rede.toString(),
                               iconeEsquerda: Icons.person,
                               iconeDireita: Icons.search
                           );
@@ -128,7 +130,8 @@ class _TelaCadastroDeRedesState extends State<TelaCadastroDeRedes> {
   void _obterRegistros(bool resetaLista) {
     if (resetaLista) setState(() => _carregandoRegistros = true);
 
-    RedeModel().carregarRedesPaginadas(_ultimaRedeCarregada, filtro)
+    print(_buscaController.text);
+    RedeModel().carregarRedesPaginadas(_ultimaRedeCarregada, _buscaController.text)
         .then((snapshot) {
       // Obter e salvar último redeiro
       _ultimaRedeCarregada = snapshot.docs.isNotEmpty ? snapshot.docs.last : null;
@@ -141,7 +144,7 @@ class _TelaCadastroDeRedesState extends State<TelaCadastroDeRedes> {
       // Adicionar na lista de mp elementos não repetidos
       snapshot.docs.toList().forEach((element) {
         if (!_listaDeRedes.any((matPrima) => matPrima.id == element.id))
-          _listaDeRedes.add(element);
+          _listaDeRedes.add(RedeModel().converterSnapshotEmRede(element));
       });
 
       if (resetaLista)
