@@ -18,7 +18,7 @@ class GooglePlaceServiceProvider {
   final sessionToken;
 
   /// Chave da API do Google para dispositivos Android.
-  static final String androidKey = '';
+  static final String androidKey = 'AIzaSyAtsWz3hEnP-lEZtJaBaV9EktLweLajEp4';
 
   /// Chave da API do Google para dispositivos IOS.
   static final String iosKey = 'YOUR_API_KEY_HERE';
@@ -102,11 +102,11 @@ class GooglePlaceServiceProvider {
             endereco.logradouro = c['long_name'];
           }
 
-          if(type.contains('sublocality_level_1') || type.contains('sublocality') || type.contains('political')){
+          if(type.contains('sublocality_level_1') || type.contains('sublocality')){
             endereco.bairro = c['long_name'];
           }
 
-          if (type.contains('administrative_area_level_2') || type.contains('locality') || type.contains('political')) {
+          if (type.contains('administrative_area_level_2') || type.contains('locality')) {
             endereco.cidade = c['long_name'];
           }
 
@@ -156,11 +156,11 @@ class GooglePlaceServiceProvider {
             endereco.logradouro = c['long_name'];
           }
 
-          if(type.contains('sublocality_level_1') || type.contains('sublocality') || type.contains('political')){
+          if(type.contains('sublocality_level_1') || type.contains('sublocality')){
             endereco.bairro = c['long_name'];
           }
 
-          if (type.contains('administrative_area_level_2') || type.contains('locality') || type.contains('political')) {
+          if (type.contains('administrative_area_level_2') || type.contains('locality')) {
             endereco.cidade = c['long_name'];
           }
 

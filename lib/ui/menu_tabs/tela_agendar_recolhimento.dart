@@ -25,7 +25,7 @@ class _TelaAgendarRecolhimentoState extends State<TelaAgendarRecolhimento> {
   @override
   Widget build(BuildContext context) {
 
-    // Formatar para para dd/MM
+    // Formatar para para dd/MM/yyyy
     final formatoData = new DateFormat('dd/MM/yyyy');
     
     return LayoutBuilder(

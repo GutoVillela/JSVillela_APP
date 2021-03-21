@@ -59,6 +59,7 @@ class CustomDrawer extends StatelessWidget {
                 color: Theme.of(context).primaryColor,
                 child: Column(
                   children: [
+                    ItemDeMenu(Icons.home, "Início", _customDrawerPageController, AppPages.inicio),
                     ItemDeMenu(Icons.directions_car, "Agendar recolhimento", _customDrawerPageController, AppPages.agendarRecolhimento),
                     ItemDeMenu(Icons.search, "Consultar recolhimentos", _customDrawerPageController, AppPages.consultarRecolhimentos),
                     ItemDeMenu(Icons.notifications, "Notificações", _customDrawerPageController, AppPages.notificacoes),
