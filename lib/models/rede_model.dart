@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:jsvillela_app/infra/preferencias.dart';
+import 'package:jsvillela_app/dml/rede_dmo.dart';
 
 /// Model para rede.
 class RedeModel extends Model{
@@ -41,12 +42,16 @@ class RedeModel extends Model{
       if(ultimaRede == null)
         return FirebaseFirestore.instance.collection(NOME_COLECAO)
             .orderBy(CAMPO_REDE)
+            .startAt([filtroPorNome])
+            .endAt([filtroPorNome + "\uf8ff"])
             .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
             .where(CAMPO_REDE, isEqualTo: filtroPorNome)
             .get();
       else
         return FirebaseFirestore.instance.collection(NOME_COLECAO)
             .orderBy(CAMPO_REDE)
+            .startAt([filtroPorNome])
+            .endAt([filtroPorNome + "\uf8ff"])
             .startAfterDocument(ultimaRede)
             .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
             .where(CAMPO_REDE, isEqualTo: filtroPorNome)
@@ -60,8 +65,13 @@ class RedeModel extends Model{
         .get();
   }
 
+  RedeDmo converterSnapshotEmRede(DocumentSnapshot rede){
 
+    return RedeDmo(
+        id: rede.id,
+        nome_rede: rede[CAMPO_REDE],
+        valor_unitario_rede: rede[CAMPO_VALOR_UNITARIO]
+    );
+  }
 //#endregion Métodos
-
-
 }
