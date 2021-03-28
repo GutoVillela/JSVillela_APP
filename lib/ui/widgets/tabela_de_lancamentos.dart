@@ -196,7 +196,7 @@ class _TabelaDeLancamentosState extends State<TabelaDeLancamentos> {
   confirmarERealizarPagamento(BuildContext context){
 
     // Botão de Cancelar
-    Widget botaoCancelar = FlatButton(
+    Widget botaoCancelar = TextButton(
       child: Text("Cancelar"),
       onPressed:  () {
         Navigator.of(context).pop();
@@ -204,7 +204,7 @@ class _TabelaDeLancamentosState extends State<TabelaDeLancamentos> {
     );
 
     // Botão de confirmar
-    Widget botaoConfirmar = FlatButton(
+    Widget botaoConfirmar = TextButton(
       child: Text("Confirmar"),
       onPressed:  () {
         Navigator.of(context).pop();

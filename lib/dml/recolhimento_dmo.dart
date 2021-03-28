@@ -1,4 +1,5 @@
 import 'package:jsvillela_app/dml/grupo_de_redeiros_dmo.dart';
+import 'package:jsvillela_app/dml/redeiro_do_recolhimento_dmo.dart';
 
 /// Classe modelo para recolhimentos.
 class RecolhimentoDmo{
@@ -17,10 +18,13 @@ class RecolhimentoDmo{
   /// Lista de grupos associados ao recolhimento.
   List<GrupoDeRedeirosDmo> gruposDoRecolhimento;
 
+  /// Lista de redeiros associados ao recolhimento.
+  List<RedeiroDoRecolhimentoDmo> redeirosDoRecolhimento;
+
   //#endregion Atributos
 
   //#region Construtor(es)
-  RecolhimentoDmo({this.id, this.dataDoRecolhimento, this.dataFinalizado, this.gruposDoRecolhimento});
+  RecolhimentoDmo({this.id, this.dataDoRecolhimento, this.dataFinalizado, this.gruposDoRecolhimento, this.redeirosDoRecolhimento});
   //#endregion Construtor(es)
 
   //#region Métodos

@@ -46,7 +46,7 @@ class UsuarioModel extends Model{
   /// Caso a autenticação falhe o CallBack [onFail] é chamado.
    void logar({@required String email, @required String senha, @required VoidCallback onSuccess, @required VoidCallback onFail}) async {
      estaCarregando = true;
-    notifyListeners();
+      notifyListeners();
 
     // Realizar login no Firebase
     _autenticacao.signInWithEmailAndPassword(email: email, password: senha).then(

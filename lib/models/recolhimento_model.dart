@@ -24,6 +24,11 @@ class RecolhimentoModel extends Model{
 
   //#endregion Constantes
 
+  //#region Atributos
+  /// Indica que existe um processo em execução a partir desta classe.
+  bool estaCarregando = false;
+  //#endregion Atributos
+
   //#region Métodos
   ///Cadastra um recolhimento no Firebase.
   void cadastrarRecolhimento({@required RecolhimentoDmo dadosDoRecolhimento, @required Function onSuccess, @required Function onFail}){
@@ -140,7 +145,6 @@ class RecolhimentoModel extends Model{
 
   /// Carrega os recolhimentos agendados em uma data específica diretamente do Firebase.
   Future<QuerySnapshot> carregarRecolhimentosAgendadosNaData(DateTime dataRecolhimento) {
-
     return FirebaseFirestore.instance.collection(NOME_COLECAO)
         .where(CAMPO_DATA_RECOLHIMENTO, isEqualTo: dataRecolhimento.toLocal())
         .get();
@@ -153,6 +157,28 @@ class RecolhimentoModel extends Model{
         .doc(idDoRecolhimento)
         .get();
   }
+
+  /// Atualiza a data de Finalização para um Recolhimento.
+  Future<void> finalizarRecolhimento({@required String idRecolhimento, @required DateTime dataFinalizacao}) {
+
+    estaCarregando = true;// Indicar início do processamento
+    notifyListeners();
+
+    return FirebaseFirestore.instance.collection(RecolhimentoModel.NOME_COLECAO)
+      .doc(idRecolhimento)
+      .update({ CAMPO_DATA_FINALIZADO: dataFinalizacao })
+      .then((value){
+        estaCarregando = false;
+        notifyListeners();
+      })
+      .catchError((erro) {
+        estaCarregando = false;
+        notifyListeners();
+      });
+  }
+
+
+
 
 //#endregion Métodos
 

@@ -6,6 +6,7 @@ import 'package:jsvillela_app/ui/tela_principal.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:jsvillela_app/infra/preferencias.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() async{
 
@@ -23,9 +24,16 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return ScopedModel<UsuarioModel>(
         model: UsuarioModel(),
         child: MaterialApp(
+          localizationsDelegates: [
+            GlobalMaterialLocalizations.delegate
+          ],
+          supportedLocales: [
+            Locale(WidgetsBinding.instance.window.locale.languageCode, WidgetsBinding.instance.window.locale.countryCode)
+          ],
           title: 'JS Villela ME',
           theme: ThemeData(
             fontFamily: "Nunito",

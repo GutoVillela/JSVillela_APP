@@ -21,9 +21,6 @@ class _TelaCadastroDeRedeirosState extends State<TelaCadastroDeRedeiros> {
   /// Controller utilizado no campo de texto de Busca.
   final _buscaController = TextEditingController();
 
-  // /// Lista de redeiros a ser carregada no ListView
-  // List<DocumentSnapshot> _listaDeRedeiros = [];
-
   /// Lista de redeiros a ser carregada no ListView
   List<RedeiroDmo> _listaDeRedeiros = [];
 
@@ -158,7 +155,7 @@ class _TelaCadastroDeRedeirosState extends State<TelaCadastroDeRedeiros> {
       // Adicionar na lista de redeiros elementos não repetidos
       snapshot.docs.toList().forEach((element) {
         if(!_listaDeRedeiros.any((redeiro) => redeiro.id == element.id))
-          _listaDeRedeiros.add(RedeiroModel().converterSnapshotEmRedeiro(element));
+          _listaDeRedeiros.add(RedeiroDmo.converterSnapshotEmRedeiro(element));
       });
 
       if(resetaLista)
