@@ -1,8 +1,10 @@
+import 'package:jsvillela_app/dml/base_dmo.dart';
 import 'package:jsvillela_app/dml/redeiro_dmo.dart';
+import 'package:jsvillela_app/models/redeiro_do_recolhimento_model.dart';
 
 // TODO: Finalizar implementação da Classe RedeiroDoRecolhimentoDmo
 /// Classe modelo para redeiros do recolhimento.
-class RedeiroDoRecolhimentoDmo{
+class RedeiroDoRecolhimentoDmo implements BaseDmo{
 
   //#region Atributos
 
@@ -19,6 +21,14 @@ class RedeiroDoRecolhimentoDmo{
 
   //#region Construtor(es)
   RedeiroDoRecolhimentoDmo({this.id, this.redeiro, this.dataFinalizacao});
+
+  @override
+  Map<String, dynamic> converterParaMapa() {
+    return {
+      RedeiroDoRecolhimentoModel.CAMPO_DATA_FINALIZACAO : dataFinalizacao,
+      RedeiroDoRecolhimentoModel.CAMPO_REDEIRO : redeiro.id
+    };
+  }
   //#endregion Construtor(es)
 
   //#region Métodos

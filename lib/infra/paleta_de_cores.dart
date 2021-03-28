@@ -17,6 +17,9 @@ class PaletaDeCor {
 /// Azul claro (#3185F9).
   static const Color AZUL_CLARO = Color(0xFF3185F9);
 
+/// Vermelho desfocado (#BD655A).
+  static const Color VERMELHO_DESFOCADO = Color(0xFFBD655A);
+
 
 
   //#endregion Constantes

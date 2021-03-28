@@ -13,3 +13,9 @@ enum AppPages{
     relatorios,
     preferencias
 }
+
+/// Enum que define os aplicativos da mapas instalados pelo usuário.
+enum AplicativosDeMapa{
+    googleMaps,
+    waze
+}

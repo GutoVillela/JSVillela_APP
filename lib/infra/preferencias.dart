@@ -1,4 +1,5 @@
 import 'package:geolocator/geolocator.dart';
+import 'package:jsvillela_app/infra/enums.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Classe que mantém as preferências do usuário salvas.
@@ -11,6 +12,9 @@ class Preferencias{
   /// Constante que define nome da preferência que guarda a informação do usuário logado.
   static const String PREF_USUARIO_LOGADO = "PREF_USUARIO_LOGADO";
 
+  /// Constante que define nome da preferência que guarda a informação do aplicativo padrão de mapas.
+  static const String PREF_APP_MAPAS = "PREF_APP_MAPAS";
+
   /// Define a quantidade de registros a ser carregado por vez, para Lazy Loading.
   static const int QUANTIDADE_REGISTROS_LAZY_LOADING = 8;
   //#endregion Constantes
@@ -22,6 +26,9 @@ class Preferencias{
   /// Define o ID do usuário logado.
   static String idUsuarioLogado;
 
+  /// Define o aplicativo de mapa padrão do usuário.
+  static AplicativosDeMapa aplicativosDeMapa;
+
   //#endregion Atributos
 
   //#region Métodos
@@ -31,6 +38,7 @@ class Preferencias{
     final SharedPreferences preferencias = await SharedPreferences.getInstance();
 
     manterUsuarioLogado = preferencias.getBool(PREF_MANTER_LOGADO) ?? false;
+    aplicativosDeMapa = preferencias.getInt(PREF_APP_MAPAS) ?? AplicativosDeMapa.googleMaps;
 
     if(manterUsuarioLogado)
       idUsuarioLogado = preferencias.getString(PREF_USUARIO_LOGADO);

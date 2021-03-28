@@ -53,6 +53,7 @@ class _TelaAgendarRecolhimentoState extends State<TelaAgendarRecolhimento> {
 
                     DateTime dataSelecionada = await showDatePicker(
                         context: context,
+                        locale: Locale(WidgetsBinding.instance.window.locale.languageCode, WidgetsBinding.instance.window.locale.countryCode),
                         initialDate: _dataDoRecolhimento ?? DateTime.now(),
                         firstDate: DateTime.now(),
                         lastDate: DateTime(DateTime.now().year + 1)

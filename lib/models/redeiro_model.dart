@@ -71,15 +71,9 @@ class RedeiroModel extends Model{
   ///Cadastra um redeiro no Firebase.
   void cadastrarRedeiro({@required RedeiroDmo dadosDoRedeiro, @required VoidCallback onSuccess, @required VoidCallback onFail}){
 
-    FirebaseFirestore.instance.collection(NOME_COLECAO).add({
-      CAMPO_NOME : dadosDoRedeiro.nome,
-      CAMPO_CELULAR : dadosDoRedeiro.celular,
-      CAMPO_EMAIL : dadosDoRedeiro.email,
-      CAMPO_WHATSAPP : dadosDoRedeiro.whatsApp,
-      CAMPO_ENDERECO : dadosDoRedeiro.endereco.converterParaMapa(),
-      CAMPO_ATIVO : dadosDoRedeiro.ativo,
-      SUBCOLECAO_GRUPOS : dadosDoRedeiro.gruposDoRedeiro.map((e) => e.idGrupo).toList()
-    }).then((value) => onSuccess()).catchError((e){
+    FirebaseFirestore.instance.collection(NOME_COLECAO).add(
+      dadosDoRedeiro.converterParaMapa()
+    ).then((value) => onSuccess()).catchError((e){
       print(e.toString());
       onFail();
     });
@@ -120,34 +114,6 @@ class RedeiroModel extends Model{
         .get();
   }
 
-  /// Converte um snapshot em um objeto RedeiroDmo.
-  RedeiroDmo converterSnapshotEmRedeiro(DocumentSnapshot redeiro){
-
-    return RedeiroDmo(
-        id: redeiro.id,
-        nome: redeiro[CAMPO_NOME],
-        celular: redeiro[CAMPO_CELULAR],
-        email: redeiro[CAMPO_EMAIL],
-        whatsApp: redeiro[CAMPO_WHATSAPP],
-        endereco: EnderecoDmo(
-            logradouro: redeiro[CAMPO_ENDERECO][CAMPO_ENDERECO_LOGRADOURO],
-            numero: redeiro[CAMPO_ENDERECO][CAMPO_ENDERECO_NUMERO],
-            bairro: redeiro[CAMPO_ENDERECO][CAMPO_ENDERECO_BAIRRO],
-            cidade: redeiro[CAMPO_ENDERECO][CAMPO_ENDERECO_CIDADE],
-            cep: redeiro[CAMPO_ENDERECO][CAMPO_ENDERECO_CEP],
-            complemento: redeiro[CAMPO_ENDERECO][CAMPO_ENDERECO_COMPLEMENTO],
-            posicao: Position(
-                longitude: (redeiro[CAMPO_ENDERECO][CAMPO_ENDERECO_POSICAO] as GeoPoint).longitude,
-                latitude: (redeiro[CAMPO_ENDERECO][CAMPO_ENDERECO_POSICAO] as GeoPoint).latitude
-            )
-        ),
-        ativo: redeiro[CAMPO_ATIVO],
-        gruposDoRedeiro: (redeiro[SUBCOLECAO_GRUPOS] as List)
-            .map((e) => GrupoDeRedeirosDmo(
-            idGrupo: e)).toList()
-    );
-  }
-
   /// Carrega o caderno do redeiro diretamente do Firebase.
   Future<QuerySnapshot> carregarCadernoDoRedeiro(String idDoRedeiro) {
 
@@ -172,7 +138,7 @@ class RedeiroModel extends Model{
     // Obter lista de cidades
     List<String> listaDeCidades = [];
     redeiros.forEach((element) {
-      var redeiro = RedeiroModel().converterSnapshotEmRedeiro(element);
+      var redeiro = RedeiroDmo.converterSnapshotEmRedeiro(element);
       if(redeiro.endereco != null &&
           redeiro.endereco.cidade != null &&
           !listaDeCidades.any((cidade) => cidade == redeiro.endereco.cidade))
@@ -181,6 +147,15 @@ class RedeiroModel extends Model{
 
     return listaDeCidades;
   }
+
+  /// Carrega o redeiro por ID diretamente do Firebase.
+  Future<DocumentSnapshot> carregarRedeiroPorId(String idDoRedeiro) {
+
+    return FirebaseFirestore.instance.collection(NOME_COLECAO)
+        .doc(idDoRedeiro)
+        .get();
+  }
+
   //#endregion Métodos
 
 }
