@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:jsvillela_app/infra/preferencias.dart';
+import 'package:jsvillela_app/dml/materia_prima_dmo.dart';
 
 /// Model para matérias-primas.
 class MateriaPrimaModel extends Model{
@@ -33,27 +34,37 @@ class MateriaPrimaModel extends Model{
   /// Carrega as mp de forma paginada
   Future<QuerySnapshot> carregarMpPaginadas(DocumentSnapshot ultimaMp, String filtroPorNome) {
 
-    if(ultimaMp == null)
+    if(filtroPorNome != null && filtroPorNome.isNotEmpty){
+      print("******************1");
+      if(ultimaMp == null) {
+        print("******************2");
+        return FirebaseFirestore.instance.collection(NOME_COLECAO)
+            .orderBy(CAMPO_NM_MAT_PRIMA)
+            .startAt([filtroPorNome])
+            .endAt([filtroPorNome + "\uf8ff"])
+            .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
+            .get();
+      }
+      else {
+        print("******************3");
+        return FirebaseFirestore.instance.collection(NOME_COLECAO)
+            .orderBy(CAMPO_NM_MAT_PRIMA)
+            .startAt([filtroPorNome])
+            .endAt([filtroPorNome + "\uf8ff"])
+            .startAfterDocument(ultimaMp)
+            .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
+            .get();
+      }
+    }
+
+    if(ultimaMp == null) {
+      print("******************4");
       return FirebaseFirestore.instance.collection(NOME_COLECAO)
           .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
           .orderBy(CAMPO_NM_MAT_PRIMA).get();
-
-    if(filtroPorNome != null && filtroPorNome.isNotEmpty){
-      if(ultimaMp == null)
-        return FirebaseFirestore.instance.collection(NOME_COLECAO)
-            .orderBy(CAMPO_NM_MAT_PRIMA)
-            .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
-            .where(CAMPO_NM_MAT_PRIMA, isEqualTo: filtroPorNome)
-            .get();
-      else
-        return FirebaseFirestore.instance.collection(NOME_COLECAO)
-            .orderBy(CAMPO_NM_MAT_PRIMA)
-            .startAfterDocument(ultimaMp)
-            .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
-            .where(CAMPO_NM_MAT_PRIMA, isEqualTo: filtroPorNome)
-            .get();
     }
 
+    print("******************5");
     return FirebaseFirestore.instance.collection(NOME_COLECAO)
         .orderBy(CAMPO_NM_MAT_PRIMA)
         .startAfterDocument(ultimaMp)
@@ -61,7 +72,14 @@ class MateriaPrimaModel extends Model{
         .get();
   }
 
+  MatPrimaDmo converterSnapshotEmMateriaPrima(DocumentSnapshot materiaPrima){
 
+    return MatPrimaDmo(
+        id: materiaPrima.id,
+        nome_materia_prima: materiaPrima[CAMPO_NM_MAT_PRIMA],
+        icone: materiaPrima[CAMPO_ICONE_MAT_PRIMA]
+    );
+  }
 //#endregion Métodos
 
 }
