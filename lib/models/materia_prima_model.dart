@@ -18,6 +18,7 @@ class MateriaPrimaModel extends Model{
 
   /// Nome do identificador para o campo "icone_materia_prima" utilizado na collection do Firebase.
   static const String CAMPO_ICONE_MAT_PRIMA = "icone_materia_prima";
+  //#endregion Constantes
 
   //#region Métodos
   ///Cadastra um redeiro no Firebase.
@@ -61,7 +62,13 @@ class MateriaPrimaModel extends Model{
         .get();
   }
 
+  /// Carrega o redeiro por ID diretamente do Firebase.
+  Future<DocumentSnapshot> carregarMateriaPrimaPorId(String idDaMateriaPrima) async {
 
+    return await FirebaseFirestore.instance.collection(NOME_COLECAO)
+        .doc(idDaMateriaPrima)
+        .get();
+  }
 //#endregion Métodos
 
 }

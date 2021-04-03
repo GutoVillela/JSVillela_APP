@@ -6,6 +6,7 @@ import 'package:jsvillela_app/infra/infraestrutura.dart';
 import 'package:jsvillela_app/models/recolhimento_model.dart';
 import 'package:jsvillela_app/models/redeiro_model.dart';
 import 'package:jsvillela_app/ui/tela_principal.dart';
+import 'package:scoped_model/scoped_model.dart';
 
 class TelaConfirmarRecolhimento extends StatelessWidget {
 
@@ -46,80 +47,84 @@ class TelaConfirmarRecolhimento extends StatelessWidget {
 
 
                 // Obter lista de cidades
-                List<String> listaDeCidades = RedeiroModel().obterCidadesDosRedeiros(snapshot.data.docs.toList());
+                List<String> listaDeCidades = RedeiroModel().obterCidadesAPartirDosSnaptshots(snapshot.data.docs.toList());
 
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Center(child: Icon(Icons.location_on_outlined, size: 80, color: Theme.of(context).primaryColor)),
-                    SizedBox(height: 20),
-                    Text("Confirmar cidades",
-                        style:  TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold
+                return ScopedModelDescendant<RecolhimentoModel>(
+                  builder: (context, child, modelRecolhimento){
+                    return Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Center(child: Icon(Icons.location_on_outlined, size: 80, color: Theme.of(context).primaryColor)),
+                        SizedBox(height: 20),
+                        Text("Confirmar cidades",
+                            style:  TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold
+                            )
+                        ),
+                        SizedBox(height: 20),
+                        Expanded(
+                          child: ListView.builder(
+                              itemCount: listaDeCidades.length,
+                              itemBuilder: (context, index){
+                                return Center(
+                                    child: Text(
+                                      listaDeCidades[index],
+                                      style: TextStyle(
+                                          color: Theme.of(context).primaryColor,
+                                          fontSize: 28,
+                                          fontWeight: FontWeight.bold
+
+                                      ),
+                                    ));
+                              }
+
+                          ),
+                        ),
+                        SizedBox(height: 20),
+                        SizedBox(
+                          height: 60,
+                          width: constraints.maxWidth,
+                          child: ElevatedButton(
+                              style: ButtonStyle(
+                                  backgroundColor: MaterialStateProperty.resolveWith((Set<MaterialState> states) {
+                                    return Theme.of(context).primaryColor;
+                                  })
+                              ),
+                              child: Text(
+                                "Concluir agendamento",
+                                style: TextStyle(
+                                    fontSize: 20
+                                ),
+                              ),
+                              onPressed: (){
+
+                                if(_dataDoRecolhimento == null)
+                                  Infraestrutura.mostrarMensagemDeErro(context, "Data do recolhimento não fornecida.");
+                                else if(_gruposDeRedeiros == null || _gruposDeRedeiros.isEmpty)
+                                  Infraestrutura.mostrarMensagemDeErro(context, "Selecione pelo menos um grupo de redeiros para prosseguir.");
+                                else{
+
+                                  // Realizar cadastro do Redeiro
+                                  var dadosDoRecolhimento = RecolhimentoDmo(
+                                      dataDoRecolhimento: _dataDoRecolhimento,
+                                      gruposDoRecolhimento: _gruposDeRedeiros
+                                  );
+
+                                  modelRecolhimento.cadastrarRecolhimento(
+                                      dadosDoRecolhimento: dadosDoRecolhimento,
+                                      onSuccess: () => _finalizarAgendamento(context),
+                                      onFail: () => _informarErroNoAgendamento(context)
+                                  );
+                                }
+
+                              }
+                          ),
                         )
-                    ),
-                    SizedBox(height: 20),
-                    Expanded(
-                      child: ListView.builder(
-                          itemCount: listaDeCidades.length,
-                          itemBuilder: (context, index){
-                            return Center(
-                                child: Text(
-                                  listaDeCidades[index],
-                                  style: TextStyle(
-                                    color: Theme.of(context).primaryColor,
-                                    fontSize: 28,
-                                    fontWeight: FontWeight.bold
-
-                                  ),
-                                ));
-                          }
-
-                      ),
-                    ),
-                    SizedBox(height: 20),
-                    SizedBox(
-                      height: 60,
-                      width: constraints.maxWidth,
-                      child: ElevatedButton(
-                          style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.resolveWith((Set<MaterialState> states) {
-                                return Theme.of(context).primaryColor;
-                              })
-                          ),
-                          child: Text(
-                            "Concluir agendamento",
-                            style: TextStyle(
-                                fontSize: 20
-                            ),
-                          ),
-                          onPressed: (){
-
-                            if(_dataDoRecolhimento == null)
-                              Infraestrutura.mostrarMensagemDeErro(context, "Data do recolhimento não fornecida.");
-                            else if(_gruposDeRedeiros == null || _gruposDeRedeiros.isEmpty)
-                              Infraestrutura.mostrarMensagemDeErro(context, "Selecione pelo menos um grupo de redeiros para prosseguir.");
-                            else{
-
-                              // Realizar cadastro do Redeiro
-                              var dadosDoRecolhimento = RecolhimentoDmo(
-                                dataDoRecolhimento: _dataDoRecolhimento,
-                                gruposDoRecolhimento: _gruposDeRedeiros
-                              );
-
-                              RecolhimentoModel().cadastrarRecolhimento(
-                                  dadosDoRecolhimento: dadosDoRecolhimento,
-                                  onSuccess: () => _finalizarAgendamento(context),
-                                  onFail: () => _informarErroNoAgendamento(context)
-                              );
-                            }
-
-                          }
-                      ),
-                    )
-                  ],
+                      ],
+                    );
+                  }
                 );
               },
             ),

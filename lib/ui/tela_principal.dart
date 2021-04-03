@@ -83,6 +83,12 @@ class _TelaPrincipalState extends State<TelaPrincipal> {
             body: TelaAgendarRecolhimento()
         ),
         Scaffold(
+            appBar: AppBar(
+              title: Text("CONSULTAR RECOLHIMENTOS"),
+              centerTitle: true,
+              //backgroundColor: PaletaDeCor.AZUL_BEM_CLARO,
+            ),
+            //drawerScrimColor: PaletaDeCor.AZUL_BEM_CLARO,
             drawer: CustomDrawer(_homeScreenPageController),
             body: TelaConsultarRecolhimento()
         ),

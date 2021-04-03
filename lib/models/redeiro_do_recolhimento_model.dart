@@ -27,6 +27,8 @@ class RedeiroDoRecolhimentoModel extends Model{
 
   //#region Métodos
 
+  static RedeiroDoRecolhimentoModel of (BuildContext context) => ScopedModel.of<RedeiroDoRecolhimentoModel>(context);
+
   @override
   void addListener(VoidCallback listener) {
     super.addListener(listener);
@@ -81,19 +83,37 @@ class RedeiroDoRecolhimentoModel extends Model{
   }
 
   /// Busca os redeiros de um recolhimento específico.
-  Future<QuerySnapshot> carregarRedeirosDeUmRecolhimento(String idDoRecolhimento){
-    return FirebaseFirestore.instance.collection(RecolhimentoModel.NOME_COLECAO)
+  Future<QuerySnapshot> carregarRedeirosDeUmRecolhimento(String idDoRecolhimento) async{
+    return await FirebaseFirestore.instance.collection(RecolhimentoModel.NOME_COLECAO)
         .doc(idDoRecolhimento).collection(NOME_COLECAO)
         .get();
   }
 
-  /// Converte um snapshot em um objeto RedeiroDoRecolhimentoDmo.
-  RedeiroDoRecolhimentoDmo converterSnapshotEmRedeiroDoRecolhimento(DocumentSnapshot redeiroDoRecolhimento){
-    return RedeiroDoRecolhimentoDmo(
-        id: redeiroDoRecolhimento.id,
-        dataFinalizacao:  redeiroDoRecolhimento[CAMPO_DATA_FINALIZACAO] != null ? new DateTime.fromMillisecondsSinceEpoch((redeiroDoRecolhimento[CAMPO_DATA_FINALIZACAO] as Timestamp).millisecondsSinceEpoch).toLocal() : null,// Obter data e converter para o fuso horário local
-        redeiro: RedeiroDmo(id: redeiroDoRecolhimento[CAMPO_REDEIRO])
-    );
+  /// Busca os redeiros de um recolhimento específico.
+  Future<List<RedeiroDoRecolhimentoDmo>> carregarRedeirosDeUmRecolhimentoComDetalhes(String idDoRecolhimento) async{
+    estaCarregando = true;
+    notifyListeners();
+
+    // Consultar redeiros do recolhimento diretamente no Firebase
+    QuerySnapshot snapshotRedeiros = await carregarRedeirosDeUmRecolhimento(idDoRecolhimento);
+
+    // Inicializar lista de redeiros
+    List<RedeiroDoRecolhimentoDmo> redeirosDoRecolhimento = [];
+
+    // Converter lista de redeiros para uma lista de objetos RedeiroDoRecolhimentoDmo.
+    snapshotRedeiros.docs.forEach((element) {
+      redeirosDoRecolhimento.add(RedeiroDoRecolhimentoDmo.converterSnapshotEmRedeiroDoRecolhimento(element));
+    });
+
+    // Obter detalhes de todos os redeiros obtidos
+    for(int i = 0; i < redeirosDoRecolhimento.length; i++){
+      redeirosDoRecolhimento[i].redeiro =  RedeiroDmo.converterSnapshotEmRedeiro(await RedeiroModel().carregarRedeiroPorId(redeirosDoRecolhimento[i].redeiro.id));
+    }
+
+    estaCarregando = false;
+    notifyListeners();
+
+    return redeirosDoRecolhimento;
   }
 
   /// Carrega as informações do redeiro por ID.
@@ -110,6 +130,6 @@ class RedeiroDoRecolhimentoModel extends Model{
 
       });
   }
-//#endregion Métodos
+  //#endregion Métodos
 
 }

@@ -24,21 +24,15 @@ class CardRecolhimentoEmAndamento extends StatefulWidget {
 
   //#region Atributos
 
-  /// Ação do botão "Finalizar recolhimento"
-  final Function acaoBotaoFinalizar;
-
   /// Recolhimento associado ao card.
   final RecolhimentoDmo recolhimento;
-
-  /// Callback que é chamado após a finalização do recolhimento.
-  final Function callbackFinalizarRecolhimento;
 
   /// Flag que indica se processo de cadastrar redeiros está em progresso.
   bool cadastrandoRedeiros;
   //#endregion Atributos
 
   //#region Construtor(es)
-  CardRecolhimentoEmAndamento(this.acaoBotaoFinalizar, this.recolhimento, this.callbackFinalizarRecolhimento);
+  CardRecolhimentoEmAndamento(this.recolhimento);
   //#endregion Construtor(es)
 
   @override
@@ -53,16 +47,36 @@ class _CardRecolhimentoEmAndamentoState extends State<CardRecolhimentoEmAndament
   Widget build(BuildContext context) {
     print("Tamanho recolhimento: ${widget.recolhimento.redeirosDoRecolhimento.length}");
     return Expanded(
-        child: CarrouselDeItens(widget.recolhimento, _finalizarRecolhimento)
+        child: Column(children: [
+          Expanded(child: CarrouselDeItens(widget.recolhimento, _finalizarRecolhimento)),
+          Padding(
+            padding: const EdgeInsets.all(15.0),
+            child: SizedBox(
+              height: 40,
+              child: ElevatedButton(
+                  style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.resolveWith((Set<MaterialState> states) {
+                        return Theme.of(context).primaryColor;
+                      })
+                  ),
+                  child: Text(
+                    "Terminar recolhimento",
+                    style: TextStyle(
+                        fontSize: 20
+                    ),
+                  ),
+                  onPressed: _finalizarRecolhimento
+              ),
+            ),
+          )
+        ],)
     );
   }
 
   /// Callback chamado quando o recolhimento for finalizado.
   void _finalizarRecolhimento(){
-    print("Iniciar finalizar recolhimento");
     DateTime dataFinalizacao = DateTime.now();
-    RecolhimentoModel().finalizarRecolhimento(idRecolhimento: widget.recolhimento.id, dataFinalizacao: dataFinalizacao)
-      .then((value) => widget.callbackFinalizarRecolhimento(dataFinalizacao));
+    RecolhimentoModel.of(context).finalizarRecolhimento(idRecolhimento: widget.recolhimento.id, dataFinalizacao: dataFinalizacao);
   }
 //#endregion Métodos
 }

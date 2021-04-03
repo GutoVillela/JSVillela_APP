@@ -39,8 +39,6 @@ class _CarrouselDeItensState extends State<CarrouselDeItens> {
 
   @override
   Widget build(BuildContext context) {
-    print("Finalizou: ");
-    print(finalizouRecolhimento);
     return Center(
       child: Container(
         child: finalizouRecolhimento ?? false ?

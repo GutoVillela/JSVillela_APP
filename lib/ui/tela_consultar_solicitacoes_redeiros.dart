@@ -17,7 +17,7 @@ class _TelaConsultarSolicitacoesRedeirosState
   /// Controller utilizado no campo de texto de Busca.
   final _buscaController = TextEditingController();
 
-  //Define se o checkbox foi marcado
+  /// Define se o checkbox foi marcado
   bool _solicitacoesJaAtendidas = false;
   //#endregion Atributos
 

@@ -2,11 +2,21 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:jsvillela_app/dml/grupo_de_redeiros_dmo.dart';
 import 'package:jsvillela_app/dml/recolhimento_dmo.dart';
+import 'package:jsvillela_app/dml/redeiro_dmo.dart';
+import 'package:jsvillela_app/dml/redeiro_do_recolhimento_dmo.dart';
 import 'package:jsvillela_app/infra/preferencias.dart';
+import 'package:jsvillela_app/models/redeiro_do_recolhimento_model.dart';
+import 'package:jsvillela_app/models/redeiro_model.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 /// Model para recolhimentos.
 class RecolhimentoModel extends Model{
+
+  //#region Construtor(es)
+  RecolhimentoModel(){
+    _carregarRecolhimentoDoDia();
+  }
+  //#endregion Construtor(es)
 
   //#region Constantes
   
@@ -27,9 +37,17 @@ class RecolhimentoModel extends Model{
   //#region Atributos
   /// Indica que existe um processo em execução a partir desta classe.
   bool estaCarregando = false;
+
+  /// Indica se existe um recolhimento em andamento ou não.
+  bool recolhimentoEmAndamento = false;
+
+  /// Recolhimento do dia associado ao model.
+  RecolhimentoDmo recolhimentoDoDia;
   //#endregion Atributos
 
   //#region Métodos
+  static RecolhimentoModel of (BuildContext context) => ScopedModel.of<RecolhimentoModel>(context);
+
   ///Cadastra um recolhimento no Firebase.
   void cadastrarRecolhimento({@required RecolhimentoDmo dadosDoRecolhimento, @required Function onSuccess, @required Function onFail}){
 
@@ -37,34 +55,60 @@ class RecolhimentoModel extends Model{
       CAMPO_DATA_RECOLHIMENTO : dadosDoRecolhimento.dataDoRecolhimento,
       CAMPO_DATA_FINALIZADO : null,
       CAMPO_GRUPOS_DO_RECOLHIMENTO : dadosDoRecolhimento.gruposDoRecolhimento.map((e) => e.idGrupo).toList()
-    }).then((value) => onSuccess()).catchError((e){
+    }).then((value) async{
+      onSuccess();
+      await _carregarRecolhimentoDoDia();
+    }).catchError((e){
       print(e.toString());
       onFail();
     });
   }
 
   /// Carrega os recolhimentos de forma paginada diretamente do Firebase.
-  Future<QuerySnapshot> carregarRecolhimentosPaginados(DocumentSnapshot ultimoRecolhimento, DateTime filtroDataInicial, DateTime filtroDataFinal) {
+  Future<QuerySnapshot> carregarRecolhimentosPaginados(DocumentSnapshot ultimoRecolhimento, DateTime filtroDataInicial, DateTime filtroDataFinal, bool incluirFinalizados) {
 
     //#region Filtro com data inicial e final
     if(filtroDataInicial != null && filtroDataFinal != null){
       
       if(ultimoRecolhimento == null){
-        return FirebaseFirestore.instance.collection(NOME_COLECAO)
-            .orderBy(CAMPO_DATA_RECOLHIMENTO)
-            .where(CAMPO_DATA_RECOLHIMENTO, isGreaterThanOrEqualTo: filtroDataInicial)
-            .where(CAMPO_DATA_RECOLHIMENTO, isLessThanOrEqualTo: filtroDataFinal)
-            .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
-            .get();
+        if(incluirFinalizados){
+          return FirebaseFirestore.instance.collection(NOME_COLECAO)
+              .orderBy(CAMPO_DATA_RECOLHIMENTO)
+              .where(CAMPO_DATA_RECOLHIMENTO, isGreaterThanOrEqualTo: filtroDataInicial)
+              .where(CAMPO_DATA_RECOLHIMENTO, isLessThanOrEqualTo: filtroDataFinal)
+              .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
+              .get();
+        }
+        else{
+          return FirebaseFirestore.instance.collection(NOME_COLECAO)
+              .orderBy(CAMPO_DATA_RECOLHIMENTO)
+              .where(CAMPO_DATA_RECOLHIMENTO, isGreaterThanOrEqualTo: filtroDataInicial)
+              .where(CAMPO_DATA_RECOLHIMENTO, isLessThanOrEqualTo: filtroDataFinal)
+              .where(CAMPO_DATA_FINALIZADO, isNull: true)
+              .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
+              .get();
+        }
       }
       else{
-        return FirebaseFirestore.instance.collection(NOME_COLECAO)
-            .orderBy(CAMPO_DATA_RECOLHIMENTO)
-            .where(CAMPO_DATA_RECOLHIMENTO, isGreaterThanOrEqualTo: filtroDataInicial)
-            .where(CAMPO_DATA_RECOLHIMENTO, isLessThanOrEqualTo: filtroDataFinal)
-            .startAfterDocument(ultimoRecolhimento)
-            .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
-            .get();
+        if(incluirFinalizados){
+          return FirebaseFirestore.instance.collection(NOME_COLECAO)
+              .orderBy(CAMPO_DATA_RECOLHIMENTO)
+              .where(CAMPO_DATA_RECOLHIMENTO, isGreaterThanOrEqualTo: filtroDataInicial)
+              .where(CAMPO_DATA_RECOLHIMENTO, isLessThanOrEqualTo: filtroDataFinal)
+              .startAfterDocument(ultimoRecolhimento)
+              .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
+              .get();
+        }
+        else{
+          return FirebaseFirestore.instance.collection(NOME_COLECAO)
+              .orderBy(CAMPO_DATA_RECOLHIMENTO)
+              .where(CAMPO_DATA_RECOLHIMENTO, isGreaterThanOrEqualTo: filtroDataInicial)
+              .where(CAMPO_DATA_RECOLHIMENTO, isLessThanOrEqualTo: filtroDataFinal)
+              .where(CAMPO_DATA_FINALIZADO, isNull: true)
+              .startAfterDocument(ultimoRecolhimento)
+              .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
+              .get();
+        }
       }
     }
     //#endregion Filtro com data inicial e final
@@ -72,19 +116,40 @@ class RecolhimentoModel extends Model{
     //#region Filtro com data inicial
     if(filtroDataInicial != null){
       if(ultimoRecolhimento == null){
-        return FirebaseFirestore.instance.collection(NOME_COLECAO)
-            .orderBy(CAMPO_DATA_RECOLHIMENTO)
-            .where(CAMPO_DATA_RECOLHIMENTO, isGreaterThanOrEqualTo: filtroDataInicial)
-            .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
-            .get();
+        if(incluirFinalizados){
+          return FirebaseFirestore.instance.collection(NOME_COLECAO)
+              .orderBy(CAMPO_DATA_RECOLHIMENTO)
+              .where(CAMPO_DATA_RECOLHIMENTO, isGreaterThanOrEqualTo: filtroDataInicial)
+              .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
+              .get();
+        }
+        else{
+          return FirebaseFirestore.instance.collection(NOME_COLECAO)
+              .orderBy(CAMPO_DATA_RECOLHIMENTO)
+              .where(CAMPO_DATA_RECOLHIMENTO, isGreaterThanOrEqualTo: filtroDataInicial)
+              .where(CAMPO_DATA_FINALIZADO, isNull: true)
+              .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
+              .get();
+        }
       }
       else{
-        return FirebaseFirestore.instance.collection(NOME_COLECAO)
-            .orderBy(CAMPO_DATA_RECOLHIMENTO)
-            .where(CAMPO_DATA_RECOLHIMENTO, isGreaterThanOrEqualTo: filtroDataInicial)
-            .startAfterDocument(ultimoRecolhimento)
-            .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
-            .get();
+        if(incluirFinalizados){
+          return FirebaseFirestore.instance.collection(NOME_COLECAO)
+              .orderBy(CAMPO_DATA_RECOLHIMENTO)
+              .where(CAMPO_DATA_RECOLHIMENTO, isGreaterThanOrEqualTo: filtroDataInicial)
+              .startAfterDocument(ultimoRecolhimento)
+              .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
+              .get();
+        }
+        else{
+          return FirebaseFirestore.instance.collection(NOME_COLECAO)
+              .orderBy(CAMPO_DATA_RECOLHIMENTO)
+              .where(CAMPO_DATA_RECOLHIMENTO, isGreaterThanOrEqualTo: filtroDataInicial)
+              .where(CAMPO_DATA_FINALIZADO, isNull: true)
+              .startAfterDocument(ultimoRecolhimento)
+              .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
+              .get();
+        }
       }
     }
     //#endregion Filtro com data inicial
@@ -92,47 +157,73 @@ class RecolhimentoModel extends Model{
     //#region Filtro com data final
     if(filtroDataFinal != null){
       if(ultimoRecolhimento == null){
-        return FirebaseFirestore.instance.collection(NOME_COLECAO)
-            .orderBy(CAMPO_DATA_RECOLHIMENTO)
-            .where(CAMPO_DATA_RECOLHIMENTO, isLessThanOrEqualTo: filtroDataFinal)
-            .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
-            .get();
+        if(incluirFinalizados){
+          return FirebaseFirestore.instance.collection(NOME_COLECAO)
+              .orderBy(CAMPO_DATA_RECOLHIMENTO)
+              .where(CAMPO_DATA_RECOLHIMENTO, isLessThanOrEqualTo: filtroDataFinal)
+              .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
+              .get();
+        }
+        else{
+          return FirebaseFirestore.instance.collection(NOME_COLECAO)
+              .orderBy(CAMPO_DATA_RECOLHIMENTO)
+              .where(CAMPO_DATA_RECOLHIMENTO, isLessThanOrEqualTo: filtroDataFinal)
+              .where(CAMPO_DATA_FINALIZADO, isNull: true)
+              .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
+              .get();
+        }
       }
       else{
-        return FirebaseFirestore.instance.collection(NOME_COLECAO)
-            .orderBy(CAMPO_DATA_RECOLHIMENTO)
-            .where(CAMPO_DATA_RECOLHIMENTO, isLessThanOrEqualTo: filtroDataFinal)
-            .startAfterDocument(ultimoRecolhimento)
-            .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
-            .get();
+        if(incluirFinalizados){
+          return FirebaseFirestore.instance.collection(NOME_COLECAO)
+              .orderBy(CAMPO_DATA_RECOLHIMENTO)
+              .where(CAMPO_DATA_RECOLHIMENTO, isLessThanOrEqualTo: filtroDataFinal)
+              .startAfterDocument(ultimoRecolhimento)
+              .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
+              .get();
+        }
+        else{
+          return FirebaseFirestore.instance.collection(NOME_COLECAO)
+              .orderBy(CAMPO_DATA_RECOLHIMENTO)
+              .where(CAMPO_DATA_RECOLHIMENTO, isLessThanOrEqualTo: filtroDataFinal)
+              .where(CAMPO_DATA_FINALIZADO, isNull: true)
+              .startAfterDocument(ultimoRecolhimento)
+              .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
+              .get();
+        }
       }
     }
     //#endregion Filtro com data final
 
-    if(ultimoRecolhimento == null)
+    if(ultimoRecolhimento == null){
+      if(incluirFinalizados){
+        return FirebaseFirestore.instance.collection(NOME_COLECAO)
+            .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
+            .orderBy(CAMPO_DATA_RECOLHIMENTO)
+            .get();
+      }
+      else{
+        return FirebaseFirestore.instance.collection(NOME_COLECAO)
+            .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
+            .orderBy(CAMPO_DATA_RECOLHIMENTO)
+            .where(CAMPO_DATA_FINALIZADO, isNull: true)
+            .get();
+      }
+    }
+
+    if(incluirFinalizados)
       return FirebaseFirestore.instance.collection(NOME_COLECAO)
+          .orderBy(ultimoRecolhimento)
+          .startAfterDocument(ultimoRecolhimento)
           .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
-          .orderBy(CAMPO_DATA_RECOLHIMENTO)
           .get();
-
-    return FirebaseFirestore.instance.collection(NOME_COLECAO)
-        .orderBy(ultimoRecolhimento)
-        .startAfterDocument(ultimoRecolhimento)
-        .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
-        .get();
-  }
-
-  /// Converte um snapshot em um objeto RecolhimentoDmo.
-  RecolhimentoDmo converterSnapshotEmRecolhimento(DocumentSnapshot recolhimento){
-
-    return RecolhimentoDmo(
-        id: recolhimento.id,
-        dataDoRecolhimento: recolhimento[CAMPO_DATA_RECOLHIMENTO] != null ? new DateTime.fromMillisecondsSinceEpoch((recolhimento[CAMPO_DATA_RECOLHIMENTO] as Timestamp).millisecondsSinceEpoch).toLocal() : null,// Obter data e converter para o fuso horário local
-        dataFinalizado:  recolhimento[CAMPO_DATA_FINALIZADO] != null ? new DateTime.fromMillisecondsSinceEpoch((recolhimento[CAMPO_DATA_FINALIZADO] as Timestamp).millisecondsSinceEpoch).toLocal() : null,// Obter data e converter para o fuso horário local
-        gruposDoRecolhimento: (recolhimento[CAMPO_GRUPOS_DO_RECOLHIMENTO] as List)
-            .map((e) => GrupoDeRedeirosDmo(
-            idGrupo: e)).toList()
-    );
+    else
+      return FirebaseFirestore.instance.collection(NOME_COLECAO)
+          .orderBy(ultimoRecolhimento)
+          .startAfterDocument(ultimoRecolhimento)
+          .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
+          .where(CAMPO_DATA_FINALIZADO, isNull: true)
+          .get();
   }
 
   /// Carrega os recolhimentos por grupos.
@@ -169,6 +260,8 @@ class RecolhimentoModel extends Model{
       .update({ CAMPO_DATA_FINALIZADO: dataFinalizacao })
       .then((value){
         estaCarregando = false;
+        this.recolhimentoDoDia.dataFinalizado = dataFinalizacao;
+        recolhimentoEmAndamento = false;
         notifyListeners();
       })
       .catchError((erro) {
@@ -177,8 +270,65 @@ class RecolhimentoModel extends Model{
       });
   }
 
+  /// Carrega o recolhimento do dia.
+  Future<void> _carregarRecolhimentoDoDia() async{
 
+    estaCarregando = true;
+    notifyListeners();
 
+    QuerySnapshot recolhimento = await FirebaseFirestore.instance.collection(NOME_COLECAO)
+        .where(CAMPO_DATA_RECOLHIMENTO, isEqualTo: DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day).toLocal())
+        .get();
+
+    if(recolhimento != null && recolhimento.docs.any((element) => true)){
+      this.recolhimentoDoDia = RecolhimentoDmo.converterSnapshotEmRecolhimento(recolhimento.docs.first);
+
+      // Carregar redeiros do recolhimento
+      QuerySnapshot redeirosDoRecolhimento = await RedeiroModel().carregarRedeirosPorGrupos(this.recolhimentoDoDia.gruposDoRecolhimento.map((e) => e.idGrupo).toList());
+
+      // Obter redeiros dos grupos
+      List<RedeiroDmo> listaDeRedeiros = [];
+      redeirosDoRecolhimento.docs.forEach((element) {
+        listaDeRedeiros.add(RedeiroDmo.converterSnapshotEmRedeiro(element));
+      });
+
+      // Converter redeiros em Redeiros do Recolhimento
+      recolhimentoDoDia.redeirosDoRecolhimento = listaDeRedeiros.map((e) => RedeiroDoRecolhimentoDmo(redeiro: e)).toList();
+    }
+
+    estaCarregando = false;
+    notifyListeners();
+  }
+
+  /// Carrega os redeiros associados ao recolhimento do dia.
+  Future<void> _carregarRedeirosDoRecolhimentoDoDia() async {
+
+    estaCarregando = true;// Indicar início do processamento
+    notifyListeners();
+
+    recolhimentoDoDia.redeirosDoRecolhimento = [];
+
+    QuerySnapshot snapshotRedeiros = await RedeiroDoRecolhimentoModel().carregarRedeirosDeUmRecolhimento(recolhimentoDoDia.id);
+
+    // Obter os redeiros do recolhimento cadastrados no recolhimento
+    snapshotRedeiros.docs.forEach((element) {
+      recolhimentoDoDia.redeirosDoRecolhimento.add(RedeiroDoRecolhimentoDmo.converterSnapshotEmRedeiroDoRecolhimento(element));
+    });
+
+    estaCarregando = false;
+    notifyListeners();
+  }
+
+  /// Define a flag "recolhimentoEmAndamento" para true e notifica os listeners.
+  Future<void> iniciarRecolhimento() async{
+
+    // Carregar os redeiros do recolhimento caso não existam.
+    if(recolhimentoDoDia.redeirosDoRecolhimento == null || recolhimentoDoDia.redeirosDoRecolhimento.any((element) => true)){
+      await _carregarRedeirosDoRecolhimentoDoDia();
+    }
+    recolhimentoEmAndamento = true;
+    notifyListeners();
+  }
 
 //#endregion Métodos
 
