@@ -1,4 +1,7 @@
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:jsvillela_app/models/grupo_de_redeiros_model.dart';
+
 /// Classe modelo para grupo de redeiros.
 class GrupoDeRedeirosDmo {
 
@@ -17,7 +20,14 @@ class GrupoDeRedeirosDmo {
   //#endregion Construtor(es)
 
   //#region Métodos
+  /// Converte um snapshot em um objeto GrupoDeRedeirosDmo.
+  static GrupoDeRedeirosDmo converterSnapshotEmGrupoDeRedeiro(DocumentSnapshot grupo){
 
+    return GrupoDeRedeirosDmo(
+        idGrupo: grupo.id,
+        nomeGrupo: grupo[GrupoDeRedeirosModel.CAMPO_NOME]
+    );
+  }
   //#endregion Métodos
 
 }

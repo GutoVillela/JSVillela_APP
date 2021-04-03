@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:jsvillela_app/dml/base_dmo.dart';
 import 'package:jsvillela_app/dml/redeiro_dmo.dart';
 import 'package:jsvillela_app/models/redeiro_do_recolhimento_model.dart';
@@ -32,6 +33,17 @@ class RedeiroDoRecolhimentoDmo implements BaseDmo{
   //#endregion Construtor(es)
 
   //#region Métodos
+  /// Converte um snapshot em um objeto RedeiroDoRecolhimentoDmo.
+  static RedeiroDoRecolhimentoDmo converterSnapshotEmRedeiroDoRecolhimento(DocumentSnapshot redeiroDoRecolhimento){
+    return RedeiroDoRecolhimentoDmo(
+        id: redeiroDoRecolhimento.id,
+        dataFinalizacao:  redeiroDoRecolhimento[RedeiroDoRecolhimentoModel.CAMPO_DATA_FINALIZACAO] != null ?
+          new DateTime.fromMillisecondsSinceEpoch((redeiroDoRecolhimento[RedeiroDoRecolhimentoModel.CAMPO_DATA_FINALIZACAO] as Timestamp).millisecondsSinceEpoch).toLocal() :
+          null,// Obter data e converter para o fuso horário local
+        redeiro: RedeiroDmo(id: redeiroDoRecolhimento[RedeiroDoRecolhimentoModel.CAMPO_REDEIRO])
+    );
+  }
+
   // @override
   // String toString() {
   //   return 'id: $id, '

@@ -54,6 +54,12 @@ class EnderecoDmo implements BaseDmo{
     };
   }
 
+  @override
+  converterSnapshotParaDmo(DocumentSnapshot snapshot) {
+    // TODO: implement converterSnapshotParaDmo
+    throw UnimplementedError();
+  }
+
 
   //#endregion Métodos
 }

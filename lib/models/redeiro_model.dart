@@ -15,6 +15,10 @@ import 'package:jsvillela_app/dml/redeiro_dmo.dart';
 class RedeiroModel extends Model{
 
   //#region Atributos
+
+  /// Indica que existe um processo em execução a partir desta classe.
+  bool estaCarregando = false;
+
   //#endregion Atributos
 
   //#region Constantes
@@ -125,20 +129,29 @@ class RedeiroModel extends Model{
   }
 
   /// Carrega os endereços de todos os redeiros dentro do grupo.
-  Future<QuerySnapshot> carregarRedeirosPorGrupos(List<String> idsDosGrupos){
+  Future<QuerySnapshot> carregarRedeirosPorGrupos(List<String> idsDosGrupos) async {
 
-    return FirebaseFirestore.instance.collection(NOME_COLECAO)
+    return await FirebaseFirestore.instance.collection(NOME_COLECAO)
         .where(SUBCOLECAO_GRUPOS, arrayContainsAny: idsDosGrupos)
-        //.orderBy(CAMPO_NOME)
         .get();
   }
 
   /// Converte uma lista de redeiros em uma lista de cidades (sem repetição).
-  List<String> obterCidadesDosRedeiros(List<DocumentSnapshot> redeiros){
+  List<String> obterCidadesAPartirDosSnaptshots(List<DocumentSnapshot> redeiros){
+    // Converter snapshots em uma lista de RedeiroDmo.
+    List<RedeiroDmo> listaDeRedeiros = [];
+    redeiros.forEach((element) {
+      listaDeRedeiros.add(RedeiroDmo.converterSnapshotEmRedeiro(element));
+    });
+
+    return obterCidadesAPartirDosRedeiros(listaDeRedeiros);
+  }
+
+  /// Converte uma lista de redeiros em uma lista de cidades (sem repetição).
+  List<String> obterCidadesAPartirDosRedeiros(List<RedeiroDmo> redeiros){
     // Obter lista de cidades
     List<String> listaDeCidades = [];
-    redeiros.forEach((element) {
-      var redeiro = RedeiroDmo.converterSnapshotEmRedeiro(element);
+    redeiros.forEach((redeiro) {
       if(redeiro.endereco != null &&
           redeiro.endereco.cidade != null &&
           !listaDeCidades.any((cidade) => cidade == redeiro.endereco.cidade))
@@ -149,13 +162,12 @@ class RedeiroModel extends Model{
   }
 
   /// Carrega o redeiro por ID diretamente do Firebase.
-  Future<DocumentSnapshot> carregarRedeiroPorId(String idDoRedeiro) {
+  Future<DocumentSnapshot> carregarRedeiroPorId(String idDoRedeiro) async {
 
-    return FirebaseFirestore.instance.collection(NOME_COLECAO)
+    return await FirebaseFirestore.instance.collection(NOME_COLECAO)
         .doc(idDoRedeiro)
         .get();
   }
-
   //#endregion Métodos
 
 }

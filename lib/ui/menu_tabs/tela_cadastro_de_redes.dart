@@ -141,7 +141,7 @@ class _TelaCadastroDeRedesState extends State<TelaCadastroDeRedes> {
       if (snapshot.docs.length < Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
         _temMaisRegistros = false;
 
-      // Adicionar na lista de mp elementos não repetidos
+      // Adicionar na lista de redes elementos não repetidos
       snapshot.docs.toList().forEach((element) {
         if (!_listaDeRedes.any((matPrima) => matPrima.id == element.id))
           _listaDeRedes.add(RedeModel().converterSnapshotEmRede(element));

@@ -7,11 +7,15 @@ import 'package:scoped_model/scoped_model.dart';
 class GrupoDeRedeirosModel extends Model{
 
   //#region Atributos
+
+  /// Indica que existe um processo em execução a partir desta classe.
+  bool estaCarregando = false;
+
   //#endregion Atributos
 
   //#region Constantes
 
-/// Nome do identificador para a coleção "grupos_de_redeiros" utilizado no Firebase.
+  /// Nome do identificador para a coleção "grupos_de_redeiros" utilizado no Firebase.
   static const String NOME_COLECAO = "grupos_de_redeiros";
 
   /// Nome do identificador para o campo "nome_grupo" utilizado na collection.
@@ -22,6 +26,8 @@ class GrupoDeRedeirosModel extends Model{
   //#endregion Constantes
 
   //#region Métodos
+  static GrupoDeRedeirosModel of (BuildContext context) => ScopedModel.of<GrupoDeRedeirosModel>(context);
+
   ///Cadastra um grupo de redeiros no Firebase.
   void cadastrarGrupoDeRedeiros({@required Map<String, dynamic> dadosDoGrupo, @required VoidCallback onSuccess, @required VoidCallback onFail}){
     FirebaseFirestore.instance.collection(NOME_COLECAO).add({
@@ -32,21 +38,32 @@ class GrupoDeRedeirosModel extends Model{
   }
 
   /// Busca um grupo de redeiros por ID.
-  Future<DocumentSnapshot> carregarGrupoPorId(String idsDoGrupo){
+  Future<DocumentSnapshot> carregarGrupoPorId(String idDoGrupo) async{
 
-    return FirebaseFirestore.instance.collection(NOME_COLECAO)
-        .doc(idsDoGrupo)
+    return await FirebaseFirestore.instance.collection(NOME_COLECAO)
+        .doc(idDoGrupo)
         .get();
   }
 
-  /// Converte um snapshot em um objeto GrupoDeRedeirosDmo.
-  GrupoDeRedeirosDmo converterSnapshotEmGrupoDeRedeiro(DocumentSnapshot grupo){
+  /// Carrega uma lista de grupos por ID.
+  Future<List<GrupoDeRedeirosDmo>> carregarGruposPorId(List<String> idsDosGrupos) async{
 
-    return GrupoDeRedeirosDmo(
-        idGrupo: grupo.id,
-        nomeGrupo: grupo[CAMPO_NOME]
-    );
+    estaCarregando = true;
+    notifyListeners();
+
+    List<GrupoDeRedeirosDmo> listaDeGrupos = [];
+
+    for(int i = 0; i < idsDosGrupos.length; i++){
+      DocumentSnapshot grupo = await carregarGrupoPorId(idsDosGrupos[i]);
+      listaDeGrupos.add(GrupoDeRedeirosDmo.converterSnapshotEmGrupoDeRedeiro(grupo));
+    }
+
+    estaCarregando = false;
+    notifyListeners();
+
+    return listaDeGrupos;
   }
+
   //#endregion Métodos
 
 }

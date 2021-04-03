@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 /// Classe abstrata base para objetos Dmo.
 abstract class BaseDmo{
 

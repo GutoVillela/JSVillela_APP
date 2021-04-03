@@ -1,22 +1,49 @@
-class MatPrimaDmo
-{
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:jsvillela_app/dml/base_dmo.dart';
+import 'package:jsvillela_app/models/materia_prima_model.dart';
 
-  //Id da materia prima
+/// Classe modelo para matéria-prima.
+class MateriaPrimaDmo implements BaseDmo{
+
+  //#region Atributos
+
+  /// Id da matéria-prima.
   String id;
 
-  /// Nome da Rede
-  String nome_materia_prima;
+  /// Nome da matéria-prima.
+  String nomeMateriaPrima;
 
-  /// Valor da Rede
-  String icone;
+  /// Ícone da matéria-prima.
+  String iconeMateriaPrima;
 
-  MatPrimaDmo({this.id, this.nome_materia_prima, this.icone});
+  //#endregion Atributos
+
+  //#region Construtor(es)
+  MateriaPrimaDmo({this.id, this.nomeMateriaPrima, this.iconeMateriaPrima});
+  //#endregion Construtor(es)
+
+  //#region Métodos
+  @override
+  Map<String, dynamic> converterParaMapa() {
+    return {
+      MateriaPrimaModel.CAMPO_NM_MAT_PRIMA : nomeMateriaPrima,
+      MateriaPrimaModel.CAMPO_ICONE_MAT_PRIMA : iconeMateriaPrima
+    };
+  }
 
   @override
   String toString() {
-    return
-      'id: $id, '
-          'nome_mat_prima: $nome_materia_prima, '
-          'icone_mat_prima: $icone';
+    return 'MateriaPrimaDmo(id : ${id ?? "null"}, nomeMateriaPrima : ${nomeMateriaPrima ?? "null"}, iconeMateriaPrima : ${iconeMateriaPrima ?? "null"})';
   }
+
+  /// Converte um snapshot em um objeto MateriaPrimaDmo.
+  static MateriaPrimaDmo converterSnapshotEmDmo(DocumentSnapshot materiaPrima){
+
+    return MateriaPrimaDmo(
+        id: materiaPrima.id,
+        nomeMateriaPrima: materiaPrima[MateriaPrimaModel.CAMPO_NM_MAT_PRIMA],
+        iconeMateriaPrima: materiaPrima[MateriaPrimaModel.CAMPO_ICONE_MAT_PRIMA]
+    );
+  }
+  //#endregion Métodos
 }
