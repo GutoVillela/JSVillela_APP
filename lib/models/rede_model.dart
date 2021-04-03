@@ -33,11 +33,6 @@ class RedeModel extends Model{
   /// Carrega as redes de forma paginada
   Future<QuerySnapshot> carregarRedesPaginadas(DocumentSnapshot ultimaRede, String filtroPorNome) {
 
-    if(ultimaRede == null)
-      return FirebaseFirestore.instance.collection(NOME_COLECAO)
-          .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
-          .orderBy(CAMPO_REDE).get();
-
     if(filtroPorNome != null && filtroPorNome.isNotEmpty){
       if(ultimaRede == null)
         return FirebaseFirestore.instance.collection(NOME_COLECAO)
@@ -45,7 +40,6 @@ class RedeModel extends Model{
             .startAt([filtroPorNome])
             .endAt([filtroPorNome + "\uf8ff"])
             .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
-            .where(CAMPO_REDE, isEqualTo: filtroPorNome)
             .get();
       else
         return FirebaseFirestore.instance.collection(NOME_COLECAO)
@@ -54,9 +48,13 @@ class RedeModel extends Model{
             .endAt([filtroPorNome + "\uf8ff"])
             .startAfterDocument(ultimaRede)
             .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
-            .where(CAMPO_REDE, isEqualTo: filtroPorNome)
             .get();
     }
+
+    if(ultimaRede == null)
+      return FirebaseFirestore.instance.collection(NOME_COLECAO)
+          .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
+          .orderBy(CAMPO_REDE).get();
 
     return FirebaseFirestore.instance.collection(NOME_COLECAO)
         .orderBy(CAMPO_REDE)

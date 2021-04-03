@@ -6,6 +6,7 @@ import 'package:jsvillela_app/models/materia_prima_model.dart';
 import 'package:jsvillela_app/ui/widgets/campo_de_texto_com_icone.dart';
 import 'package:jsvillela_app/ui/widgets/list_view_item_pesquisa.dart';
 import 'package:jsvillela_app/infra/preferencias.dart';
+import 'package:jsvillela_app/dml/materia_prima_dmo.dart';
 
 class TelaCadastroDeMateriaPrima extends StatefulWidget {
   @override
@@ -20,7 +21,9 @@ class _TelaCadastroDeMateriaPrimaState
   /// Controller utilizado no campo de texto de Busca.
   final _buscaController = TextEditingController();
 
-  List<DocumentSnapshot> _listaDeMP = [];
+  //List<DocumentSnapshot> _listaDeMP = []
+
+  List<MatPrimaDmo> _listaDeMP = [];
 
   /// Última mp carregada em tela.
   DocumentSnapshot _ultimaMpCarregada;
@@ -32,7 +35,7 @@ class _TelaCadastroDeMateriaPrimaState
   bool _carregandoRegistros = false;
 
   /// Filtro utilizado na busca
-  String filtro;
+  //String filtro;
 
   /// ScrollController usado para saber se usuário scrollou a lista até o final.
   ScrollController _scrollController = ScrollController();
@@ -73,8 +76,9 @@ class _TelaCadastroDeMateriaPrimaState
                     acaoAoSubmeter: (String filtro) {
                       setState(() {
                         print("Submeteu");
-                        filtro = _buscaController.text;
+                        //filtro = _buscaController.text;
                         resetarCamposDeBusca();
+                        _obterRegistros(true);
                       });
                     },
                     regraDeValidacao: (texto) {
@@ -106,12 +110,8 @@ class _TelaCadastroDeMateriaPrimaState
                           }
 
                           return ListViewItemPesquisa(
-                              textoPrincipal: _listaDeMP[index]
-                              [MateriaPrimaModel.CAMPO_NM_MAT_PRIMA],
-                              textoSecundario: _listaDeMP[index][
-                              MateriaPrimaModel
-                                  .CAMPO_ICONE_MAT_PRIMA]
-                                  .toString(),
+                              textoPrincipal: _listaDeMP[index].nome_materia_prima,
+                              textoSecundario: _listaDeMP[index].icone.toString(),
                               iconeEsquerda: Icons.person,
                               iconeDireita: Icons.search);
                         })),
@@ -132,8 +132,7 @@ class _TelaCadastroDeMateriaPrimaState
   void _obterRegistros(bool resetaLista) {
     if (resetaLista) setState(() => _carregandoRegistros = true);
 
-    MateriaPrimaModel()
-        .carregarMpPaginadas(_ultimaMpCarregada, filtro)
+    MateriaPrimaModel().carregarMpPaginadas(_ultimaMpCarregada, _buscaController.text)
         .then((snapshot) {
       // Obter e salvar último redeiro
       _ultimaMpCarregada = snapshot.docs.isNotEmpty ? snapshot.docs.last : null;
@@ -146,7 +145,7 @@ class _TelaCadastroDeMateriaPrimaState
       // Adicionar na lista de mp elementos não repetidos
       snapshot.docs.toList().forEach((element) {
         if (!_listaDeMP.any((matPrima) => matPrima.id == element.id))
-          _listaDeMP.add(element);
+          _listaDeMP.add(MateriaPrimaModel().converterSnapshotEmMateriaPrima(element));
       });
 
       if (resetaLista)
