@@ -21,9 +21,7 @@ class _TelaCadastroDeMateriaPrimaState
   /// Controller utilizado no campo de texto de Busca.
   final _buscaController = TextEditingController();
 
-  //List<DocumentSnapshot> _listaDeMP = []
-
-  List<MatPrimaDmo> _listaDeMP = [];
+  List<MateriaPrimaDmo> _listaDeMP = [];
 
   /// Última mp carregada em tela.
   DocumentSnapshot _ultimaMpCarregada;
@@ -110,8 +108,8 @@ class _TelaCadastroDeMateriaPrimaState
                           }
 
                           return ListViewItemPesquisa(
-                              textoPrincipal: _listaDeMP[index].nome_materia_prima,
-                              textoSecundario: _listaDeMP[index].icone.toString(),
+                              textoPrincipal: _listaDeMP[index].nomeMateriaPrima,
+                              textoSecundario: _listaDeMP[index].iconeMateriaPrima,
                               iconeEsquerda: Icons.person,
                               iconeDireita: Icons.search);
                         })),
@@ -145,7 +143,7 @@ class _TelaCadastroDeMateriaPrimaState
       // Adicionar na lista de mp elementos não repetidos
       snapshot.docs.toList().forEach((element) {
         if (!_listaDeMP.any((matPrima) => matPrima.id == element.id))
-          _listaDeMP.add(MateriaPrimaModel().converterSnapshotEmMateriaPrima(element));
+          _listaDeMP.add(MateriaPrimaDmo.converterSnapshotEmDmo(element));
       });
 
       if (resetaLista)
