@@ -106,7 +106,7 @@ class _TelaCadastroDeGruposDeRedeirosState extends State<TelaCadastroDeGruposDeR
                           return ListViewItemPesquisa(
                               textoPrincipal: _listaDeGruposDeRedeiros[index].nomeGrupo,
                               textoSecundario: "Id" + _listaDeGruposDeRedeiros[index].idGrupo.toString(),
-                              iconeEsquerda: Icons.person,
+                              iconeEsquerda: Icons.group,
                               iconeDireita: Icons.search
                           );
                         })),
