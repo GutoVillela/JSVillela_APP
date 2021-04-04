@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:jsvillela_app/dml/recolhimento_dmo.dart';
+import 'package:jsvillela_app/infra/infraestrutura.dart';
 import 'package:jsvillela_app/infra/paleta_de_cores.dart';
 import 'package:jsvillela_app/models/grupo_de_redeiros_model.dart';
 import 'package:jsvillela_app/models/recolhimento_model.dart';
 import 'package:jsvillela_app/models/redeiro_do_recolhimento_model.dart';
 import 'package:jsvillela_app/models/redeiro_model.dart';
+import 'package:jsvillela_app/ui/tela_informacoes_do_redeiro.dart';
 import 'package:jsvillela_app/ui/widgets/list_view_item_pesquisa.dart';
 import 'package:scoped_model/scoped_model.dart';
 
@@ -91,15 +93,20 @@ class TelaInformacoesDoRecolhimento extends StatelessWidget {
                                 padding: EdgeInsets.symmetric(vertical: 8),
                                 itemCount: recolhimento.redeirosDoRecolhimento.length,
                                 itemBuilder: (context, index){
-                                  // return ListTile(
-                                  //   title: Text(recolhimento.redeirosDoRecolhimento[index].redeiro.nome),
-                                  // );
+
+                                  bool redeiroExcluido = recolhimento.redeirosDoRecolhimento[index].redeiro == null;
+
                                   return ListViewItemPesquisa(
-                                      textoPrincipal: recolhimento.redeirosDoRecolhimento[index].redeiro.nome,
-                                      textoSecundario: recolhimento.redeirosDoRecolhimento[index].redeiro.endereco.cidade,
-                                      iconeEsquerda: Icons.person,
-                                      iconeDireita: Icons.arrow_forward_ios_sharp,
-                                      acaoAoClicar: (){}
+                                      textoPrincipal: redeiroExcluido ? "Redeiro excluído" : recolhimento.redeirosDoRecolhimento[index].redeiro.nome,
+                                      textoSecundario: redeiroExcluido ? "" : recolhimento.redeirosDoRecolhimento[index].redeiro.endereco.cidade,
+                                      iconeEsquerda: redeiroExcluido ? Icons.remove_circle_outlined : Icons.person,
+                                      iconeDireita: redeiroExcluido ? null : Icons.arrow_forward_ios_sharp,
+                                      acaoAoClicar: (){
+                                        if(!redeiroExcluido)
+                                          Navigator.of(context).push(MaterialPageRoute(builder: (context) => TelaInformacoesDoRedeiro(recolhimento.redeirosDoRecolhimento[index].redeiro)));
+                                        else
+                                          Infraestrutura.mostrarMensagemDeErro(context, "Este redeiro foi excluído");
+                                      }
                                   );
                                 }
                               );

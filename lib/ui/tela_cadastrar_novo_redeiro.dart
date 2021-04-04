@@ -1,5 +1,3 @@
-import 'dart:collection';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:jsvillela_app/dml/endereco_dmo.dart';
@@ -7,8 +5,6 @@ import 'package:jsvillela_app/dml/grupo_de_redeiros_dmo.dart';
 import 'package:jsvillela_app/dml/sugestao_endereco_dmo.dart';
 import 'package:jsvillela_app/infra/infraestrutura.dart';
 import 'package:jsvillela_app/infra/preferencias.dart';
-import 'package:jsvillela_app/models/checklist_item_model.dart';
-import 'package:jsvillela_app/models/grupo_de_redeiros_model.dart';
 import 'package:jsvillela_app/models/redeiro_model.dart';
 import 'package:jsvillela_app/services/google_place_service.dart';
 import 'package:jsvillela_app/ui/widgets/list_view_item_pesquisa.dart';
@@ -17,7 +13,6 @@ import 'package:jsvillela_app/ui/widgets/tela_busca_grupos_de_redeiros.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:uuid/uuid.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:jsvillela_app/dml/redeiro_dmo.dart';
 
 class TelaCadastrarNovoRedeiro extends StatefulWidget {
@@ -45,6 +40,9 @@ class _TelaCadastrarNovoRedeiroState extends State<TelaCadastrarNovoRedeiro> {
 
   ///Controller utilizado no campo de texto "Endereço".
   final _enderecoController = TextEditingController();
+
+///Controller utilizado no campo de texto "Complemento".
+  final _complementoController = TextEditingController();
 
   /// Define se usuário marcou a checkbox "WhatsApp" para este redeiro.
   bool _whatsApp = true;
@@ -92,7 +90,7 @@ class _TelaCadastrarNovoRedeiroState extends State<TelaCadastrarNovoRedeiro> {
                       return null;
                     },
                   ),
-                  SizedBox(height: 20,),
+                  SizedBox(height: 20),
                   TextFormField(
                     controller: _emailController,
                     decoration: InputDecoration(
@@ -221,6 +219,20 @@ class _TelaCadastrarNovoRedeiroState extends State<TelaCadastrarNovoRedeiro> {
                     ],
                   ),
                   SizedBox(height: 20),
+                  TextFormField(
+                    controller: _complementoController,
+                    decoration: InputDecoration(
+                        prefixIcon: Icon(Icons.pin_drop_outlined),
+                        contentPadding: EdgeInsets.symmetric(vertical: 20),
+                        isDense: true,
+                        border: OutlineInputBorder(),
+                        hintText: "Complemento"
+                    ),
+                    validator: (text){
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: 20,),
                   ListViewItemPesquisa(
                     textoPrincipal: "Grupo do Redeiro",
                     textoSecundario: gruposDeRedeiros == null || gruposDeRedeiros.isEmpty ?
@@ -258,6 +270,8 @@ class _TelaCadastrarNovoRedeiroState extends State<TelaCadastrarNovoRedeiro> {
                         onPressed: (){
 
                           if(_formKey.currentState.validate() && validarGruposDeRedeiros(context)){
+
+                            _enderecoDoRedeiro.complemento = _complementoController.text;
 
                             RedeiroDmo dadosDoRedeiro = RedeiroDmo(
                               nome: _nomeController.text,

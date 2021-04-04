@@ -3,11 +3,13 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:http/http.dart';
 import 'package:jsvillela_app/dml/endereco_dmo.dart';
 import 'package:jsvillela_app/dml/grupo_de_redeiros_dmo.dart';
 import 'package:jsvillela_app/infra/preferencias.dart';
 import 'package:jsvillela_app/models/grupo_de_redeiros_model.dart';
 import 'package:jsvillela_app/models/lancamento_no_caderno.dart';
+import 'package:jsvillela_app/models/solicitacao_do_redeiro_model.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:jsvillela_app/dml/redeiro_dmo.dart';
 
@@ -76,6 +78,17 @@ class RedeiroModel extends Model{
   void cadastrarRedeiro({@required RedeiroDmo dadosDoRedeiro, @required VoidCallback onSuccess, @required VoidCallback onFail}){
 
     FirebaseFirestore.instance.collection(NOME_COLECAO).add(
+      dadosDoRedeiro.converterParaMapa()
+    ).then((value) => onSuccess()).catchError((e){
+      print(e.toString());
+      onFail();
+    });
+  }
+
+  ///Atualiza um redeiro no Firebase.
+  void atualizarRedeiro({@required RedeiroDmo dadosDoRedeiro, @required VoidCallback onSuccess, @required VoidCallback onFail}){
+
+    FirebaseFirestore.instance.collection(NOME_COLECAO).doc(dadosDoRedeiro.id).update(
       dadosDoRedeiro.converterParaMapa()
     ).then((value) => onSuccess()).catchError((e){
       print(e.toString());
@@ -168,6 +181,80 @@ class RedeiroModel extends Model{
         .doc(idDoRedeiro)
         .get();
   }
-  //#endregion Métodos
+
+  /// Busca os IDs de todos os redeiros que iniciam com o nome fornecido.
+  Future<List<String>> obterIdsPorNome(String filtroPorNome) async {
+
+    QuerySnapshot redeiros = await FirebaseFirestore.instance.collection(NOME_COLECAO)
+        .orderBy(CAMPO_NOME)
+        .startAt([filtroPorNome])
+        .endAt([filtroPorNome + "\uf8ff"])
+        .get();
+
+    List<String> idsRedeiros = [];
+    redeiros.docs.forEach((element) {
+      idsRedeiros.add(element.id);
+    });
+
+    return idsRedeiros;
+  }
+
+  /// Desativa o redeiro.
+  Future<void> desativarRedeiro(String idRedeiro) async {
+    return await FirebaseFirestore.instance.collection(NOME_COLECAO)
+        .doc(idRedeiro)
+        .update({CAMPO_ATIVO : false});
+  }
+
+  /// Ativa o redeiro.
+  Future<void> ativarRedeiro(String idRedeiro) async {
+    return await FirebaseFirestore.instance.collection(NOME_COLECAO)
+        .doc(idRedeiro)
+        .update({CAMPO_ATIVO : true});
+  }
+
+  ///Cadastra uma lista de redeiro do recolhimento na collection de Recolhimentos no Firebase.
+  Future<void> apagarRedeiro({@required String idRedeiro, @required Function onSuccess, @required VoidCallback onFail}) async{
+
+    estaCarregando = true;// Indicar início do processamento
+    notifyListeners();
+
+    WriteBatch batch = FirebaseFirestore.instance.batch();// Batch para criação de uma transação
+
+    // Obter referência ao redeiro
+    DocumentReference redeiro = await FirebaseFirestore.instance.collection(NOME_COLECAO)
+        .doc(idRedeiro);
+
+    // Apagar o redeiro
+    batch.delete(redeiro);
+
+    // Obter solicitações do redeiro
+    QuerySnapshot solicitacoesDoRedeiro = await FirebaseFirestore.instance.collection(SolicitacaoDoRedeiroModel.NOME_COLECAO)
+        .where(SolicitacaoDoRedeiroModel.CAMPO_REDEIRO_SOLICITANTE, isEqualTo: idRedeiro)
+        .get();
+
+    // Obter e apagar solicitações do redeiro
+    if(solicitacoesDoRedeiro != null && solicitacoesDoRedeiro.docs.any((element) => true)){
+      for(DocumentSnapshot doc in solicitacoesDoRedeiro.docs){
+        DocumentReference solicitacao = await FirebaseFirestore.instance.collection(SolicitacaoDoRedeiroModel.NOME_COLECAO).doc(doc.id);
+        batch.delete(solicitacao);
+      }
+    }
+
+    // Comitar batch em caso de sucesso
+    batch.commit()
+    .then((value) {
+      estaCarregando = false;// Indicar FIM do processamento
+      notifyListeners();
+      onSuccess();
+    }).catchError((e){
+      estaCarregando = false;// Indicar FIM do processamento
+      notifyListeners();
+      print(e.toString());
+      onFail();
+    });
+  }
+
+//#endregion Métodos
 
 }

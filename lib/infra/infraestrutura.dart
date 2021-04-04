@@ -68,6 +68,30 @@ class Infraestrutura {
     );
   }
 
+  /// Método que exibe um diálogo com um Widget de processamento.
+  static void mostrarDialogoDeCarregamento({@required BuildContext context, @required String titulo}){
+
+    // Diálogo de processamento.
+    AlertDialog alert = AlertDialog(
+      title: Text(titulo),
+      content: Container(
+        height: 30,
+        child: Center(
+            child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
+            )
+        ),
+      ),
+    );
+
+    // Exibir diálogo
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) => alert
+    );
+  }
+
   /// Abre o aplicativo padrão de mapa para as coordenadas fornecidas.
   static Future<void> abrirMapa(Position destino) async{
 
@@ -115,32 +139,6 @@ class Infraestrutura {
 
     await launch(urlMapa);
   }
-  // /**
-  //  * Uses refection (mirrors) to produce a Map (array) from an object's
-  //  * variables. Making the variable name the key, and it's value the
-  //  * value.
-  //  */
-  // Map objectToMap(Object object)
-  // {
-  //   // Mirror the particular instance (rather than the class itself)
-  //   InstanceMirror instanceMirror = reflect(object);
-  //   Map dataMapped = new Map();
-  //
-  //   // Mirror the instance's class (type) to get the declarations
-  //   for (var declaration in instanceMirror.type.declarations.values)
-  //   {
-  //     // If declaration is a type of variable, map variable name and value
-  //     if (declaration is VariableMirror)
-  //     {
-  //       String variableName = MirrorSystem.getName(declaration.simpleName);
-  //       String variableValue = instanceMirror.getField(declaration.simpleName).reflectee;
-  //
-  //       dataMapped[variableName] = variableValue;
-  //     }
-  //   }
-  //
-  //   return dataMapped;
-  // }
   //#endregion Métodos
 
 }

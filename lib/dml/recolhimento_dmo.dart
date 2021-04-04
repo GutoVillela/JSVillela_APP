@@ -14,7 +14,10 @@ class RecolhimentoDmo{
   /// Data do recolhimento.
   DateTime dataDoRecolhimento;
 
-  /// Data em que o recolhimento foi finalizado.
+  /// Data em que o recolhimento foi iniciado.
+  DateTime dataIniciado;
+
+/// Data em que o recolhimento foi finalizado.
   DateTime dataFinalizado;
 
   /// Lista de grupos associados ao recolhimento.
@@ -26,7 +29,7 @@ class RecolhimentoDmo{
   //#endregion Atributos
 
   //#region Construtor(es)
-  RecolhimentoDmo({this.id, this.dataDoRecolhimento, this.dataFinalizado, this.gruposDoRecolhimento, this.redeirosDoRecolhimento});
+  RecolhimentoDmo({this.id, this.dataDoRecolhimento, this.dataIniciado, this.dataFinalizado, this.gruposDoRecolhimento, this.redeirosDoRecolhimento});
   //#endregion Construtor(es)
 
   //#region Métodos
@@ -37,6 +40,7 @@ class RecolhimentoDmo{
     return RecolhimentoDmo(
         id: recolhimento.id,
         dataDoRecolhimento: recolhimento[RecolhimentoModel.CAMPO_DATA_RECOLHIMENTO] != null ? new DateTime.fromMillisecondsSinceEpoch((recolhimento[RecolhimentoModel.CAMPO_DATA_RECOLHIMENTO] as Timestamp).millisecondsSinceEpoch).toLocal() : null,// Obter data e converter para o fuso horário local
+        dataIniciado:  recolhimento[RecolhimentoModel.CAMPO_DATA_INICIADO] != null ? new DateTime.fromMillisecondsSinceEpoch((recolhimento[RecolhimentoModel.CAMPO_DATA_INICIADO] as Timestamp).millisecondsSinceEpoch).toLocal() : null,// Obter data e converter para o fuso horário local
         dataFinalizado:  recolhimento[RecolhimentoModel.CAMPO_DATA_FINALIZADO] != null ? new DateTime.fromMillisecondsSinceEpoch((recolhimento[RecolhimentoModel.CAMPO_DATA_FINALIZADO] as Timestamp).millisecondsSinceEpoch).toLocal() : null,// Obter data e converter para o fuso horário local
         gruposDoRecolhimento: (recolhimento[RecolhimentoModel.CAMPO_GRUPOS_DO_RECOLHIMENTO] as List)
             .map((e) => GrupoDeRedeirosDmo(
@@ -49,6 +53,7 @@ class RecolhimentoDmo{
     return 'id: $id, '
         'dataDoRecolhimento: $dataDoRecolhimento, '
         'dataFinalizado: $dataFinalizado, '
+        'dataIniciado: $dataIniciado, '
         'gruposDoRecolhimento: ${ gruposDoRecolhimento == null ? "null" : ( gruposDoRecolhimento.map((e) => "{ id: " + (e.idGrupo ?? "null") + ", nomeGrupo: " + (e.nomeGrupo ?? "null") + "} ").toString() ) }.'
     ;
   }

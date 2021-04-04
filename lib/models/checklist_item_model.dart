@@ -1,5 +1,3 @@
-//import 'package:flutter/cupertino.dart';
-
 import 'package:flutter/cupertino.dart';
 
 /// Classe modelo utilizada nos itens de lista do tipo Checkbox.

@@ -26,6 +26,9 @@ class RecolhimentoModel extends Model{
   /// Nome do identificador para o campo "data_recolhimento" utilizado na collection do Firebase.
   static const String CAMPO_DATA_RECOLHIMENTO = "data_recolhimento";
 
+  /// Nome do identificador para o campo "data_iniciado" utilizado na collection do Firebase.
+  static const String CAMPO_DATA_INICIADO = "data_iniciado";
+
   /// Nome do identificador para o campo "data_finalizado" utilizado na collection do Firebase.
   static const String CAMPO_DATA_FINALIZADO = "data_finalizado";
 
@@ -53,6 +56,7 @@ class RecolhimentoModel extends Model{
 
     FirebaseFirestore.instance.collection(NOME_COLECAO).add({
       CAMPO_DATA_RECOLHIMENTO : dadosDoRecolhimento.dataDoRecolhimento,
+      CAMPO_DATA_INICIADO: null,
       CAMPO_DATA_FINALIZADO : null,
       CAMPO_GRUPOS_DO_RECOLHIMENTO : dadosDoRecolhimento.gruposDoRecolhimento.map((e) => e.idGrupo).toList()
     }).then((value) async{
@@ -296,6 +300,9 @@ class RecolhimentoModel extends Model{
       recolhimentoDoDia.redeirosDoRecolhimento = listaDeRedeiros.map((e) => RedeiroDoRecolhimentoDmo(redeiro: e)).toList();
     }
 
+    // Verificar se recolhimento do dia está em andamento
+    recolhimentoEmAndamento = recolhimentoDoDia != null && recolhimentoDoDia.dataFinalizado == null && recolhimentoDoDia.dataIniciado != null;
+
     estaCarregando = false;
     notifyListeners();
   }
@@ -320,7 +327,11 @@ class RecolhimentoModel extends Model{
   }
 
   /// Define a flag "recolhimentoEmAndamento" para true e notifica os listeners.
-  Future<void> iniciarRecolhimento() async{
+  Future<void> iniciarRecolhimento(String idRecolhimento) async{
+
+    await FirebaseFirestore.instance.collection(RecolhimentoModel.NOME_COLECAO)
+        .doc(idRecolhimento)
+        .update({ CAMPO_DATA_INICIADO: DateTime.now() });
 
     // Carregar os redeiros do recolhimento caso não existam.
     if(recolhimentoDoDia.redeirosDoRecolhimento == null || recolhimentoDoDia.redeirosDoRecolhimento.any((element) => true)){

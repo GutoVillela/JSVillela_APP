@@ -94,7 +94,7 @@ class CardRecolhimento extends StatelessWidget {
                                       // Portanto esses IDs são recuperados e atribuídos aqui.
                                       modelRecolhimento.recolhimentoDoDia.redeirosDoRecolhimento = redeirosCadastrados;
 
-                                      await _iniciarRecolhimento(context);
+                                      await _iniciarRecolhimento(context, modelRecolhimento.recolhimentoDoDia.id);
                                     },
                                     onFail: () => _informarFalhaAoIniciarRecolhimento(context));
                               },
@@ -317,8 +317,8 @@ class CardRecolhimento extends StatelessWidget {
   );
 
   /// Informa a interface que existe um recolhimento em andamento.
-  Future<void> _iniciarRecolhimento(BuildContext context) async{
-    await RecolhimentoModel.of(context).iniciarRecolhimento();
+  Future<void> _iniciarRecolhimento(BuildContext context, String idRecolhimento) async{
+    await RecolhimentoModel.of(context).iniciarRecolhimento(idRecolhimento);
   }
 
   /// Informa a interface que aconteceu um erro ao iniciar o recolhimento.

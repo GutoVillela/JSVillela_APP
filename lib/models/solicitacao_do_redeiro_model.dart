@@ -86,6 +86,106 @@ class SolicitacaoDoRedeiroModel extends Model{
     estaCarregando = false;
     notifyListeners();
   }
-  //#endregion Métodos
+
+  /// Carrega as solicitações dos redeiros de forma paginada diretamente do Firebase.
+  Future<QuerySnapshot> carregarSolicitacoesPaginadas(DocumentSnapshot ultimaSolicitacao, String filtroNomeRedeiro, bool incluirJaAtendidas) async{
+
+    if(filtroNomeRedeiro != null && filtroNomeRedeiro.isNotEmpty){
+
+      // Obter ids dos redeiros caso filtro por tenha sido fornecido.
+      List<String> idsDosRedeiros = await RedeiroModel().obterIdsPorNome(filtroNomeRedeiro);
+
+      if(ultimaSolicitacao == null){
+        if(incluirJaAtendidas){
+          return FirebaseFirestore.instance.collection(NOME_COLECAO)
+              .orderBy(CAMPO_DATA_SOLICITACAO)
+              .where(CAMPO_REDEIRO_SOLICITANTE, whereIn: idsDosRedeiros)
+              .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
+              .get();
+        }
+        else{
+          return FirebaseFirestore.instance.collection(NOME_COLECAO)
+              .orderBy(CAMPO_DATA_SOLICITACAO)
+              .where(CAMPO_REDEIRO_SOLICITANTE, whereIn: idsDosRedeiros)
+              .where(CAMPO_DATA_FINALIZACAO, isNull: true)
+              .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
+              .get();
+        }
+      }
+      else{
+        if(incluirJaAtendidas){
+          return FirebaseFirestore.instance.collection(NOME_COLECAO)
+              .orderBy(CAMPO_DATA_SOLICITACAO)
+              .where(CAMPO_REDEIRO_SOLICITANTE, whereIn: idsDosRedeiros)
+              .startAfterDocument(ultimaSolicitacao)
+              .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
+              .get();
+        }
+        else{
+          return FirebaseFirestore.instance.collection(NOME_COLECAO)
+              .orderBy(CAMPO_DATA_SOLICITACAO)
+              .where(CAMPO_REDEIRO_SOLICITANTE, whereIn: idsDosRedeiros)
+              .where(CAMPO_DATA_FINALIZACAO, isNull: true)
+              .startAfterDocument(ultimaSolicitacao)
+              .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
+              .get();
+        }
+
+      }
+    }
+
+    if(ultimaSolicitacao == null){
+      if(incluirJaAtendidas){
+        return FirebaseFirestore.instance.collection(NOME_COLECAO)
+            .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
+            .orderBy(CAMPO_DATA_SOLICITACAO).get();
+      }
+      else{
+        return FirebaseFirestore.instance.collection(NOME_COLECAO)
+            .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
+            .where(CAMPO_DATA_FINALIZACAO, isNull: true)
+            .orderBy(CAMPO_DATA_SOLICITACAO).get();
+      }
+    }
+
+
+    if(incluirJaAtendidas){
+      return FirebaseFirestore.instance.collection(NOME_COLECAO)
+          .orderBy(CAMPO_DATA_SOLICITACAO)
+          .startAfterDocument(ultimaSolicitacao)
+          .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
+          .get();
+    }
+    else{
+      return FirebaseFirestore.instance.collection(NOME_COLECAO)
+          .orderBy(CAMPO_DATA_SOLICITACAO)
+          .startAfterDocument(ultimaSolicitacao)
+          .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
+          .get();
+    }
+  }
+
+  /// Carrega as os detalhes de redeiro solicitante e matérias primas solicitadas da solicitação.
+  Future<SolicitacaoDoRedeiroDmo> carregarDetalhesDaSolicitacao(SolicitacaoDoRedeiroDmo solicitacao) async{
+
+    // Carregar detalhes do redeiro.
+    if(solicitacao.redeiroSolicitante != null && solicitacao.redeiroSolicitante.id != null){
+      DocumentSnapshot redeiroCarregado = await RedeiroModel().carregarRedeiroPorId(solicitacao.redeiroSolicitante.id);
+      solicitacao.redeiroSolicitante = RedeiroDmo.converterSnapshotEmRedeiro(redeiroCarregado);
+    }
+
+    // Carregar detalhes da solicitação.
+    if(solicitacao.materiasPrimasSolicitadas != null && solicitacao.materiasPrimasSolicitadas.isNotEmpty){
+      for(int i = 0; i < solicitacao.materiasPrimasSolicitadas.length; i++){
+        if(solicitacao.materiasPrimasSolicitadas[i].id != null){
+          DocumentSnapshot materiaPrimaCarregada = await MateriaPrimaModel().carregarMateriaPrimaPorId(solicitacao.materiasPrimasSolicitadas[i].id);
+          solicitacao.materiasPrimasSolicitadas[i] = MateriaPrimaDmo.converterSnapshotEmDmo(materiaPrimaCarregada);
+        }
+      }
+    }
+
+    return solicitacao;
+  }
+//#endregion Métodos
 
 }

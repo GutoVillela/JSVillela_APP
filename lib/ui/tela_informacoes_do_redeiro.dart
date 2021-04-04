@@ -1,9 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:jsvillela_app/dml/redeiro_dmo.dart';
+import 'package:jsvillela_app/infra/infraestrutura.dart';
 import 'package:jsvillela_app/infra/paleta_de_cores.dart';
+import 'package:jsvillela_app/models/redeiro_model.dart';
 import 'package:jsvillela_app/ui/tela_caderno_do_redeiro.dart';
 import 'package:jsvillela_app/ui/widgets/botao_quadrado.dart';
+import 'package:jsvillela_app/ui/widgets/tela_busca_grupos_de_redeiros.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class TelaInformacoesDoRedeiro extends StatelessWidget {
@@ -156,7 +159,29 @@ class TelaInformacoesDoRedeiro extends StatelessWidget {
                           textoSecundario: "",
                           icone: Icons.people_alt,
                           acaoAoClicar: (){
-                            //TODO: Implementar ação de VISUALIZAR GRUPOS
+                            showDialog(
+                                context: context,
+                                builder: (BuildContext context){
+                                  return TelaBuscaGruposDeRedeiros(gruposJaSelecionados: redeiro.gruposDoRedeiro);
+                                }
+                            ).then((gruposSelecionados) {
+                                if(gruposSelecionados != null){
+                                  Infraestrutura.mostrarDialogoDeCarregamento(context: context, titulo: "Atualizando grupos do redeiro...");
+
+                                  redeiro.gruposDoRedeiro = gruposSelecionados;
+
+                                  RedeiroModel().atualizarRedeiro(dadosDoRedeiro: redeiro,
+                                    onSuccess: (){
+                                    Infraestrutura.mostrarMensagemDeSucesso(context, "Grupos do redeiro alterados com sucesso!");
+                                    },
+                                    onFail: (){
+                                      Infraestrutura.mostrarMensagemDeErro(context, "Não foi possível alterar os grupos do redeiro.");
+                                    });
+
+                                  // Esconder diálogo de carregamento
+                                  Navigator.of(context).pop();
+                                }
+                            });
                           }
                       )
                     ],

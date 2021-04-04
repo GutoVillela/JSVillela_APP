@@ -58,7 +58,7 @@ class _TelaBuscaGruposDeRedeirosState extends State<TelaBuscaGruposDeRedeiros> {
                     children: [
                       Center(
                         child: Icon(
-                          Icons.people_sharp,
+                          Icons.people_alt,
                           color: Theme.of(context).primaryColor,
                           size: 50,
                         ),
@@ -70,21 +70,21 @@ class _TelaBuscaGruposDeRedeirosState extends State<TelaBuscaGruposDeRedeiros> {
                           fontSize: 26
                         ),
                       ),
-                      Container(
-                        child: CampoDeTextoComIcone(
-                          texto: "Nome do redeiro",
-                          icone: Icon(
-                              Icons.search,
-                              color: Theme.of(context).primaryColor
-                          ),
-                          cor: Theme.of(context).primaryColor,
-                          campoDeSenha: false,
-                          controller: _buscaController,
-                          regraDeValidacao: (texto){
-                            return null;
-                          },
-                        ),
-                      ),
+                      // Container(
+                      //   child: CampoDeTextoComIcone(
+                      //     texto: "Nome do redeiro",
+                      //     icone: Icon(
+                      //         Icons.search,
+                      //         color: Theme.of(context).primaryColor
+                      //     ),
+                      //     cor: Theme.of(context).primaryColor,
+                      //     campoDeSenha: false,
+                      //     controller: _buscaController,
+                      //     regraDeValidacao: (texto){
+                      //       return null;
+                      //     },
+                      //   ),
+                      // ),
                       FutureBuilder<QuerySnapshot>(
                         future: FirebaseFirestore.instance.collection(GrupoDeRedeirosModel.NOME_COLECAO).orderBy(GrupoDeRedeirosModel.CAMPO_NOME).get(),
                         builder: (context, snapshot){
@@ -92,8 +92,10 @@ class _TelaBuscaGruposDeRedeirosState extends State<TelaBuscaGruposDeRedeiros> {
                             return Container(
                               height: 200,
                               alignment: Alignment.center,
-                              child: CircularProgressIndicator(
-                                valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
+                              child: Center(
+                                child: CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
+                                ),
                               ),
                             );
                           else{
@@ -122,7 +124,8 @@ class _TelaBuscaGruposDeRedeirosState extends State<TelaBuscaGruposDeRedeiros> {
                                     padding: EdgeInsets.only(top: 10),
                                     children: [
                                       ...gruposDeRedeiros.map((item) => ChecklistItem(
-                                          checkListItemModel: item
+                                          checkListItemModel: item,
+                                          iconeDoCheckBox: Icon(Icons.people_alt),
                                       )).toList()
                                     ],
                                 ),

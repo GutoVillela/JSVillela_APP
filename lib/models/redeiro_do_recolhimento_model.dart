@@ -107,7 +107,13 @@ class RedeiroDoRecolhimentoModel extends Model{
 
     // Obter detalhes de todos os redeiros obtidos
     for(int i = 0; i < redeirosDoRecolhimento.length; i++){
-      redeirosDoRecolhimento[i].redeiro =  RedeiroDmo.converterSnapshotEmRedeiro(await RedeiroModel().carregarRedeiroPorId(redeirosDoRecolhimento[i].redeiro.id));
+      try{
+        redeirosDoRecolhimento[i].redeiro =  RedeiroDmo.converterSnapshotEmRedeiro(await RedeiroModel().carregarRedeiroPorId(redeirosDoRecolhimento[i].redeiro.id));
+      }
+      catch(erro){
+        // Caso aconteça algum erro ao obter as informações do redeiro, assumir que redeiro foi excluído.
+        redeirosDoRecolhimento[i].redeiro = null;
+      }
     }
 
     estaCarregando = false;

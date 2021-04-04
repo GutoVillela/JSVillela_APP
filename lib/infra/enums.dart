@@ -19,3 +19,13 @@ enum AplicativosDeMapa{
     googleMaps,
     waze
 }
+
+/// Enum que define quais são as preferências passíveis de configurações do usuário.
+enum PreferenciasDoApp{
+
+    /// Preferência que define se a sessão do usuário será mantida no aplicativo.
+    manterUsuarioLogado,
+
+    /// Preferência de aplicativo padrão para abrir mapas.
+    appPadraoMapas
+}

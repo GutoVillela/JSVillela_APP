@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:jsvillela_app/dml/redeiro_dmo.dart';
+import 'package:jsvillela_app/infra/infraestrutura.dart';
 import 'package:jsvillela_app/infra/paleta_de_cores.dart';
 import 'package:jsvillela_app/infra/preferencias.dart';
 import 'package:jsvillela_app/models/redeiro_model.dart';
@@ -35,6 +37,7 @@ class _TelaCadastroDeRedeirosState extends State<TelaCadastroDeRedeiros> {
 
   /// ScrollController usado para saber se usuário scrollou a lista até o final.
   ScrollController _scrollController = ScrollController();
+
   //#endregion Atributos
 
   //#region Métodos
@@ -118,6 +121,20 @@ class _TelaCadastroDeRedeirosState extends State<TelaCadastroDeRedeiros> {
                                     MaterialPageRoute(builder: (context) => TelaInformacoesDoRedeiro(_listaDeRedeiros[index]))
                                 );
                               },
+                              acoesDoSlidable: [
+                                IconSlideAction(
+                                  caption: "Apagar",
+                                  color: Colors.redAccent,
+                                  icon: Icons.delete_forever_sharp,
+                                  onTap: () => _apagarRedeiro(index),
+                                ),
+                                IconSlideAction(
+                                  caption: _listaDeRedeiros[index].ativo ? "Desativar" : "Reativar",
+                                  color: _listaDeRedeiros[index].ativo ? Colors.yellow[800] : Colors.blueGrey,
+                                  icon: Icons.remove_circle_outlined,
+                                  onTap: () => _listaDeRedeiros[index].ativo ? _desativarRedeiro(index) : _ativarRedeiro(index),
+                                ),
+                              ],
                             );
                           }
                       ),
@@ -177,6 +194,87 @@ class _TelaCadastroDeRedeirosState extends State<TelaCadastroDeRedeiros> {
     _listaDeRedeiros = [];
     _temMaisRegistros = true;
     _ultimoRedeiroCarregado = null;
+  }
+
+  /// Desativa o redeiro.
+  void _desativarRedeiro(int indexRedeiro) async{
+    Infraestrutura.confirmar(
+        context: context,
+        titulo: "Desativar o redeiro?",
+        mensagem: "Você ainde pode consultar os registros deste redeiro mas ele não será incluído nos recolhimentos enquanto estiver desativado.",
+        acaoAoConfirmar: () async {
+
+          // Fechar diálogo de confirmação
+          Navigator.of(context).pop();
+
+          Infraestrutura.mostrarDialogoDeCarregamento(
+            context: context,
+            titulo: "Desativando o redeiro ${_listaDeRedeiros[indexRedeiro].nome}..."
+          );
+
+          await RedeiroModel().desativarRedeiro(_listaDeRedeiros[indexRedeiro].id);
+
+          // Fechar diálogo de carregamento.
+          Navigator.of(context).pop();
+
+          setState(() { _listaDeRedeiros[indexRedeiro].ativo = false; });
+        }
+    );
+  }
+
+  /// Ativa o redeiro.
+  void _ativarRedeiro(int indexRedeiro) async{
+    Infraestrutura.confirmar(
+        context: context,
+        titulo: "Reativar o redeiro?",
+        mensagem: "Este redeiro será incluído nos próximos recolhimentos.",
+        acaoAoConfirmar: () async {
+          // Fechar diálogo de confirmação
+          Navigator.of(context).pop();
+
+          Infraestrutura.mostrarDialogoDeCarregamento(
+              context: context,
+              titulo: "Desativando o redeiro ${_listaDeRedeiros[indexRedeiro].nome}..."
+          );
+
+          await RedeiroModel().ativarRedeiro(_listaDeRedeiros[indexRedeiro].id);
+
+          // Fechar diálogo de carregamento.
+          Navigator.of(context).pop();
+          setState(() { _listaDeRedeiros[indexRedeiro].ativo = true; });
+        }
+    );
+  }
+
+  /// Apagar o redeiro e os registros associados à ele.
+  void _apagarRedeiro(int indexRedeiro) async{
+    Infraestrutura.confirmar(
+        context: context,
+        titulo: "Tem certeza que quer apagar o registro deste redeiro?",
+        mensagem: "Esta ação não pode ser desfeita. Todos os registros de Solicitações deste redeiro também serão apagados.",
+        acaoAoConfirmar: () async {
+          // Fechar diálogo de confirmação
+          Navigator.of(context).pop();
+
+          Infraestrutura.mostrarDialogoDeCarregamento(
+              context: context,
+              titulo: "Apagando o redeiro ${_listaDeRedeiros[indexRedeiro].nome}..."
+          );
+
+          await RedeiroModel().apagarRedeiro(
+              idRedeiro: _listaDeRedeiros[indexRedeiro].id,
+              onSuccess: (){
+                // Fechar diálogo de carregamento.
+                Navigator.of(context).pop();
+                setState(() { _listaDeRedeiros.removeAt(indexRedeiro); });
+              },
+              onFail: (){
+                // Fechar diálogo de carregamento.
+                Navigator.of(context).pop();
+              }
+          );
+        }
+    );
   }
   //#endregion Métodos
 }

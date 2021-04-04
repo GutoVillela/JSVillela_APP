@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:jsvillela_app/infra/enums.dart';
 import 'package:jsvillela_app/infra/paleta_de_cores.dart';
 import 'package:jsvillela_app/models/usuario_model.dart';
 import 'package:jsvillela_app/ui/tela_principal.dart';
@@ -367,9 +368,7 @@ class _TelaDeLoginState extends State<TelaDeLogin> {
     );
 
     // Salvar preferência de "Manter Logado"
-    final SharedPreferences preferencias = await SharedPreferences.getInstance();
-    preferencias.setBool(Preferencias.PREF_MANTER_LOGADO, _lembrarDeMim);
-    Preferencias.manterUsuarioLogado = _lembrarDeMim;
+    await Preferencias().salvarPreferencia(PreferenciasDoApp.manterUsuarioLogado, _lembrarDeMim);
     
     Navigator.pushReplacement(context, MaterialPageRoute(
         builder: (context) => TelaPrincipal())

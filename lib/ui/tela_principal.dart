@@ -6,11 +6,13 @@ import 'package:jsvillela_app/ui/menu_tabs/tela_cadastro_de_mat_prima.dart';
 import 'package:jsvillela_app/ui/menu_tabs/tela_cadastro_de_redes.dart';
 import 'package:jsvillela_app/ui/menu_tabs/tela_consultar_recolhimento.dart';
 import 'package:jsvillela_app/ui/menu_tabs/tela_notificacoes.dart';
+import 'package:jsvillela_app/ui/menu_tabs/tela_preferencias.dart';
+import 'package:jsvillela_app/ui/menu_tabs/tela_relatorios.dart';
 import 'package:jsvillela_app/ui/tela_cadastrar_nova_materia_prima.dart';
 import 'package:jsvillela_app/ui/tela_cadastrar_nova_rede.dart';
 import 'package:jsvillela_app/ui/widgets/custom_drawer.dart';
 import 'package:jsvillela_app/ui/tela_cadastrar_novo_redeiro.dart';
-import 'package:jsvillela_app/ui/tela_consultar_solicitacoes_redeiros.dart';
+import 'file:///C:/Users/gusta/AndroidStudioProjects/jsvillela_app/lib/ui/menu_tabs/tela_consultar_solicitacoes_redeiros.dart';
 
 import 'menu_tabs/tela_cadastro_de_redeiros.dart';
 
@@ -200,6 +202,22 @@ class _TelaPrincipalState extends State<TelaPrincipal> {
             ),
             drawer: CustomDrawer(_homeScreenPageController),
             body: TelaCadastroDeRedes()
+        ),
+        Scaffold(
+            appBar: AppBar(
+              title: Text("RELATÓRIOS"),
+              centerTitle: true,
+            ),
+            drawer: CustomDrawer(_homeScreenPageController),
+            body: TelaRelatorios()
+        ),
+        Scaffold(
+            appBar: AppBar(
+              title: Text("PREFERÊNCIAS"),
+              centerTitle: true,
+            ),
+            drawer: CustomDrawer(_homeScreenPageController),
+            body: TelaPreferencias()
         ),
       ],
     );
