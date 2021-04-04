@@ -2,30 +2,28 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:jsvillela_app/infra/paleta_de_cores.dart';
-import 'package:jsvillela_app/models/rede_model.dart';
+import 'package:jsvillela_app/models/grupo_de_redeiros_model.dart';
 import 'package:jsvillela_app/ui/widgets/campo_de_texto_com_icone.dart';
 import 'package:jsvillela_app/ui/widgets/list_view_item_pesquisa.dart';
 import 'package:jsvillela_app/infra/preferencias.dart';
-import 'package:jsvillela_app/dml/rede_dmo.dart';
+import 'package:jsvillela_app/dml/grupo_de_redeiros_dmo.dart';
 
-class TelaCadastroDeRedes extends StatefulWidget {
+class TelaCadastroDeGruposDeRedeiros extends StatefulWidget {
   @override
-  _TelaCadastroDeRedesState createState() => _TelaCadastroDeRedesState();
+  _TelaCadastroDeGruposDeRedeirosState createState() => _TelaCadastroDeGruposDeRedeirosState();
 }
 
-class _TelaCadastroDeRedesState extends State<TelaCadastroDeRedes> {
+class _TelaCadastroDeGruposDeRedeirosState extends State<TelaCadastroDeGruposDeRedeiros> {
 
   //#region Atributos
 
   /// Controller utilizado no campo de texto de Busca.
   final _buscaController = TextEditingController();
 
-  //List<DocumentSnapshot> _listaDeRedes = [];
+  List<GrupoDeRedeirosDmo> _listaDeGruposDeRedeiros = [];
 
-  List<RedeDmo> _listaDeRedes = [];
-
-  /// Última rede carregada em tela.
-  DocumentSnapshot _ultimaRedeCarregada;
+  /// Último grupo carregado em tela.
+  DocumentSnapshot _ultimoGrupoCarregado;
 
   /// Define se existem mais registros a serem carregados na lista.
   bool _temMaisRegistros = true;
@@ -63,7 +61,7 @@ class _TelaCadastroDeRedesState extends State<TelaCadastroDeRedes> {
               Container(
                 padding: EdgeInsets.all(12),
                 child: CampoDeTextoComIcone(
-                  texto: "Buscar redes",
+                  texto: "Buscar grupos",
                   icone: Icon(Icons.search, color: PaletaDeCor.AZUL_ESCURO),
                   cor: PaletaDeCor.AZUL_ESCURO,
                   campoDeSenha: false,
@@ -71,7 +69,6 @@ class _TelaCadastroDeRedesState extends State<TelaCadastroDeRedes> {
                   acaoAoSubmeter: (String filtro) {
                     setState(() {
                       print("Submeteu");
-                      //filtro = _buscaController.text;
                       print(_buscaController.text);
                       resetarCamposDeBusca();
                       _obterRegistros(true);
@@ -96,10 +93,10 @@ class _TelaCadastroDeRedesState extends State<TelaCadastroDeRedes> {
                         scrollDirection: Axis.vertical,
                         shrinkWrap: true,
                         padding: EdgeInsets.only(top: 10),
-                        itemCount: _listaDeRedes.length +
+                        itemCount: _listaDeGruposDeRedeiros.length +
                             1, // É somado um pois o último widget será um item de carregamento
                         itemBuilder: (context, index) {
-                          if (index == _listaDeRedes.length) {
+                          if (index == _listaDeGruposDeRedeiros.length) {
                             if (_temMaisRegistros)
                               return CupertinoActivityIndicator();
                             else
@@ -107,9 +104,9 @@ class _TelaCadastroDeRedesState extends State<TelaCadastroDeRedes> {
                           }
 
                           return ListViewItemPesquisa(
-                              textoPrincipal: _listaDeRedes[index].nome_rede,
-                              textoSecundario: "R\$ " + _listaDeRedes[index].valor_unitario_rede.toString(),
-                              iconeEsquerda: Icons.person,
+                              textoPrincipal: _listaDeGruposDeRedeiros[index].nomeGrupo,
+                              textoSecundario: "Id" + _listaDeGruposDeRedeiros[index].idGrupo.toString(),
+                              iconeEsquerda: Icons.group,
                               iconeDireita: Icons.search
                           );
                         })),
@@ -130,10 +127,11 @@ class _TelaCadastroDeRedesState extends State<TelaCadastroDeRedes> {
   void _obterRegistros(bool resetaLista) {
     if (resetaLista) setState(() => _carregandoRegistros = true);
 
-    RedeModel().carregarRedesPaginadas(_ultimaRedeCarregada, _buscaController.text)
+    print("obter_mais_registros");
+    GrupoDeRedeirosModel().carregarGruposDeRedeirosPaginados(_ultimoGrupoCarregado, _buscaController.text)
         .then((snapshot) {
-      // Obter e salvar último redeiro
-      _ultimaRedeCarregada = snapshot.docs.isNotEmpty ? snapshot.docs.last : null;
+      // Obter e salvar último grupo
+      _ultimoGrupoCarregado = snapshot.docs.isNotEmpty ? snapshot.docs.last : null;
 
       // Se a quantidade de registros obtidos na nova busca for menor que a quantidade
       // de registros a se recuperar por vez, então não existem mais documentos a serem carregados.
@@ -142,8 +140,8 @@ class _TelaCadastroDeRedesState extends State<TelaCadastroDeRedes> {
 
       // Adicionar na lista de redes elementos não repetidos
       snapshot.docs.toList().forEach((element) {
-        if (!_listaDeRedes.any((matPrima) => matPrima.id == element.id))
-          _listaDeRedes.add(RedeModel().converterSnapshotEmRede(element));
+        if (!_listaDeGruposDeRedeiros.any((grupoDeRedeiros) => grupoDeRedeiros.idGrupo == element.id))
+          _listaDeGruposDeRedeiros.add(GrupoDeRedeirosModel().converterSnapshotEmGrupoDeRedeiros(element));
       });
 
       if (resetaLista)
@@ -161,8 +159,8 @@ class _TelaCadastroDeRedesState extends State<TelaCadastroDeRedes> {
 
   /// Reseta os campos de busca para iniciar nova busca.
   void resetarCamposDeBusca() {
-    _listaDeRedes = [];
+    _listaDeGruposDeRedeiros = [];
     _temMaisRegistros = true;
-    _ultimaRedeCarregada = null;
+    _ultimoGrupoCarregado = null;
   }
 }
