@@ -30,6 +30,7 @@ class RedeModel extends Model{
       onFail();
     });
   }
+
   /// Carrega as redes de forma paginada
   Future<QuerySnapshot> carregarRedesPaginadas(DocumentSnapshot ultimaRede, String filtroPorNome) {
 
@@ -64,7 +65,6 @@ class RedeModel extends Model{
   }
 
   RedeDmo converterSnapshotEmRede(DocumentSnapshot rede){
-
     return RedeDmo(
         id: rede.id,
         nome_rede: rede[CAMPO_REDE],
