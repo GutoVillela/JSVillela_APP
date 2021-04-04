@@ -127,10 +127,10 @@ class _TelaCadastroDeGruposDeRedeirosState extends State<TelaCadastroDeGruposDeR
   void _obterRegistros(bool resetaLista) {
     if (resetaLista) setState(() => _carregandoRegistros = true);
 
-    print(_buscaController.text);
+    print("obter_mais_registros");
     GrupoDeRedeirosModel().carregarGruposDeRedeirosPaginados(_ultimoGrupoCarregado, _buscaController.text)
         .then((snapshot) {
-      // Obter e salvar último redeiro
+      // Obter e salvar último grupo
       _ultimoGrupoCarregado = snapshot.docs.isNotEmpty ? snapshot.docs.last : null;
 
       // Se a quantidade de registros obtidos na nova busca for menor que a quantidade
@@ -155,9 +155,6 @@ class _TelaCadastroDeGruposDeRedeirosState extends State<TelaCadastroDeGruposDeR
         setState(() {});
     });
 
-    // setState(() {
-    //
-    // });
   }
 
   /// Reseta os campos de busca para iniciar nova busca.

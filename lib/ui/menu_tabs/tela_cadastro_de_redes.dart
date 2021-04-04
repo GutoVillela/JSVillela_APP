@@ -130,7 +130,6 @@ class _TelaCadastroDeRedesState extends State<TelaCadastroDeRedes> {
   void _obterRegistros(bool resetaLista) {
     if (resetaLista) setState(() => _carregandoRegistros = true);
 
-    print(_buscaController.text);
     RedeModel().carregarRedesPaginadas(_ultimaRedeCarregada, _buscaController.text)
         .then((snapshot) {
       // Obter e salvar último redeiro
@@ -158,9 +157,6 @@ class _TelaCadastroDeRedesState extends State<TelaCadastroDeRedes> {
         setState(() {});
     });
 
-    // setState(() {
-    //
-    // });
   }
 
   /// Reseta os campos de busca para iniciar nova busca.

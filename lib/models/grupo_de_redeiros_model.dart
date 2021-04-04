@@ -70,14 +70,14 @@ class GrupoDeRedeirosModel extends Model{
     if(filtroPorNome != null && filtroPorNome.isNotEmpty){
       if(ultimoGrupo == null)
         return FirebaseFirestore.instance.collection(NOME_COLECAO)
-            .orderBy(ID_COLECAO)
+            .orderBy(CAMPO_NOME)
             .startAt([filtroPorNome])
             .endAt([filtroPorNome + "\uf8ff"])
             .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
             .get();
       else
         return FirebaseFirestore.instance.collection(NOME_COLECAO)
-            .orderBy(ID_COLECAO)
+            .orderBy(CAMPO_NOME)
             .startAt([filtroPorNome])
             .endAt([filtroPorNome + "\uf8ff"])
             .startAfterDocument(ultimoGrupo)
@@ -88,10 +88,10 @@ class GrupoDeRedeirosModel extends Model{
     if(ultimoGrupo == null)
       return FirebaseFirestore.instance.collection(NOME_COLECAO)
           .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
-          .orderBy(ID_COLECAO).get();
+          .orderBy(CAMPO_NOME).get();
 
     return FirebaseFirestore.instance.collection(NOME_COLECAO)
-        .orderBy(ID_COLECAO)
+        .orderBy(CAMPO_NOME)
         .startAfterDocument(ultimoGrupo)
         .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
         .get();
