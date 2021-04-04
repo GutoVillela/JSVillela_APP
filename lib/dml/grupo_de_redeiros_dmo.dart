@@ -1,4 +1,3 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:jsvillela_app/models/grupo_de_redeiros_model.dart';
 

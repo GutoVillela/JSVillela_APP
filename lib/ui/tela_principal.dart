@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:jsvillela_app/infra/paleta_de_cores.dart';
 import 'package:jsvillela_app/ui/menu_tabs/home_tab.dart';
 import 'package:jsvillela_app/ui/menu_tabs/tela_agendar_recolhimento.dart';
+import 'package:jsvillela_app/ui/menu_tabs/tela_cadastro_de_grupos_de_redeiros.dart';
 import 'package:jsvillela_app/ui/menu_tabs/tela_cadastro_de_mat_prima.dart';
 import 'package:jsvillela_app/ui/menu_tabs/tela_cadastro_de_redes.dart';
 import 'package:jsvillela_app/ui/menu_tabs/tela_consultar_recolhimento.dart';
@@ -134,7 +135,7 @@ class _TelaPrincipalState extends State<TelaPrincipal> {
               centerTitle: true,
             ),
             drawer: CustomDrawer(_homeScreenPageController),
-            body: TelaAgendarRecolhimento()
+            body: TelaCadastroDeGruposDeRedeiros()
         ),
         Scaffold(
             appBar: AppBar(

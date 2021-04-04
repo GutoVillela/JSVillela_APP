@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:jsvillela_app/dml/grupo_de_redeiros_dmo.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:jsvillela_app/infra/preferencias.dart';
 
 /// Model para grupo de redeiros.
 class GrupoDeRedeirosModel extends Model{
@@ -62,6 +63,45 @@ class GrupoDeRedeirosModel extends Model{
     notifyListeners();
 
     return listaDeGrupos;
+  }
+
+  Future<QuerySnapshot> carregarGruposDeRedeirosPaginados(DocumentSnapshot ultimoGrupo, String filtroPorNome) {
+
+    if(filtroPorNome != null && filtroPorNome.isNotEmpty){
+      if(ultimoGrupo == null)
+        return FirebaseFirestore.instance.collection(NOME_COLECAO)
+            .orderBy(ID_COLECAO)
+            .startAt([filtroPorNome])
+            .endAt([filtroPorNome + "\uf8ff"])
+            .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
+            .get();
+      else
+        return FirebaseFirestore.instance.collection(NOME_COLECAO)
+            .orderBy(ID_COLECAO)
+            .startAt([filtroPorNome])
+            .endAt([filtroPorNome + "\uf8ff"])
+            .startAfterDocument(ultimoGrupo)
+            .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
+            .get();
+    }
+
+    if(ultimoGrupo == null)
+      return FirebaseFirestore.instance.collection(NOME_COLECAO)
+          .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
+          .orderBy(ID_COLECAO).get();
+
+    return FirebaseFirestore.instance.collection(NOME_COLECAO)
+        .orderBy(ID_COLECAO)
+        .startAfterDocument(ultimoGrupo)
+        .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
+        .get();
+  }
+
+  GrupoDeRedeirosDmo converterSnapshotEmGrupoDeRedeiros(DocumentSnapshot grupoDeRedeiros){
+    return GrupoDeRedeirosDmo(
+        idGrupo: grupoDeRedeiros.id,
+        nomeGrupo: grupoDeRedeiros[CAMPO_NOME]
+    );
   }
 
   //#endregion Métodos
