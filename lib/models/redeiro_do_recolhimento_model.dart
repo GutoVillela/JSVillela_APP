@@ -43,9 +43,13 @@ class RedeiroDoRecolhimentoModel extends Model{
     var batch = FirebaseFirestore.instance.batch();// Batch para criação de uma transação
 
     redeirosDoRecolhimento.forEach((redeiro) {
-      var idUnico = FirebaseFirestore.instance.collection(RecolhimentoModel.NOME_COLECAO).doc(idRecolhimento).collection(NOME_COLECAO).doc();
-      redeiro.id = idUnico.id;// Após gerar ID único, atribuir ID na lista de redeiros que será devolvida no CallBack
-      batch.set(idUnico, redeiro.converterParaMapa());
+
+      // Validar se o redeiro está ativo.
+      if(redeiro.redeiro.ativo){
+        var idUnico = FirebaseFirestore.instance.collection(RecolhimentoModel.NOME_COLECAO).doc(idRecolhimento).collection(NOME_COLECAO).doc();
+        redeiro.id = idUnico.id;// Após gerar ID único, atribuir ID na lista de redeiros que será devolvida no CallBack
+        batch.set(idUnico, redeiro.converterParaMapa());
+      }
     });
 
     // Comitar batch em caso de sucesso
@@ -68,7 +72,6 @@ class RedeiroDoRecolhimentoModel extends Model{
     estaCarregando = true;// Indicar início do processamento
     notifyListeners();
 
-    print("ID que será gravado: $idRedeiroDoRecolhimento");
     return FirebaseFirestore.instance.collection(RecolhimentoModel.NOME_COLECAO)
         .doc(idRecolhimento).collection(NOME_COLECAO).doc(idRedeiroDoRecolhimento)
         .update({ CAMPO_DATA_FINALIZACAO: dataFinalizacao })

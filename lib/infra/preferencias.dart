@@ -46,8 +46,6 @@ class Preferencias{
 
     if(manterUsuarioLogado)
       idUsuarioLogado = preferencias.getString(PREF_USUARIO_LOGADO);
-
-    print(manterUsuarioLogado);
   }
 
   /// Obtém localização atual do dispositivo do usuário
@@ -108,7 +106,6 @@ class Preferencias{
       // Preferência de Aplicativo de mapa
       case PreferenciasDoApp.appPadraoMapas:
         if(valor is AplicativosDeMapa){
-          print(valor);
           preferencias.setInt(Preferencias.PREF_APP_MAPAS, (valor).index);
           Preferencias.aplicativosDeMapa = valor;
         }

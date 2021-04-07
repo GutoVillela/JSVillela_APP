@@ -5,6 +5,7 @@ import 'package:jsvillela_app/dml/recolhimento_dmo.dart';
 import 'package:jsvillela_app/dml/redeiro_dmo.dart';
 import 'package:jsvillela_app/dml/redeiro_do_recolhimento_dmo.dart';
 import 'package:jsvillela_app/infra/preferencias.dart';
+import 'package:jsvillela_app/models/grupo_de_redeiros_model.dart';
 import 'package:jsvillela_app/models/redeiro_do_recolhimento_model.dart';
 import 'package:jsvillela_app/models/redeiro_model.dart';
 import 'package:scoped_model/scoped_model.dart';
@@ -14,7 +15,7 @@ class RecolhimentoModel extends Model{
 
   //#region Construtor(es)
   RecolhimentoModel(){
-    _carregarRecolhimentoDoDia();
+    carregarRecolhimentoDoDia();
   }
   //#endregion Construtor(es)
 
@@ -54,15 +55,69 @@ class RecolhimentoModel extends Model{
   ///Cadastra um recolhimento no Firebase.
   void cadastrarRecolhimento({@required RecolhimentoDmo dadosDoRecolhimento, @required Function onSuccess, @required Function onFail}){
 
+    estaCarregando = true;
+    notifyListeners();
+
     FirebaseFirestore.instance.collection(NOME_COLECAO).add({
       CAMPO_DATA_RECOLHIMENTO : dadosDoRecolhimento.dataDoRecolhimento,
       CAMPO_DATA_INICIADO: null,
       CAMPO_DATA_FINALIZADO : null,
       CAMPO_GRUPOS_DO_RECOLHIMENTO : dadosDoRecolhimento.gruposDoRecolhimento.map((e) => e.idGrupo).toList()
     }).then((value) async{
+      estaCarregando = false;
+      notifyListeners();
       onSuccess();
-      await _carregarRecolhimentoDoDia();
+      await carregarRecolhimentoDoDia();
     }).catchError((e){
+      estaCarregando = false;
+      notifyListeners();
+      print(e.toString());
+      onFail();
+    });
+  }
+
+  ///Atualiza um recolhimento no Firebase.
+  void atualizarRecolhimento({@required RecolhimentoDmo dadosDoRecolhimento, @required Function onSuccess, @required Function onFail}){
+
+    estaCarregando = true;
+    notifyListeners();
+
+    FirebaseFirestore.instance.collection(NOME_COLECAO).doc(dadosDoRecolhimento.id). update(
+      dadosDoRecolhimento.converterParaMapa()
+    ).then((value) async{
+      estaCarregando = false;
+      notifyListeners();
+      onSuccess();
+      await carregarRecolhimentoDoDia();
+    }).catchError((e){
+      estaCarregando = false;
+      notifyListeners();
+      print(e.toString());
+      onFail();
+    });
+  }
+
+  /// Apaga o recolhimento do Firebase.
+  Future<void> apagarRecolhimento({@required String idRecolhimento, @required BuildContext context, @required Function onSuccess, @required VoidCallback onFail}) async{
+
+    estaCarregando = true;// Indicar início do processamento
+    notifyListeners();
+
+    FirebaseFirestore.instance.collection(NOME_COLECAO).doc(idRecolhimento).delete()
+    .then((value) {
+
+      // Parar recolhimento do dia caso este seja o recolhimento apagado
+      if(idRecolhimento == RecolhimentoModel.of(context).recolhimentoDoDia.id){
+        RecolhimentoModel.of(context).recolhimentoDoDia = null;
+        RecolhimentoModel.of(context).recolhimentoEmAndamento = false;
+      }
+
+      estaCarregando = false;// Indicar FIM do processamento
+      notifyListeners();
+      onSuccess();
+    }).catchError((e){
+      estaCarregando = false;// Indicar FIM do processamento
+      notifyListeners();
       print(e.toString());
       onFail();
     });
@@ -239,8 +294,8 @@ class RecolhimentoModel extends Model{
   }
 
   /// Carrega os recolhimentos agendados em uma data específica diretamente do Firebase.
-  Future<QuerySnapshot> carregarRecolhimentosAgendadosNaData(DateTime dataRecolhimento) {
-    return FirebaseFirestore.instance.collection(NOME_COLECAO)
+  Future<QuerySnapshot> carregarRecolhimentosAgendadosNaData(DateTime dataRecolhimento) async {
+    return await FirebaseFirestore.instance.collection(NOME_COLECAO)
         .where(CAMPO_DATA_RECOLHIMENTO, isEqualTo: dataRecolhimento.toLocal())
         .get();
   }
@@ -274,30 +329,55 @@ class RecolhimentoModel extends Model{
       });
   }
 
+  // Busca o recolhimento do dia.
+  Future<QuerySnapshot> _buscarRecolhimentoDoDia() async{
+    return await FirebaseFirestore.instance.collection(NOME_COLECAO)
+        .where(CAMPO_DATA_RECOLHIMENTO, isEqualTo: DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day).toLocal())
+        .get();
+  }
+
   /// Carrega o recolhimento do dia.
-  Future<void> _carregarRecolhimentoDoDia() async{
+  Future<void> carregarRecolhimentoDoDia() async{
 
     estaCarregando = true;
     notifyListeners();
 
-    QuerySnapshot recolhimento = await FirebaseFirestore.instance.collection(NOME_COLECAO)
-        .where(CAMPO_DATA_RECOLHIMENTO, isEqualTo: DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day).toLocal())
-        .get();
+    QuerySnapshot recolhimento = await _buscarRecolhimentoDoDia();
 
     if(recolhimento != null && recolhimento.docs.any((element) => true)){
       this.recolhimentoDoDia = RecolhimentoDmo.converterSnapshotEmRecolhimento(recolhimento.docs.first);
 
+      List<GrupoDeRedeirosDmo> listaDeGrupos = [];
+
+      // Verificar se o grupo associado ao recolhimento não foi apagado
+      if(this.recolhimentoDoDia.gruposDoRecolhimento != null && this.recolhimentoDoDia.gruposDoRecolhimento.isNotEmpty){
+
+        for(var grupo in this.recolhimentoDoDia.gruposDoRecolhimento){
+          try{
+            DocumentSnapshot grupoCarregado = await GrupoDeRedeirosModel().carregarGrupoPorId(grupo.idGrupo);
+            listaDeGrupos.add(GrupoDeRedeirosDmo.converterSnapshotEmGrupoDeRedeiro(grupoCarregado));
+          }
+          catch(erro){
+            listaDeGrupos.add(GrupoDeRedeirosDmo(nomeGrupo: "Grupo apagado"));
+          }
+        }
+      }
+
+      this.recolhimentoDoDia.gruposDoRecolhimento = listaDeGrupos;
+
       // Carregar redeiros do recolhimento
-      QuerySnapshot redeirosDoRecolhimento = await RedeiroModel().carregarRedeirosPorGrupos(this.recolhimentoDoDia.gruposDoRecolhimento.map((e) => e.idGrupo).toList());
+      if(this.recolhimentoDoDia.gruposDoRecolhimento.where((element) => element.idGrupo != null).isNotEmpty){
+        QuerySnapshot redeirosDoRecolhimento = await RedeiroModel().carregarRedeirosPorGrupos(this.recolhimentoDoDia.gruposDoRecolhimento.where((element) => element.idGrupo != null).map((e) => e.idGrupo).toList());
 
-      // Obter redeiros dos grupos
-      List<RedeiroDmo> listaDeRedeiros = [];
-      redeirosDoRecolhimento.docs.forEach((element) {
-        listaDeRedeiros.add(RedeiroDmo.converterSnapshotEmRedeiro(element));
-      });
+        // Obter redeiros dos grupos
+        List<RedeiroDmo> listaDeRedeiros = [];
+        redeirosDoRecolhimento.docs.forEach((element) {
+          listaDeRedeiros.add(RedeiroDmo.converterSnapshotEmRedeiro(element));
+        });
 
-      // Converter redeiros em Redeiros do Recolhimento
-      recolhimentoDoDia.redeirosDoRecolhimento = listaDeRedeiros.map((e) => RedeiroDoRecolhimentoDmo(redeiro: e)).toList();
+        // Converter redeiros em Redeiros do Recolhimento
+        recolhimentoDoDia.redeirosDoRecolhimento = listaDeRedeiros.map((e) => RedeiroDoRecolhimentoDmo(redeiro: e)).toList();
+      }
     }
 
     // Verificar se recolhimento do dia está em andamento
@@ -341,6 +421,14 @@ class RecolhimentoModel extends Model{
     notifyListeners();
   }
 
-//#endregion Métodos
+  /// Valida se já existe um recolhimento agendado na data fornecida.
+  /// Retorna true caso seja uma data válida (ou seja, não esteja agendada ainda) e false caso não seja.
+  Future<bool> validarSeExisteRecolhimentoAgendadoParaAData(DateTime data) async {
+    QuerySnapshot recolhimentosDaData = await carregarRecolhimentosAgendadosNaData(data);
+
+    return !recolhimentosDaData.docs.any((element) => true);
+  }
+
+  //#endregion Métodos
 
 }

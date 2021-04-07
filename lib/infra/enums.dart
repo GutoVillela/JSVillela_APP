@@ -29,3 +29,13 @@ enum PreferenciasDoApp{
     /// Preferência de aplicativo padrão para abrir mapas.
     appPadraoMapas
 }
+
+/// Enum que define o tipo de manutenção a ser realizado em um registro CRUD.
+enum TipoDeManutencao{
+
+    /// Define que será realizado um cadastro de novo registro.
+    cadastro,
+
+    /// Define que será realizada alteração em um registro já existente.
+    alteracao
+}

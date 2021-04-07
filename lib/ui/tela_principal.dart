@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jsvillela_app/infra/enums.dart';
 import 'package:jsvillela_app/infra/paleta_de_cores.dart';
 import 'package:jsvillela_app/ui/menu_tabs/home_tab.dart';
 import 'package:jsvillela_app/ui/menu_tabs/tela_agendar_recolhimento.dart';
@@ -120,7 +121,7 @@ class _TelaPrincipalState extends State<TelaPrincipal> {
                       // Quando a opção de "Cadastrar novo redeiro" é selecionada na barra ação
                       if(opcaoSelecionada == OPCAO_CADASTRAR_REDEIRO){
                         Navigator.of(context).push(
-                            MaterialPageRoute(builder: (context) => TelaCadastrarNovoRedeiro())
+                            MaterialPageRoute(builder: (context) => TelaCadastrarNovoRedeiro(tipoDeManutencao: TipoDeManutencao.cadastro))
                         ).then((value){
                           setState(() {});// Atualizar estado da tela para recarregar os redeiros após cadastro.
                         });
@@ -148,7 +149,7 @@ class _TelaPrincipalState extends State<TelaPrincipal> {
                       // Quando a opção de "Grupo de Redeiros" é selecionada na barra ação
                       if(opcaoSelecionada == OPCAO_CADASTRAR_NOVO_GRUPO_DE_REDEIROS){
                         Navigator.of(context).push(
-                            MaterialPageRoute(builder: (context) => TelaCadastrarNovoGrupoDeRedeiros())
+                            MaterialPageRoute(builder: (context) => TelaCadastrarNovoGrupoDeRedeiros(tipoDeManutencao: TipoDeManutencao.cadastro))
                         ).then((value){
                           setState(() {});// Atualizar estado da tela para recarregar os grupos
                         });
@@ -184,7 +185,7 @@ class _TelaPrincipalState extends State<TelaPrincipal> {
                       // Quando a opção de "Cadastrar nova matéria-prima" é selecionada na barra ação
                       if(opcaoSelecionada == OPCAO_CADASTRAR_MATERIA_PRIMA){
                         Navigator.of(context).push(
-                            MaterialPageRoute(builder: (context) => TelaCadastrarMateriaPrima())
+                            MaterialPageRoute(builder: (context) => TelaCadastrarMateriaPrima(tipoDeManutencao: TipoDeManutencao.cadastro))
                         ).then((value){
                           setState(() {});// Atualizar estado da tela para recarregar as matérias-primas após cadastro.
                         });
@@ -209,11 +210,10 @@ class _TelaPrincipalState extends State<TelaPrincipal> {
               actions: [
                 PopupMenuButton<String>(
                     onSelected: (opcaoSelecionada){
-                      print(opcaoSelecionada);
                       // Quando a opção de "Cadastrar nova rede" é selecionada na barra ação
                       if(opcaoSelecionada == OPCAO_CADASTRAR_REDE){
                         Navigator.of(context).push(
-                            MaterialPageRoute(builder: (context) => TelaCadastrarNovaRede())
+                            MaterialPageRoute(builder: (context) => TelaCadastrarNovaRede(tipoDeManutencao: TipoDeManutencao.cadastro))
                         ).then((value){
                           setState(() {});// Atualizar estado da tela para recarregar as redes após cadastro.
                         });

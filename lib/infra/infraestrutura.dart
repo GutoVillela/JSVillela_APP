@@ -68,6 +68,34 @@ class Infraestrutura {
     );
   }
 
+  /// Método que exibe um diálogo de aviso padrão.
+  static void mostrarAviso({@required BuildContext context, @required String titulo, @required String mensagem, @required Function acaoAoConfirmar}){
+
+    // Botão de confirmar
+    Widget botaoConfirmar = TextButton(
+      child: Text("OK"),
+      onPressed: acaoAoConfirmar,
+    );
+
+
+    // Diálogo de confirmação
+    AlertDialog alert = AlertDialog(
+      title: Text(titulo),
+      content: Text(mensagem),
+      actions: [
+        botaoConfirmar,
+      ],
+    );
+
+    // Exibir diálogo
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
   /// Método que exibe um diálogo com um Widget de processamento.
   static void mostrarDialogoDeCarregamento({@required BuildContext context, @required String titulo}){
 

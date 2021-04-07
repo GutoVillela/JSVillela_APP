@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:jsvillela_app/dml/endereco_dmo.dart';
 import 'package:jsvillela_app/dml/grupo_de_redeiros_dmo.dart';
 import 'package:jsvillela_app/dml/sugestao_endereco_dmo.dart';
+import 'package:jsvillela_app/infra/enums.dart';
 import 'package:jsvillela_app/infra/infraestrutura.dart';
 import 'package:jsvillela_app/infra/preferencias.dart';
 import 'package:jsvillela_app/models/redeiro_model.dart';
@@ -16,6 +17,21 @@ import 'package:uuid/uuid.dart';
 import 'package:jsvillela_app/dml/redeiro_dmo.dart';
 
 class TelaCadastrarNovoRedeiro extends StatefulWidget {
+
+  //#region Atributos
+
+  /// Tipo de manutenção desta tela (inclusão ou alteração)
+  final TipoDeManutencao tipoDeManutencao;
+
+  /// Redeiro a ser editado.
+  final RedeiroDmo redeiroASerEditado;
+
+  //#endregion Atributos
+
+  //#region Construtor(es)
+  TelaCadastrarNovoRedeiro({@required this.tipoDeManutencao, this.redeiroASerEditado});
+  //#endregion Construtor(es)
+
   @override
   _TelaCadastrarNovoRedeiroState createState() => _TelaCadastrarNovoRedeiroState();
 }
@@ -58,11 +74,28 @@ class _TelaCadastrarNovoRedeiroState extends State<TelaCadastrarNovoRedeiro> {
   //#endregion Atributos
 
   @override
+  void initState() {
+    super.initState();
+
+    if(widget.tipoDeManutencao == TipoDeManutencao.alteracao)
+      setState(() {
+        _nomeController.text = widget.redeiroASerEditado.nome;
+        _emailController.text = widget.redeiroASerEditado.email;
+        _celularController.text = widget.redeiroASerEditado.celular;
+        _whatsApp = widget.redeiroASerEditado.whatsApp;
+        _enderecoController.text = widget.redeiroASerEditado.endereco.toString();
+        _enderecoDoRedeiro = widget.redeiroASerEditado.endereco;
+        _complementoController.text = widget.redeiroASerEditado.endereco.complemento;
+        gruposDeRedeiros = widget.redeiroASerEditado.gruposDoRedeiro;
+      });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       key: _chaveScaffold,
       appBar: AppBar(
-        title: Text("CADASTRAR NOVO REDEIRO"),
+        title: Text(widget.tipoDeManutencao == TipoDeManutencao.cadastro ? "CADASTRAR NOVO REDEIRO" : "EDITAR REDEIRO"),
         centerTitle: true
       ),
       body: ScopedModel<RedeiroModel>(
@@ -153,7 +186,6 @@ class _TelaCadastrarNovoRedeiroState extends State<TelaCadastrarNovoRedeiro> {
                             final detalhesDoEndereco = await GooglePlaceServiceProvider(sessionToken)
                                 .obterDetalhesDoEndereco(sugestao.idDoEndereco);
 
-                            print(detalhesDoEndereco.toString());
                             _enderecoController.text = detalhesDoEndereco.toString();
                             _enderecoDoRedeiro = detalhesDoEndereco;
                           }
@@ -196,7 +228,6 @@ class _TelaCadastrarNovoRedeiroState extends State<TelaCadastrarNovoRedeiro> {
                                   final detalhesDoEndereco = await GooglePlaceServiceProvider(sessionToken)
                                       .obterDetalhesDoEnderecoViaPosition(localizacao);
 
-                                  print(detalhesDoEndereco.toString());
                                   _enderecoController.text = detalhesDoEndereco.toString();
                                   _enderecoDoRedeiro = detalhesDoEndereco;
                                 }
@@ -260,7 +291,7 @@ class _TelaCadastrarNovoRedeiroState extends State<TelaCadastrarNovoRedeiro> {
                     height: 60,
                     child: RaisedButton(
                         child: Text(
-                          "Cadastrar redeiro",
+                          widget.tipoDeManutencao == TipoDeManutencao.cadastro ? "Cadastrar redeiro" : "Editar redeiro",
                           style: TextStyle(
                               fontSize: 20
                           ),
@@ -274,18 +305,23 @@ class _TelaCadastrarNovoRedeiroState extends State<TelaCadastrarNovoRedeiro> {
                             _enderecoDoRedeiro.complemento = _complementoController.text;
 
                             RedeiroDmo dadosDoRedeiro = RedeiroDmo(
+                              id: widget.redeiroASerEditado == null ? null : widget.redeiroASerEditado.id,
                               nome: _nomeController.text,
                               celular: _celularController.text,
                               email: _emailController.text,
                               whatsApp: _whatsApp,
                               endereco: _enderecoDoRedeiro,
-                              ativo: true,
+                              ativo: widget.redeiroASerEditado == null ? true : (widget.redeiroASerEditado.ativo ?? true),
                               gruposDoRedeiro: gruposDeRedeiros
                             );
 
-                            print(dadosDoRedeiro);
-
-                            model.cadastrarRedeiro(
+                            if((widget.tipoDeManutencao ?? TipoDeManutencao.cadastro) == TipoDeManutencao.cadastro)
+                              model.cadastrarRedeiro(
+                                  dadosDoRedeiro: dadosDoRedeiro,
+                                  onSuccess: _finalizarCadastroDoRedeiro,
+                                  onFail: _informarErroDeCadastro);
+                            else
+                              model.atualizarRedeiro(
                                 dadosDoRedeiro: dadosDoRedeiro,
                                 onSuccess: _finalizarCadastroDoRedeiro,
                                 onFail: _informarErroDeCadastro);
@@ -304,24 +340,17 @@ class _TelaCadastrarNovoRedeiroState extends State<TelaCadastrarNovoRedeiro> {
 
   /// É chamado após o cadastro do Redeiro ser efetuado com sucesso.
   void _finalizarCadastroDoRedeiro(){
-    _chaveScaffold.currentState.showSnackBar(
-        SnackBar(
-            content: Text("Redeiro Cadastrado com sucesso!"),
-            backgroundColor: Colors.green,
-            duration: Duration(seconds: 2))
-    );
-
+    String mensagem = (widget.tipoDeManutencao??TipoDeManutencao.cadastro) == TipoDeManutencao.cadastro
+        ? "Redeiro Cadastrado com sucesso!" : "Redeiro editado com sucesso!";
+    Infraestrutura.mostrarMensagemDeSucesso(context, mensagem);
     Navigator.of(context).pop();
   }
 
   /// Informa usuário que ocorreu uma falha no login.
   void _informarErroDeCadastro(){
-    _chaveScaffold.currentState.showSnackBar(
-        SnackBar(
-            content: Text("Falha ao cadastrar redeiro!"),
-            backgroundColor: Colors.redAccent,
-            duration: Duration(seconds: 2))
-    );
+    String mensagem = (widget.tipoDeManutencao??TipoDeManutencao.cadastro) == TipoDeManutencao.cadastro
+        ? "Falha ao cadastrar redeiro!" : "Falha ao editar redeiro!";
+    Infraestrutura.mostrarMensagemDeErro(context, mensagem);
   }
 
   bool validarGruposDeRedeiros(BuildContext context){

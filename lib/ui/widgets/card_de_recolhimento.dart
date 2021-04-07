@@ -15,6 +15,7 @@ import 'package:jsvillela_app/models/redeiro_model.dart';
 import 'package:jsvillela_app/ui/widgets/botao_arredondado.dart';
 import 'package:jsvillela_app/ui/widgets/card_recolhimento_em_andamento.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:jsvillela_app/ui/tela_editar_recolhimento.dart';
 
 class CardRecolhimento extends StatelessWidget {
   @override
@@ -34,7 +35,10 @@ class CardRecolhimento extends StatelessWidget {
             return _cardNaoExisteRecolhimento(context, formatoData, recolhimentoDoDiaFinalizado);
           else{
             // Obter cidades dos redeiros
-            List<String> cidadesDoRecolhimento = RedeiroModel().obterCidadesAPartirDosRedeiros(modelRecolhimento.recolhimentoDoDia.redeirosDoRecolhimento.map((e) => e.redeiro).toList());
+            List<String> cidadesDoRecolhimento = [];
+
+            if(modelRecolhimento.recolhimentoDoDia.redeirosDoRecolhimento != null && modelRecolhimento.recolhimentoDoDia.redeirosDoRecolhimento.isNotEmpty)
+              cidadesDoRecolhimento = RedeiroModel().obterCidadesAPartirDosRedeiros(modelRecolhimento.recolhimentoDoDia.redeirosDoRecolhimento.map((e) => e.redeiro).toList());
 
             // Verificar se para este recolhimento existe algum redeiro já cadastrado
             return ScopedModel<RedeiroDoRecolhimentoModel>(
@@ -85,18 +89,39 @@ class CardRecolhimento extends StatelessWidget {
                             SizedBox(height: 20),
                             GestureDetector(
                               onTap: (){
-                                model.cadastrarRedeirosDoRecolhimento(
-                                    idRecolhimento: modelRecolhimento.recolhimentoDoDia.id,
-                                    redeirosDoRecolhimento: modelRecolhimento.recolhimentoDoDia.redeirosDoRecolhimento,
-                                    onSuccess: (redeirosCadastrados) async {
-                                      // Após a Model cadastrar os Redeiros do Recolhimento ela devolve
-                                      //no callback uma nova lista dos redeiros cadastrados com ID's preenchidos.
-                                      // Portanto esses IDs são recuperados e atribuídos aqui.
-                                      modelRecolhimento.recolhimentoDoDia.redeirosDoRecolhimento = redeirosCadastrados;
 
-                                      await _iniciarRecolhimento(context, modelRecolhimento.recolhimentoDoDia.id);
-                                    },
-                                    onFail: () => _informarFalhaAoIniciarRecolhimento(context));
+                                //Validar se existem grupos associados ao recolhimento
+                                if(modelRecolhimento.recolhimentoDoDia.gruposDoRecolhimento == null || modelRecolhimento.recolhimentoDoDia.gruposDoRecolhimento.isEmpty || modelRecolhimento.recolhimentoDoDia.gruposDoRecolhimento.any((element) => element.idGrupo == null)){
+                                  Infraestrutura.mostrarAviso(
+                                    context: context,
+                                    titulo: "Grupo do recolhimento apagado",
+                                    mensagem: "Existe um ou mais grupos deste recolhimento que foi apagado. Por favor edite o recolhimento e selecione grupos válidos para poder iniciá-lo.",
+                                    acaoAoConfirmar: (){
+                                      Navigator.of(context).pop();// Fechar diálogo
+                                      Navigator.of(context).push(
+                                          MaterialPageRoute(builder: (context) => TelaEditarRecolhimento(modelRecolhimento.recolhimentoDoDia))
+                                      );
+                                    }
+                                  );
+                                }
+                                else{
+                                  print("INICIOU RECOLHIMENTO");
+                                  modelRecolhimento.recolhimentoDoDia.gruposDoRecolhimento..forEach((element) {
+                                    print("REC: ${element.idGrupo} | GRUPO: ${element.nomeGrupo}");
+                                  });
+                                  model.cadastrarRedeirosDoRecolhimento(
+                                      idRecolhimento: modelRecolhimento.recolhimentoDoDia.id,
+                                      redeirosDoRecolhimento: modelRecolhimento.recolhimentoDoDia.redeirosDoRecolhimento,
+                                      onSuccess: (redeirosCadastrados) async {
+                                        // Após a Model cadastrar os Redeiros do Recolhimento ela devolve
+                                        //no callback uma nova lista dos redeiros cadastrados com ID's preenchidos.
+                                        // Portanto esses IDs são recuperados e atribuídos aqui.
+                                        modelRecolhimento.recolhimentoDoDia.redeirosDoRecolhimento = redeirosCadastrados;
+
+                                        await _iniciarRecolhimento(context, modelRecolhimento.recolhimentoDoDia.id);
+                                      },
+                                      onFail: () => _informarFalhaAoIniciarRecolhimento(context));
+                                }
                               },
                               child: BotaoArredondado(
                                   textoDoBotao: "Iniciar recolhimento"
@@ -127,159 +152,6 @@ class CardRecolhimento extends StatelessWidget {
         }
     );
   }
-
-  // @override
-  // Widget build(BuildContext context) {
-  //   print("Recolhimento em andamento: $recolhimentoEmAndamento");
-  //   // Formatar para para dd/MM/yyyy
-  //   final formatoData = new DateFormat('dd/MM/yyyy');
-  //
-  //   // Verificar se existe recolhimentos
-  //   existeRecolhimento = widget.recolhimento != null;
-  //
-  //   bool recolhimentoDoDiaFinalizado = existeRecolhimento && widget.recolhimento.dataFinalizado != null;
-  //
-  //   if(!existeRecolhimento || recolhimentoDoDiaFinalizado)
-  //     return _cardNaoExisteRecolhimento(formatoData, recolhimentoDoDiaFinalizado);
-  //   else
-  //     // Verificar se para este recolhimento existe algum redeiro já cadastrado
-  //     return FutureBuilder<QuerySnapshot>(
-  //       future: RedeiroDoRecolhimentoModel().carregarRedeirosDeUmRecolhimento(widget.recolhimento.id),
-  //       builder: (context, snapshotRedeiros){
-  //
-  //         if(!snapshotRedeiros.hasData)
-  //           return Center(
-  //               child: CircularProgressIndicator(
-  //                 valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
-  //               )
-  //           );
-  //
-  //         // Inicializar a lista de redeiros do recolhimento, caso exista um recolhimento
-  //         if(existeRecolhimento)
-  //           widget.recolhimento.redeirosDoRecolhimento = [];
-  //
-  //         // Obter os redeiros do recolhimento cadastrados no recolhimento
-  //         snapshotRedeiros.data.docs.forEach((element) {
-  //           widget.recolhimento.redeirosDoRecolhimento.add(RedeiroDoRecolhimentoDmo.converterSnapshotEmRedeiroDoRecolhimento(element));
-  //         });
-  //
-  //         // Verificar se o recolhimento já está em andamento
-  //         recolhimentoEmAndamento = widget.recolhimento != null && widget.recolhimento.redeirosDoRecolhimento != null && widget.recolhimento.redeirosDoRecolhimento.any((e) => true);
-  //
-  //         return ScopedModel<RedeiroDoRecolhimentoModel>(
-  //           model: RedeiroDoRecolhimentoModel(),
-  //           child: !recolhimentoEmAndamento ?
-  //           Container(
-  //             padding: EdgeInsets.all(20),
-  //             margin: EdgeInsets.all(20),
-  //             decoration: BoxDecoration(
-  //                 borderRadius: BorderRadius.circular(30),
-  //                 color: PaletaDeCor.AZUL_BEM_CLARO
-  //             ),
-  //             child: Column(
-  //               children: [
-  //                 Text(formatoData.format(DateTime.now()),
-  //                     style:  TextStyle(
-  //                         fontSize: 20,
-  //                         fontWeight: FontWeight.bold,
-  //                         color: Theme.of(context).primaryColor
-  //                     )
-  //                 ),
-  //                 SizedBox(height: 20),
-  //                 existeRecolhimento ?
-  //                 ScopedModelDescendant<RedeiroDoRecolhimentoModel>(
-  //                   builder: (context, child, model){
-  //                     return Column(
-  //                       mainAxisAlignment: MainAxisAlignment.center,
-  //                       crossAxisAlignment: CrossAxisAlignment.center,
-  //                       children: [
-  //                         Text("Você tem um recolhimento agendado para hoje.",
-  //                             textAlign: TextAlign.center,
-  //                             style: TextStyle(
-  //                                 fontSize: 16
-  //                             )
-  //                         ),
-  //                         SizedBox(height: 20),
-  //                         Row(
-  //                           mainAxisAlignment: MainAxisAlignment.center,
-  //                           children: [
-  //                             Text("DESTINO: ", style: TextStyle(fontWeight: FontWeight.bold)),
-  //
-  //
-  //                           ],
-  //                         ),
-  //                         FutureBuilder<QuerySnapshot>(
-  //                           future: RedeiroModel().carregarRedeirosPorGrupos(widget.recolhimento.gruposDoRecolhimento.map((e) => e.idGrupo).toList()),
-  //                           builder: (context, snapshotRedeiros){
-  //                             if(!snapshotRedeiros.hasData)
-  //                               return Center(
-  //                                   child: CupertinoActivityIndicator()
-  //                               );
-  //
-  //                             // Obter redeiros dos grupos
-  //                             List<RedeiroDmo> listaDeRedeiros = [];
-  //                             snapshotRedeiros.data.docs.forEach((element) {
-  //                               listaDeRedeiros.add(RedeiroDmo.converterSnapshotEmRedeiro(element));
-  //                             });
-  //
-  //                             // Converter redeiros em Redeiros do Recolhimento
-  //                             widget.recolhimento.redeirosDoRecolhimento = listaDeRedeiros.map((e) => RedeiroDoRecolhimentoDmo(redeiro: e)).toList();
-  //
-  //                             // Obter cidades dos redeiros
-  //                             List<String> cidadesDoRecolhimento = RedeiroModel().obterCidadesDosRedeiros(snapshotRedeiros.data.docs.toList());
-  //
-  //                             return ListView.builder(
-  //                                 shrinkWrap: true,
-  //                                 itemCount: cidadesDoRecolhimento.length,
-  //                                 itemBuilder: (context, index) => Text(cidadesDoRecolhimento[index], textAlign: TextAlign.center)
-  //                             );
-  //                           },
-  //                         ),
-  //                         SizedBox(height: 20),
-  //                         GestureDetector(
-  //                           onTap: (){
-  //                             model.cadastrarRedeirosDoRecolhimento(
-  //                                 idRecolhimento: widget.recolhimento.id,
-  //                                 redeirosDoRecolhimento: widget.recolhimento.redeirosDoRecolhimento,
-  //                                 onSuccess: (redeirosCadastrados) {
-  //                                   // Após a Model cadastrar os Redeiros do Recolhimento ela devolve
-  //                                   //no callback uma nova lista dos redeiros cadastrados com ID's preenchidos.
-  //                                   // Portanto esses IDs são recuperados e atribuídos aqui.
-  //                                   widget.recolhimento.redeirosDoRecolhimento = redeirosCadastrados;
-  //
-  //                                   _iniciarRecolhimento();
-  //                                 },
-  //                                 onFail: () => _informarFalhaAoIniciarRecolhimento(context));
-  //                           },
-  //                           child: BotaoArredondado(
-  //                               textoDoBotao: "Iniciar recolhimento"
-  //                           ),
-  //                         )
-  //                       ],
-  //                     );
-  //                   },
-  //                 ) :
-  //                 Column(
-  //                   mainAxisAlignment: MainAxisAlignment.center,
-  //                   crossAxisAlignment: CrossAxisAlignment.center,
-  //                   children: [
-  //                     Text("Você não tem nada agendado para hoje. Aproveite o dia!",
-  //                         textAlign: TextAlign.center,
-  //                         style: TextStyle(
-  //                             fontSize: 16
-  //                         )
-  //                     ),
-  //                   ],
-  //                 )
-  //               ],
-  //             ),
-  //           ) :
-  //           CardRecolhimentoEmAndamento(_finalizarRecolhimento, widget.recolhimento, _finalizarRecolhimento),
-  //         );
-  //
-  //       }
-  //     );
-  // }
 
   Widget _cardNaoExisteRecolhimento(BuildContext context, DateFormat formatoData, bool recolhimentoDoDiaFinalizado) => Container(
     padding: EdgeInsets.all(20),

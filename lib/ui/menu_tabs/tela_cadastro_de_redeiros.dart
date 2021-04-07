@@ -3,15 +3,19 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:jsvillela_app/dml/redeiro_dmo.dart';
+import 'package:jsvillela_app/infra/enums.dart';
 import 'package:jsvillela_app/infra/infraestrutura.dart';
 import 'package:jsvillela_app/infra/paleta_de_cores.dart';
 import 'package:jsvillela_app/infra/preferencias.dart';
+import 'package:jsvillela_app/models/grupo_de_redeiros_model.dart';
 import 'package:jsvillela_app/models/redeiro_model.dart';
 import 'package:jsvillela_app/ui/tela_informacoes_do_redeiro.dart';
 import 'package:jsvillela_app/ui/widgets/campo_de_texto_com_icone.dart';
 import 'package:jsvillela_app/ui/widgets/list_view_item_pesquisa.dart';
+import 'package:jsvillela_app/ui/tela_cadastrar_novo_redeiro.dart';
 
 class TelaCadastroDeRedeiros extends StatefulWidget {
+
   @override
   _TelaCadastroDeRedeirosState createState() => _TelaCadastroDeRedeirosState();
 }
@@ -133,6 +137,21 @@ class _TelaCadastroDeRedeirosState extends State<TelaCadastroDeRedeiros> {
                                   color: _listaDeRedeiros[index].ativo ? Colors.yellow[800] : Colors.blueGrey,
                                   icon: Icons.remove_circle_outlined,
                                   onTap: () => _listaDeRedeiros[index].ativo ? _desativarRedeiro(index) : _ativarRedeiro(index),
+                                ),
+                                IconSlideAction(
+                                  caption: "Editar",
+                                  color: PaletaDeCor.AZUL_BEM_CLARO,
+                                  icon: Icons.edit,
+                                  onTap: () async {
+                                    //Recuperar informações dos grupos do redeiro antes de iniciar edição
+                                    _listaDeRedeiros[index].gruposDoRedeiro = await GrupoDeRedeirosModel().carregarGruposPorId(
+                                      _listaDeRedeiros[index].gruposDoRedeiro.map((e) => e.idGrupo).toList()
+                                    );
+
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(builder: (context) => TelaCadastrarNovoRedeiro(tipoDeManutencao: TipoDeManutencao.alteracao, redeiroASerEditado: _listaDeRedeiros[index]))
+                                    );
+                                  },
                                 ),
                               ],
                             );

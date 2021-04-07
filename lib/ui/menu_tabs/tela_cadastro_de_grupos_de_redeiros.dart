@@ -1,8 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:jsvillela_app/infra/enums.dart';
+import 'package:jsvillela_app/infra/infraestrutura.dart';
 import 'package:jsvillela_app/infra/paleta_de_cores.dart';
 import 'package:jsvillela_app/models/grupo_de_redeiros_model.dart';
+import 'package:jsvillela_app/ui/tela_cadastrar_novo_grupo_de_redeiros.dart';
 import 'package:jsvillela_app/ui/widgets/campo_de_texto_com_icone.dart';
 import 'package:jsvillela_app/ui/widgets/list_view_item_pesquisa.dart';
 import 'package:jsvillela_app/infra/preferencias.dart';
@@ -68,7 +72,6 @@ class _TelaCadastroDeGruposDeRedeirosState extends State<TelaCadastroDeGruposDeR
                   controller: _buscaController,
                   acaoAoSubmeter: (String filtro) {
                     setState(() {
-                      print("Submeteu");
                       print(_buscaController.text);
                       resetarCamposDeBusca();
                       _obterRegistros(true);
@@ -105,9 +108,27 @@ class _TelaCadastroDeGruposDeRedeirosState extends State<TelaCadastroDeGruposDeR
 
                           return ListViewItemPesquisa(
                               textoPrincipal: _listaDeGruposDeRedeiros[index].nomeGrupo,
-                              textoSecundario: "Id" + _listaDeGruposDeRedeiros[index].idGrupo.toString(),
+                              textoSecundario: "Id: " + _listaDeGruposDeRedeiros[index].idGrupo.toString(),
                               iconeEsquerda: Icons.group,
-                              iconeDireita: Icons.search
+                              iconeDireita: Icons.search,
+                              acoesDoSlidable:[
+                                IconSlideAction(
+                                  caption: "Apagar",
+                                  color: Colors.redAccent,
+                                  icon: Icons.delete_forever_sharp,
+                                  onTap: () => _apagarGrupo(index),
+                                ),
+                                IconSlideAction(
+                                  caption: "Editar",
+                                  color: Colors.yellow[800],
+                                  icon: Icons.edit,
+                                  onTap: () {
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(builder: (context) => TelaCadastrarNovoGrupoDeRedeiros(tipoDeManutencao: TipoDeManutencao.alteracao, grupoASerEditado:  _listaDeGruposDeRedeiros[index]))
+                                    );
+                                  },
+                                )
+                            ],
                           );
                         })),
               )
@@ -162,5 +183,37 @@ class _TelaCadastroDeGruposDeRedeirosState extends State<TelaCadastroDeGruposDeR
     _listaDeGruposDeRedeiros = [];
     _temMaisRegistros = true;
     _ultimoGrupoCarregado = null;
+  }
+
+  /// Apagar o grupo de redeiros.
+  void _apagarGrupo(int indexGrupo) async{
+    Infraestrutura.confirmar(
+        context: context,
+        titulo: "Tem certeza que quer apagar o este grupo de redeiro?",
+        mensagem: "Esta ação não pode ser desfeita.",
+        acaoAoConfirmar: () async {
+          // Fechar diálogo de confirmação
+          Navigator.of(context).pop();
+
+          Infraestrutura.mostrarDialogoDeCarregamento(
+              context: context,
+              titulo: "Apagando o grupo do dia ${_listaDeGruposDeRedeiros[indexGrupo].nomeGrupo}..."
+          );
+
+          await GrupoDeRedeirosModel().apagarGrupoDeRedeiros(
+              idGrupo: _listaDeGruposDeRedeiros[indexGrupo].idGrupo,
+              context: context,
+              onSuccess: (){
+                // Fechar diálogo de carregamento.
+                Navigator.of(context).pop();
+                setState(() { _listaDeGruposDeRedeiros.removeAt(indexGrupo); });
+              },
+              onFail: (){
+                // Fechar diálogo de carregamento.
+                Navigator.of(context).pop();
+              }
+          );
+        }
+    );
   }
 }

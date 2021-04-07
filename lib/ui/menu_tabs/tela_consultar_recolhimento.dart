@@ -1,11 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
 import 'package:jsvillela_app/dml/recolhimento_dmo.dart';
+import 'package:jsvillela_app/infra/infraestrutura.dart';
 import 'package:jsvillela_app/infra/paleta_de_cores.dart';
 import 'package:jsvillela_app/infra/preferencias.dart';
 import 'package:jsvillela_app/models/recolhimento_model.dart';
+import 'package:jsvillela_app/ui/tela_editar_recolhimento.dart';
 import 'package:jsvillela_app/ui/widgets/list_view_item_pesquisa.dart';
 
 import '../tela_informacoes_do_recolhimento.dart';
@@ -65,6 +68,10 @@ class _TelaConsultarRecolhimentoState extends State<TelaConsultarRecolhimento> {
 
     // Formatar para para dd/MM/yyyy
     final formatoData = new DateFormat('dd/MM/yyyy');
+
+    _listaDeRecolhimentos.forEach((element) {
+      print("ID: ${element.id} | Lista: ${element.gruposDoRecolhimento.length}");
+    });
 
     return Container(
         child:
@@ -184,6 +191,25 @@ class _TelaConsultarRecolhimentoState extends State<TelaConsultarRecolhimento> {
                                       MaterialPageRoute(builder: (context) => TelaInformacoesDoRecolhimento(_listaDeRecolhimentos[index]))
                                   );
                                 },
+                                acoesDoSlidable:
+                                _listaDeRecolhimentos[index].dataFinalizado == null ? [
+                                  IconSlideAction(
+                                    caption: "Apagar",
+                                    color: Colors.redAccent,
+                                    icon: Icons.delete_forever_sharp,
+                                    onTap: () => _apagarRecolhimento(index),
+                                  ),
+                                  IconSlideAction(
+                                    caption: "Editar",
+                                    color: Colors.yellow[800],
+                                    icon: Icons.edit,
+                                    onTap: () {
+                                      Navigator.of(context).push(
+                                          MaterialPageRoute(builder: (context) => TelaEditarRecolhimento(_listaDeRecolhimentos[index]))
+                                      );
+                                    },
+                                  )
+                                ] : null,
                               );
                             }
                         ),
@@ -243,6 +269,48 @@ class _TelaConsultarRecolhimentoState extends State<TelaConsultarRecolhimento> {
     _listaDeRecolhimentos = [];
     _temMaisRegistros = true;
     _ultimoRecolhimentoCarregado = null;
+  }
+
+  /// Apagar o recolhimento.
+  void _apagarRecolhimento(int indexRecolhimento) async{
+    Infraestrutura.confirmar(
+        context: context,
+        titulo: "Tem certeza que quer apagar o registro deste recolhimento?",
+        mensagem: "Esta ação não pode ser desfeita.",
+        acaoAoConfirmar: () async {
+          // Fechar diálogo de confirmação
+          Navigator.of(context).pop();
+
+          // Verificar se o recolhimento está em andamento
+          if(_listaDeRecolhimentos[indexRecolhimento].dataIniciado != null && _listaDeRecolhimentos[indexRecolhimento].dataFinalizado == null){
+            Infraestrutura.mostrarAviso(context: context,
+                titulo: "Recolhimento em andamento",
+                mensagem: "Ops... Parece que este recolhimento está em andamento. Por favor finalize o recolhimento para poder apagá-lo!",
+                acaoAoConfirmar: () => Navigator.of(context).pop()
+            );
+          }
+          else{
+            Infraestrutura.mostrarDialogoDeCarregamento(
+                context: context,
+                titulo: "Apagando o recolhimento do dia ${_listaDeRecolhimentos[indexRecolhimento].dataDoRecolhimento}..."
+            );
+
+            await RecolhimentoModel().apagarRecolhimento(
+                idRecolhimento: _listaDeRecolhimentos[indexRecolhimento].id,
+                context: context,
+                onSuccess: (){
+                  // Fechar diálogo de carregamento.
+                  Navigator.of(context).pop();
+                  setState(() { _listaDeRecolhimentos.removeAt(indexRecolhimento); });
+                },
+                onFail: (){
+                  // Fechar diálogo de carregamento.
+                  Navigator.of(context).pop();
+                }
+            );
+          }
+        }
+    );
   }
 //#endregion Métodos
 }

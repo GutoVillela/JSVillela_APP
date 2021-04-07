@@ -1,10 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:jsvillela_app/dml/base_dmo.dart';
 import 'package:jsvillela_app/dml/grupo_de_redeiros_dmo.dart';
 import 'package:jsvillela_app/dml/redeiro_do_recolhimento_dmo.dart';
 import 'package:jsvillela_app/models/recolhimento_model.dart';
 
 /// Classe modelo para recolhimentos.
-class RecolhimentoDmo{
+class RecolhimentoDmo implements BaseDmo{
 
   //#region Atributos
 
@@ -36,7 +37,6 @@ class RecolhimentoDmo{
 
   /// Converte um snapshot em um objeto RecolhimentoDmo.
   static RecolhimentoDmo converterSnapshotEmRecolhimento(DocumentSnapshot recolhimento){
-
     return RecolhimentoDmo(
         id: recolhimento.id,
         dataDoRecolhimento: recolhimento[RecolhimentoModel.CAMPO_DATA_RECOLHIMENTO] != null ? new DateTime.fromMillisecondsSinceEpoch((recolhimento[RecolhimentoModel.CAMPO_DATA_RECOLHIMENTO] as Timestamp).millisecondsSinceEpoch).toLocal() : null,// Obter data e converter para o fuso horário local
@@ -56,6 +56,16 @@ class RecolhimentoDmo{
         'dataIniciado: $dataIniciado, '
         'gruposDoRecolhimento: ${ gruposDoRecolhimento == null ? "null" : ( gruposDoRecolhimento.map((e) => "{ id: " + (e.idGrupo ?? "null") + ", nomeGrupo: " + (e.nomeGrupo ?? "null") + "} ").toString() ) }.'
     ;
+  }
+
+  @override
+  Map<String, dynamic> converterParaMapa() {
+    return{
+      RecolhimentoModel.CAMPO_DATA_RECOLHIMENTO : dataDoRecolhimento,
+      RecolhimentoModel.CAMPO_DATA_INICIADO: dataIniciado,
+      RecolhimentoModel.CAMPO_DATA_FINALIZADO : dataFinalizado,
+      RecolhimentoModel.CAMPO_GRUPOS_DO_RECOLHIMENTO : gruposDoRecolhimento.map((e) => e.idGrupo).toList()
+    };
   }
 
   //#endregion Métodos

@@ -8,6 +8,8 @@ import 'package:jsvillela_app/dml/rede_dmo.dart';
 class RedeModel extends Model{
 
   //#region Atributos
+  /// Indica que existe um processo em execução a partir desta classe.
+  bool estaCarregando = false;
   //#endregion Atributos
 
   //#region Constantes
@@ -22,11 +24,40 @@ class RedeModel extends Model{
 
   //#region Métodos
   ///Cadastra um redeiro no Firebase.
-  void cadastrarRede({@required Map<String, dynamic> dadosDaRede, @required VoidCallback onSuccess, @required VoidCallback onFail}){
-    FirebaseFirestore.instance.collection(NOME_COLECAO).add({
-      CAMPO_REDE : dadosDaRede[CAMPO_REDE],
-      CAMPO_VALOR_UNITARIO : dadosDaRede[CAMPO_VALOR_UNITARIO]
-    }).then((value) => onSuccess()).catchError((e){
+  void cadastrarRede({@required RedeDmo dadosDaRede, @required VoidCallback onSuccess, @required VoidCallback onFail}){
+    FirebaseFirestore.instance.collection(NOME_COLECAO).add(
+      dadosDaRede.converterParaMapa()
+    ).then((value) => onSuccess()).catchError((e){
+      onFail();
+    });
+  }
+
+  ///Atualiza uma rede no Firebase.
+  void atualizarRede({@required RedeDmo dadosDaRede, @required VoidCallback onSuccess, @required VoidCallback onFail}){
+
+    FirebaseFirestore.instance.collection(NOME_COLECAO).doc(dadosDaRede.id).update(
+        dadosDaRede.converterParaMapa()
+    ).then((value) => onSuccess()).catchError((e){
+      print(e.toString());
+      onFail();
+    });
+  }
+
+  /// Apaga a rede no Firebase.
+  Future<void> apagarRede({@required String idRede, @required BuildContext context, @required Function onSuccess, @required VoidCallback onFail}) async{
+
+    estaCarregando = true;// Indicar início do processamento
+    notifyListeners();
+
+    FirebaseFirestore.instance.collection(NOME_COLECAO).doc(idRede).delete()
+        .then((value) {
+      estaCarregando = false;// Indicar FIM do processamento
+      notifyListeners();
+      onSuccess();
+    }).catchError((e){
+      estaCarregando = false;// Indicar FIM do processamento
+      notifyListeners();
+      print(e.toString());
       onFail();
     });
   }

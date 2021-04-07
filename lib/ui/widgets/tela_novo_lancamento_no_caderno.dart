@@ -225,8 +225,6 @@ class _TelaNovoLancamentoNoCadernoState
                                                       LancamentoNoCadernoModel.CAMPO_DATA_CONFIRMACAO_PAGAMENTO: null
                                                     };
 
-                                                    print(dadosDoLancamento);
-
                                                     model.cadastrarNovoLancamento(
                                                         dadosDoLancamento: dadosDoLancamento,
                                                         idDoRedeiro: widget.idDoRedeiro,

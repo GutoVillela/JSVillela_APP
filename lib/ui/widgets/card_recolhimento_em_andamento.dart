@@ -45,7 +45,6 @@ class _CardRecolhimentoEmAndamentoState extends State<CardRecolhimentoEmAndament
 
   @override
   Widget build(BuildContext context) {
-    print("Tamanho recolhimento: ${widget.recolhimento.redeirosDoRecolhimento.length}");
     return Expanded(
         child: Column(children: [
           Expanded(child: CarrouselDeItens(widget.recolhimento, _finalizarRecolhimento)),

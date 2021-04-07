@@ -258,7 +258,6 @@ class _TabelaDeLancamentosState extends State<TabelaDeLancamentos> {
       model.informarPagamento(idDoLancamento: element.idLancamento, idDoRedeiro: widget.idDoRedeiro, dataDoPagamento: dataDePagamento, onSuccess: informarSucesso, onFail: informarErro);
     });
 
-    print(widget.listaDeLancamentos);
     setState(() {
       carregando = false;
     });

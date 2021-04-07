@@ -8,6 +8,8 @@ import 'package:jsvillela_app/dml/materia_prima_dmo.dart';
 class MateriaPrimaModel extends Model{
 
   //#region Atributos
+  /// Indica que existe um processo em execução a partir desta classe.
+  bool estaCarregando = false;
   //#endregion Atributos
 
   //#region Constantes
@@ -23,11 +25,40 @@ class MateriaPrimaModel extends Model{
 
   //#region Métodos
   ///Cadastra um redeiro no Firebase.
-  void cadastrarMateriaPrima({@required Map<String, dynamic> dadosDaMateriaPrima, @required VoidCallback onSuccess, @required VoidCallback onFail}){
-    FirebaseFirestore.instance.collection(NOME_COLECAO).add({
-      CAMPO_NM_MAT_PRIMA : dadosDaMateriaPrima[CAMPO_NM_MAT_PRIMA],
-      CAMPO_ICONE_MAT_PRIMA : dadosDaMateriaPrima[CAMPO_ICONE_MAT_PRIMA]
-    }).then((value) => onSuccess()).catchError((e){
+  void cadastrarMateriaPrima({@required MateriaPrimaDmo dadosDaMateriaPrima, @required VoidCallback onSuccess, @required VoidCallback onFail}){
+    FirebaseFirestore.instance.collection(NOME_COLECAO).add(
+        dadosDaMateriaPrima.converterParaMapa()
+    ).then((value) => onSuccess()).catchError((e){
+      onFail();
+    });
+  }
+
+  ///Atualiza um grupo de redeiros no Firebase.
+  void atualizarMateriaPrima({@required MateriaPrimaDmo dadosDaMateriaPrima, @required VoidCallback onSuccess, @required VoidCallback onFail}){
+
+    FirebaseFirestore.instance.collection(NOME_COLECAO).doc(dadosDaMateriaPrima.id).update(
+        dadosDaMateriaPrima.converterParaMapa()
+    ).then((value) => onSuccess()).catchError((e){
+      print(e.toString());
+      onFail();
+    });
+  }
+
+  /// Apaga a matéria-prima do Firebase.
+  Future<void> apagarMateriaPrima({@required String idMateriaPrima, @required BuildContext context, @required Function onSuccess, @required VoidCallback onFail}) async{
+
+    estaCarregando = true;// Indicar início do processamento
+    notifyListeners();
+
+    FirebaseFirestore.instance.collection(NOME_COLECAO).doc(idMateriaPrima).delete()
+        .then((value) {
+      estaCarregando = false;// Indicar FIM do processamento
+      notifyListeners();
+      onSuccess();
+    }).catchError((e){
+      estaCarregando = false;// Indicar FIM do processamento
+      notifyListeners();
+      print(e.toString());
       onFail();
     });
   }

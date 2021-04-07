@@ -141,7 +141,7 @@ class RedeiroModel extends Model{
         .get();
   }
 
-  /// Carrega os endereços de todos os redeiros dentro do grupo.
+  /// Carrega todos os redeiros dentro dos grupos.
   Future<QuerySnapshot> carregarRedeirosPorGrupos(List<String> idsDosGrupos) async {
 
     return await FirebaseFirestore.instance.collection(NOME_COLECAO)

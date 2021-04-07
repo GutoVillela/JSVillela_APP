@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:jsvillela_app/dml/grupo_de_redeiros_dmo.dart';
+import 'package:jsvillela_app/models/recolhimento_model.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:jsvillela_app/infra/preferencias.dart';
 
@@ -30,10 +31,21 @@ class GrupoDeRedeirosModel extends Model{
   static GrupoDeRedeirosModel of (BuildContext context) => ScopedModel.of<GrupoDeRedeirosModel>(context);
 
   ///Cadastra um grupo de redeiros no Firebase.
-  void cadastrarGrupoDeRedeiros({@required Map<String, dynamic> dadosDoGrupo, @required VoidCallback onSuccess, @required VoidCallback onFail}){
-    FirebaseFirestore.instance.collection(NOME_COLECAO).add({
-      CAMPO_NOME : dadosDoGrupo[CAMPO_NOME],
-    }).then((value) => onSuccess()).catchError((e){
+  void cadastrarGrupoDeRedeiros({@required GrupoDeRedeirosDmo dadosDoGrupo, @required VoidCallback onSuccess, @required VoidCallback onFail}){
+    FirebaseFirestore.instance.collection(NOME_COLECAO).add(
+        dadosDoGrupo.converterParaMapa()
+    ).then((value) => onSuccess()).catchError((e){
+      onFail();
+    });
+  }
+
+  ///Atualiza um grupo de redeiros no Firebase.
+  void atualizarGrupo({@required GrupoDeRedeirosDmo dadosDoGrupo, @required VoidCallback onSuccess, @required VoidCallback onFail}){
+
+    FirebaseFirestore.instance.collection(NOME_COLECAO).doc(dadosDoGrupo.idGrupo).update(
+        dadosDoGrupo.converterParaMapa()
+    ).then((value) => onSuccess()).catchError((e){
+      print(e.toString());
       onFail();
     });
   }
@@ -55,8 +67,13 @@ class GrupoDeRedeirosModel extends Model{
     List<GrupoDeRedeirosDmo> listaDeGrupos = [];
 
     for(int i = 0; i < idsDosGrupos.length; i++){
-      DocumentSnapshot grupo = await carregarGrupoPorId(idsDosGrupos[i]);
-      listaDeGrupos.add(GrupoDeRedeirosDmo.converterSnapshotEmGrupoDeRedeiro(grupo));
+      try{
+        DocumentSnapshot grupo = await carregarGrupoPorId(idsDosGrupos[i]);
+        listaDeGrupos.add(GrupoDeRedeirosDmo.converterSnapshotEmGrupoDeRedeiro(grupo));
+      }
+      catch(erro){
+        listaDeGrupos.add(GrupoDeRedeirosDmo(nomeGrupo: "Grupo apagado"));
+      }
     }
 
     estaCarregando = false;
@@ -104,6 +121,27 @@ class GrupoDeRedeirosModel extends Model{
     );
   }
 
-  //#endregion Métodos
+  /// Apaga o grupo de redeiros do Firebase.
+  Future<void> apagarGrupoDeRedeiros({@required String idGrupo, @required BuildContext context, @required Function onSuccess, @required VoidCallback onFail}) async{
+
+    estaCarregando = true;// Indicar início do processamento
+    notifyListeners();
+
+    FirebaseFirestore.instance.collection(NOME_COLECAO).doc(idGrupo).delete()
+    .then((value) {
+      RecolhimentoModel.of(context).carregarRecolhimentoDoDia();
+      estaCarregando = false;// Indicar FIM do processamento
+      notifyListeners();
+      onSuccess();
+    }).catchError((e){
+      estaCarregando = false;// Indicar FIM do processamento
+      notifyListeners();
+      print(e.toString());
+      onFail();
+    });
+  }
+
+
+//#endregion Métodos
 
 }

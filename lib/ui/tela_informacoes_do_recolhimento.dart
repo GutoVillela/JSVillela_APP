@@ -87,8 +87,6 @@ class TelaInformacoesDoRecolhimento extends StatelessWidget {
                                   ),
                                 );
 
-                              print("Redeiros qtd: ${recolhimento.redeirosDoRecolhimento.length}");
-
                               return ListView.builder(
                                 padding: EdgeInsets.symmetric(vertical: 8),
                                 itemCount: recolhimento.redeirosDoRecolhimento.length,
