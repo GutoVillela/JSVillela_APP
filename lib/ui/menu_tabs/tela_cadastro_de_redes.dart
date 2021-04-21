@@ -1,8 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:jsvillela_app/infra/enums.dart';
+import 'package:jsvillela_app/infra/infraestrutura.dart';
 import 'package:jsvillela_app/infra/paleta_de_cores.dart';
 import 'package:jsvillela_app/models/rede_model.dart';
+import 'package:jsvillela_app/ui/tela_cadastrar_nova_rede.dart';
 import 'package:jsvillela_app/ui/widgets/campo_de_texto_com_icone.dart';
 import 'package:jsvillela_app/ui/widgets/list_view_item_pesquisa.dart';
 import 'package:jsvillela_app/infra/preferencias.dart';
@@ -25,7 +29,7 @@ class _TelaCadastroDeRedesState extends State<TelaCadastroDeRedes> {
   List<RedeDmo> _listaDeRedes = [];
 
   /// Última rede carregada em tela.
-  DocumentSnapshot _ultimaRedeCarregada;
+  DocumentSnapshot? _ultimaRedeCarregada;
 
   /// Define se existem mais registros a serem carregados na lista.
   bool _temMaisRegistros = true;
@@ -70,9 +74,6 @@ class _TelaCadastroDeRedesState extends State<TelaCadastroDeRedes> {
                   controller: _buscaController,
                   acaoAoSubmeter: (String filtro) {
                     setState(() {
-                      print("Submeteu");
-                      //filtro = _buscaController.text;
-                      print(_buscaController.text);
                       resetarCamposDeBusca();
                       _obterRegistros(true);
                     });
@@ -107,10 +108,29 @@ class _TelaCadastroDeRedesState extends State<TelaCadastroDeRedes> {
                           }
 
                           return ListViewItemPesquisa(
-                              textoPrincipal: _listaDeRedes[index].nome_rede,
+                            acaoAoClicar: null,
+                              textoPrincipal: _listaDeRedes[index].nome_rede!,
                               textoSecundario: "R\$ " + _listaDeRedes[index].valor_unitario_rede.toString(),
                               iconeEsquerda: Icons.person,
-                              iconeDireita: Icons.search
+                              iconeDireita: Icons.search,
+                              acoesDoSlidable:[
+                                IconSlideAction(
+                                  caption: "Apagar",
+                                  color: Colors.redAccent,
+                                  icon: Icons.delete_forever_sharp,
+                                  onTap: () => _apagarRede(index),
+                                ),
+                                IconSlideAction(
+                                  caption: "Editar",
+                                  color: Colors.yellow[800],
+                                  icon: Icons.edit,
+                                  onTap: () {
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(builder: (context) => TelaCadastrarNovaRede(tipoDeManutencao: TipoDeManutencao.alteracao, redeASerEditada:  _listaDeRedes[index]))
+                                    );
+                                  },
+                                )
+                              ]
                           );
                         })),
               )
@@ -164,5 +184,37 @@ class _TelaCadastroDeRedesState extends State<TelaCadastroDeRedes> {
     _listaDeRedes = [];
     _temMaisRegistros = true;
     _ultimaRedeCarregada = null;
+  }
+
+  /// Apagar a rede.
+  void _apagarRede(int indexGrupo) async{
+    Infraestrutura.confirmar(
+        context: context,
+        titulo: "Tem certeza que quer apagar esta rede?",
+        mensagem: "Esta ação não pode ser desfeita.",
+        acaoAoConfirmar: () async {
+          // Fechar diálogo de confirmação
+          Navigator.of(context).pop();
+
+          Infraestrutura.mostrarDialogoDeCarregamento(
+              context: context,
+              titulo: "Apagando o grupo do dia ${_listaDeRedes[indexGrupo].nome_rede}..."
+          );
+
+          await RedeModel().apagarRede(
+              idRede: _listaDeRedes[indexGrupo].id!,
+              context: context,
+              onSuccess: (){
+                // Fechar diálogo de carregamento.
+                Navigator.of(context).pop();
+                setState(() { _listaDeRedes.removeAt(indexGrupo); });
+              },
+              onFail: (){
+                // Fechar diálogo de carregamento.
+                Navigator.of(context).pop();
+              }
+          );
+        }
+    );
   }
 }

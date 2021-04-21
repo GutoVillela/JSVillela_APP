@@ -8,7 +8,7 @@ class BotaoArredondado extends StatefulWidget {
   //#endregion Atributos
 
   //#region Construtor(es)
-  BotaoArredondado({this.textoDoBotao});
+  BotaoArredondado({required this.textoDoBotao});
   //#endregion Construtor(es)
 
   @override

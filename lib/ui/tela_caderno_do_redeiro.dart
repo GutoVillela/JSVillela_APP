@@ -21,7 +21,7 @@ class TelaCadernoDoRedeiro extends StatelessWidget {
   final List<String> opcoesBarraDeAcao = [OPCAO_NOVO_LANCAMENTO];
 
   /// Lista com lançamentos do caderno.
-  List<LancamentoDoCadernoDmo> caderno;
+  List<LancamentoDoCadernoDmo> caderno = [];
   //#endregion Atributos
 
   //#region Construtor(es)
@@ -35,7 +35,7 @@ class TelaCadernoDoRedeiro extends StatelessWidget {
         appBar: AppBar(
             backgroundColor: Colors.transparent,
             elevation: 0,
-            title: Text(redeiro.nome),
+            title: Text(redeiro.nome!),
             centerTitle: true,
             iconTheme: IconThemeData(color: Theme.of(context).primaryColor),
             actions: [
@@ -46,7 +46,7 @@ class TelaCadernoDoRedeiro extends StatelessWidget {
                       showDialog(
                           context: context,
                           builder: (BuildContext context){
-                            return TelaNovoLancamentoNoCaderno(idDoRedeiro: redeiro.id);
+                            return TelaNovoLancamentoNoCaderno(idDoRedeiro: redeiro.id!);
                           }
                       ).then((lancamentoRealizado) {
                         // TODO: Recarregar caderno após cadastro bem sucedido do novo lançamento
@@ -66,7 +66,7 @@ class TelaCadernoDoRedeiro extends StatelessWidget {
           child: LayoutBuilder(builder: (context, constraints) {
 
             return FutureBuilder<QuerySnapshot>(
-              future: RedeiroModel().carregarCadernoDoRedeiro(redeiro.id),
+              future: RedeiroModel().carregarCadernoDoRedeiro(redeiro.id!),
               builder: (context, snapshot){
                 if(!snapshot.hasData)
                   return Container(
@@ -82,11 +82,11 @@ class TelaCadernoDoRedeiro extends StatelessWidget {
                 else{
 
                   //#region Tela caso EXISTA dados de caderno
-                  if(snapshot.data.size > 0){
+                  if(snapshot.data!.size > 0){
 
                     caderno = [];
 
-                    snapshot.data.docs.forEach((element) {
+                    snapshot.data!.docs.forEach((element) {
 
                       //#region Preencher informações do lançamento
                       LancamentoDoCadernoDmo novoLancamento = LancamentoDoCadernoDmo(
@@ -126,7 +126,7 @@ class TelaCadernoDoRedeiro extends StatelessWidget {
                         children: listaDeCadernos.map((e) {
                             return Padding(
                               padding: const EdgeInsets.all(10),
-                              child: TabelaDeLancamentos(e, redeiro.id),
+                              child: TabelaDeLancamentos(e, redeiro.id!),
                             );
                           }).toList()
                       ),

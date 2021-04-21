@@ -3,17 +3,18 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:http/http.dart';
 import 'package:jsvillela_app/dml/endereco_dmo.dart';
 import 'package:jsvillela_app/dml/grupo_de_redeiros_dmo.dart';
 import 'package:jsvillela_app/infra/preferencias.dart';
 import 'package:jsvillela_app/models/grupo_de_redeiros_model.dart';
 import 'package:jsvillela_app/models/lancamento_no_caderno.dart';
+import 'package:jsvillela_app/models/solicitacao_do_redeiro_model.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:jsvillela_app/dml/redeiro_dmo.dart';
 
 /// Model para redeiros.
-class RedeiroModel extends Model{
-
+class RedeiroModel extends Model {
   //#region Atributos
 
   /// Indica que existe um processo em execução a partir desta classe.
@@ -73,30 +74,51 @@ class RedeiroModel extends Model{
 
   //#region Métodos
   ///Cadastra um redeiro no Firebase.
-  void cadastrarRedeiro({@required RedeiroDmo dadosDoRedeiro, @required VoidCallback onSuccess, @required VoidCallback onFail}){
+  void cadastrarRedeiro(
+      {required RedeiroDmo dadosDoRedeiro,
+      required VoidCallback onSuccess,
+      required VoidCallback onFail}) {
+    FirebaseFirestore.instance
+        .collection(NOME_COLECAO)
+        .add(dadosDoRedeiro.converterParaMapa())
+        .then((value) => onSuccess())
+        .catchError((e) {
+      print(e.toString());
+      onFail();
+    });
+  }
 
-    FirebaseFirestore.instance.collection(NOME_COLECAO).add(
-      dadosDoRedeiro.converterParaMapa()
-    ).then((value) => onSuccess()).catchError((e){
+  ///Atualiza um redeiro no Firebase.
+  void atualizarRedeiro(
+      {required RedeiroDmo dadosDoRedeiro,
+      required VoidCallback onSuccess,
+      required VoidCallback onFail}) {
+    FirebaseFirestore.instance
+        .collection(NOME_COLECAO)
+        .doc(dadosDoRedeiro.id)
+        .update(dadosDoRedeiro.converterParaMapa())
+        .then((value) => onSuccess())
+        .catchError((e) {
       print(e.toString());
       onFail();
     });
   }
 
   /// Carrega os redeiros de forma paginada diretamente do Firebase.
-  Future<QuerySnapshot> carregarRedeirosPaginados(DocumentSnapshot ultimoRedeiro, String filtroPorNome) {
-    
-    if(filtroPorNome != null && filtroPorNome.isNotEmpty){
-      if(ultimoRedeiro == null){
-        return FirebaseFirestore.instance.collection(NOME_COLECAO)
+  Future<QuerySnapshot> carregarRedeirosPaginados(
+      DocumentSnapshot? ultimoRedeiro, String? filtroPorNome) {
+    if (filtroPorNome != null && filtroPorNome.isNotEmpty) {
+      if (ultimoRedeiro == null) {
+        return FirebaseFirestore.instance
+            .collection(NOME_COLECAO)
             .orderBy(CAMPO_NOME)
             .startAt([filtroPorNome])
             .endAt([filtroPorNome + "\uf8ff"])
             .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
             .get();
-      }
-      else{
-        return FirebaseFirestore.instance.collection(NOME_COLECAO)
+      } else {
+        return FirebaseFirestore.instance
+            .collection(NOME_COLECAO)
             .orderBy(CAMPO_NOME)
             .startAt([filtroPorNome])
             .endAt([filtroPorNome + "\uf8ff"])
@@ -106,12 +128,15 @@ class RedeiroModel extends Model{
       }
     }
 
-    if(ultimoRedeiro == null)
-      return FirebaseFirestore.instance.collection(NOME_COLECAO)
+    if (ultimoRedeiro == null)
+      return FirebaseFirestore.instance
+          .collection(NOME_COLECAO)
           .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
-          .orderBy(CAMPO_NOME).get();
+          .orderBy(CAMPO_NOME)
+          .get();
 
-    return FirebaseFirestore.instance.collection(NOME_COLECAO)
+    return FirebaseFirestore.instance
+        .collection(NOME_COLECAO)
         .orderBy(CAMPO_NOME)
         .startAfterDocument(ultimoRedeiro)
         .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
@@ -120,24 +145,27 @@ class RedeiroModel extends Model{
 
   /// Carrega o caderno do redeiro diretamente do Firebase.
   Future<QuerySnapshot> carregarCadernoDoRedeiro(String idDoRedeiro) {
-
-    return FirebaseFirestore.instance.collection(NOME_COLECAO)
+    return FirebaseFirestore.instance
+        .collection(NOME_COLECAO)
         .doc(idDoRedeiro)
         .collection(SUBCOLECAO_CADERNO)
-        .orderBy(LancamentoNoCadernoModel.CAMPO_DATA_LANCAMENTO, descending: true)
+        .orderBy(LancamentoNoCadernoModel.CAMPO_DATA_LANCAMENTO,
+            descending: true)
         .get();
   }
 
-  /// Carrega os endereços de todos os redeiros dentro do grupo.
-  Future<QuerySnapshot> carregarRedeirosPorGrupos(List<String> idsDosGrupos) async {
-
-    return await FirebaseFirestore.instance.collection(NOME_COLECAO)
+  /// Carrega todos os redeiros dentro dos grupos.
+  Future<QuerySnapshot> carregarRedeirosPorGrupos(
+      List<String> idsDosGrupos) async {
+    return await FirebaseFirestore.instance
+        .collection(NOME_COLECAO)
         .where(SUBCOLECAO_GRUPOS, arrayContainsAny: idsDosGrupos)
         .get();
   }
 
   /// Converte uma lista de redeiros em uma lista de cidades (sem repetição).
-  List<String> obterCidadesAPartirDosSnaptshots(List<DocumentSnapshot> redeiros){
+  List<String> obterCidadesAPartirDosSnaptshots(
+      List<DocumentSnapshot> redeiros) {
     // Converter snapshots em uma lista de RedeiroDmo.
     List<RedeiroDmo> listaDeRedeiros = [];
     redeiros.forEach((element) {
@@ -148,14 +176,14 @@ class RedeiroModel extends Model{
   }
 
   /// Converte uma lista de redeiros em uma lista de cidades (sem repetição).
-  List<String> obterCidadesAPartirDosRedeiros(List<RedeiroDmo> redeiros){
+  List<String> obterCidadesAPartirDosRedeiros(List<RedeiroDmo> redeiros) {
     // Obter lista de cidades
     List<String> listaDeCidades = [];
     redeiros.forEach((redeiro) {
-      if(redeiro.endereco != null &&
-          redeiro.endereco.cidade != null &&
-          !listaDeCidades.any((cidade) => cidade == redeiro.endereco.cidade))
-        listaDeCidades.add(redeiro.endereco.cidade);
+      if (redeiro.endereco != null &&
+          redeiro.endereco!.cidade != null &&
+          !listaDeCidades.any((cidade) => cidade == redeiro.endereco!.cidade))
+        listaDeCidades.add(redeiro.endereco!.cidade!);
     });
 
     return listaDeCidades;
@@ -163,11 +191,93 @@ class RedeiroModel extends Model{
 
   /// Carrega o redeiro por ID diretamente do Firebase.
   Future<DocumentSnapshot> carregarRedeiroPorId(String idDoRedeiro) async {
-
-    return await FirebaseFirestore.instance.collection(NOME_COLECAO)
+    return await FirebaseFirestore.instance
+        .collection(NOME_COLECAO)
         .doc(idDoRedeiro)
         .get();
   }
-  //#endregion Métodos
+
+  /// Busca os IDs de todos os redeiros que iniciam com o nome fornecido.
+  Future<List<String>> obterIdsPorNome(String filtroPorNome) async {
+    QuerySnapshot redeiros = await FirebaseFirestore.instance
+        .collection(NOME_COLECAO)
+        .orderBy(CAMPO_NOME)
+        .startAt([filtroPorNome]).endAt([filtroPorNome + "\uf8ff"]).get();
+
+    List<String> idsRedeiros = [];
+    redeiros.docs.forEach((element) {
+      idsRedeiros.add(element.id);
+    });
+
+    return idsRedeiros;
+  }
+
+  /// Desativa o redeiro.
+  Future<void> desativarRedeiro(String idRedeiro) async {
+    return await FirebaseFirestore.instance
+        .collection(NOME_COLECAO)
+        .doc(idRedeiro)
+        .update({CAMPO_ATIVO: false});
+  }
+
+  /// Ativa o redeiro.
+  Future<void> ativarRedeiro(String idRedeiro) async {
+    return await FirebaseFirestore.instance
+        .collection(NOME_COLECAO)
+        .doc(idRedeiro)
+        .update({CAMPO_ATIVO: true});
+  }
+
+  ///Cadastra uma lista de redeiro do recolhimento na collection de Recolhimentos no Firebase.
+  Future<void> apagarRedeiro(
+      {required String idRedeiro,
+      required Function onSuccess,
+      required VoidCallback onFail}) async {
+    estaCarregando = true; // Indicar início do processamento
+    notifyListeners();
+
+    WriteBatch batch = FirebaseFirestore.instance
+        .batch(); // Batch para criação de uma transação
+
+    // Obter referência ao redeiro
+    DocumentReference redeiro = await FirebaseFirestore.instance
+        .collection(NOME_COLECAO)
+        .doc(idRedeiro);
+
+    // Apagar o redeiro
+    batch.delete(redeiro);
+
+    // Obter solicitações do redeiro
+    QuerySnapshot solicitacoesDoRedeiro = await FirebaseFirestore.instance
+        .collection(SolicitacaoDoRedeiroModel.NOME_COLECAO)
+        .where(SolicitacaoDoRedeiroModel.CAMPO_REDEIRO_SOLICITANTE,
+            isEqualTo: idRedeiro)
+        .get();
+
+    // Obter e apagar solicitações do redeiro
+    if (solicitacoesDoRedeiro != null &&
+        solicitacoesDoRedeiro.docs.any((element) => true)) {
+      for (DocumentSnapshot doc in solicitacoesDoRedeiro.docs) {
+        DocumentReference solicitacao = await FirebaseFirestore.instance
+            .collection(SolicitacaoDoRedeiroModel.NOME_COLECAO)
+            .doc(doc.id);
+        batch.delete(solicitacao);
+      }
+    }
+
+    // Comitar batch em caso de sucesso
+    batch.commit().then((value) {
+      estaCarregando = false; // Indicar FIM do processamento
+      notifyListeners();
+      onSuccess();
+    }).catchError((e) {
+      estaCarregando = false; // Indicar FIM do processamento
+      notifyListeners();
+      print(e.toString());
+      onFail();
+    });
+  }
+
+//#endregion Métodos
 
 }

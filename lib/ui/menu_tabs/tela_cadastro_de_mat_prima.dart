@@ -1,12 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:jsvillela_app/infra/enums.dart';
+import 'package:jsvillela_app/infra/infraestrutura.dart';
 import 'package:jsvillela_app/infra/paleta_de_cores.dart';
 import 'package:jsvillela_app/models/materia_prima_model.dart';
 import 'package:jsvillela_app/ui/widgets/campo_de_texto_com_icone.dart';
 import 'package:jsvillela_app/ui/widgets/list_view_item_pesquisa.dart';
 import 'package:jsvillela_app/infra/preferencias.dart';
 import 'package:jsvillela_app/dml/materia_prima_dmo.dart';
+
+import '../tela_cadastrar_nova_materia_prima.dart';
 
 class TelaCadastroDeMateriaPrima extends StatefulWidget {
   @override
@@ -24,7 +29,7 @@ class _TelaCadastroDeMateriaPrimaState
   List<MateriaPrimaDmo> _listaDeMP = [];
 
   /// Última mp carregada em tela.
-  DocumentSnapshot _ultimaMpCarregada;
+  DocumentSnapshot? _ultimaMpCarregada;
 
   /// Define se existem mais registros a serem carregados na lista.
   bool _temMaisRegistros = true;
@@ -108,10 +113,29 @@ class _TelaCadastroDeMateriaPrimaState
                           }
 
                           return ListViewItemPesquisa(
-                              textoPrincipal: _listaDeMP[index].nomeMateriaPrima,
-                              textoSecundario: _listaDeMP[index].iconeMateriaPrima,
+                            acaoAoClicar: null,
+                              textoPrincipal: _listaDeMP[index].nomeMateriaPrima!,
+                              textoSecundario: _listaDeMP[index].iconeMateriaPrima!,
                               iconeEsquerda: Icons.person,
-                              iconeDireita: Icons.search);
+                              iconeDireita: Icons.search,
+                              acoesDoSlidable:[
+                                IconSlideAction(
+                                  caption: "Apagar",
+                                  color: Colors.redAccent,
+                                  icon: Icons.delete_forever_sharp,
+                                  onTap: () => _apagarMateriaPrima(index),
+                                ),
+                                IconSlideAction(
+                                  caption: "Editar",
+                                  color: Colors.yellow[800],
+                                  icon: Icons.edit,
+                                  onTap: () {
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(builder: (context) => TelaCadastrarMateriaPrima(tipoDeManutencao: TipoDeManutencao.alteracao, mpASerEditada:  _listaDeMP[index]))
+                                    );
+                                  },
+                                )
+                              ]);
                         })),
               )
             ],
@@ -167,6 +191,38 @@ class _TelaCadastroDeMateriaPrimaState
     _listaDeMP = [];
     _temMaisRegistros = true;
     _ultimaMpCarregada = null;
+  }
+
+  /// Apagar a matéria-prima.
+  void _apagarMateriaPrima(int indexGrupo) async{
+    Infraestrutura.confirmar(
+        context: context,
+        titulo: "Tem certeza que quer apagar esta matéria-prima?",
+        mensagem: "Esta ação não pode ser desfeita.",
+        acaoAoConfirmar: () async {
+          // Fechar diálogo de confirmação
+          Navigator.of(context).pop();
+
+          Infraestrutura.mostrarDialogoDeCarregamento(
+              context: context,
+              titulo: "Apagando o grupo do dia ${_listaDeMP[indexGrupo].nomeMateriaPrima}..."
+          );
+
+          await MateriaPrimaModel().apagarMateriaPrima(
+              idMateriaPrima: _listaDeMP[indexGrupo].id!,
+              context: context,
+              onSuccess: (){
+                // Fechar diálogo de carregamento.
+                Navigator.of(context).pop();
+                setState(() { _listaDeMP.removeAt(indexGrupo); });
+              },
+              onFail: (){
+                // Fechar diálogo de carregamento.
+                Navigator.of(context).pop();
+              }
+          );
+        }
+    );
   }
 //#endregion Métodos
 

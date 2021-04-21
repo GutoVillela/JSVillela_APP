@@ -1,12 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:jsvillela_app/dml/grupo_de_redeiros_dmo.dart';
+import 'package:jsvillela_app/models/recolhimento_model.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:jsvillela_app/infra/preferencias.dart';
 
 /// Model para grupo de redeiros.
-class GrupoDeRedeirosModel extends Model{
-
+class GrupoDeRedeirosModel extends Model {
   //#region Atributos
 
   /// Indica que existe um processo em execução a partir desta classe.
@@ -27,36 +27,63 @@ class GrupoDeRedeirosModel extends Model{
   //#endregion Constantes
 
   //#region Métodos
-  static GrupoDeRedeirosModel of (BuildContext context) => ScopedModel.of<GrupoDeRedeirosModel>(context);
+  static GrupoDeRedeirosModel of(BuildContext context) =>
+      ScopedModel.of<GrupoDeRedeirosModel>(context);
 
   ///Cadastra um grupo de redeiros no Firebase.
-  void cadastrarGrupoDeRedeiros({@required Map<String, dynamic> dadosDoGrupo, @required VoidCallback onSuccess, @required VoidCallback onFail}){
-    FirebaseFirestore.instance.collection(NOME_COLECAO).add({
-      CAMPO_NOME : dadosDoGrupo[CAMPO_NOME],
-    }).then((value) => onSuccess()).catchError((e){
+  void cadastrarGrupoDeRedeiros(
+      {required GrupoDeRedeirosDmo dadosDoGrupo,
+      required VoidCallback onSuccess,
+      required VoidCallback onFail}) {
+    FirebaseFirestore.instance
+        .collection(NOME_COLECAO)
+        .add(dadosDoGrupo.converterParaMapa())
+        .then((value) => onSuccess())
+        .catchError((e) {
+      onFail();
+    });
+  }
+
+  ///Atualiza um grupo de redeiros no Firebase.
+  void atualizarGrupo(
+      {required GrupoDeRedeirosDmo dadosDoGrupo,
+      required VoidCallback onSuccess,
+      required VoidCallback onFail}) {
+    FirebaseFirestore.instance
+        .collection(NOME_COLECAO)
+        .doc(dadosDoGrupo.idGrupo)
+        .update(dadosDoGrupo.converterParaMapa())
+        .then((value) => onSuccess())
+        .catchError((e) {
+      print(e.toString());
       onFail();
     });
   }
 
   /// Busca um grupo de redeiros por ID.
-  Future<DocumentSnapshot> carregarGrupoPorId(String idDoGrupo) async{
-
-    return await FirebaseFirestore.instance.collection(NOME_COLECAO)
+  Future<DocumentSnapshot> carregarGrupoPorId(String idDoGrupo) async {
+    return await FirebaseFirestore.instance
+        .collection(NOME_COLECAO)
         .doc(idDoGrupo)
         .get();
   }
 
   /// Carrega uma lista de grupos por ID.
-  Future<List<GrupoDeRedeirosDmo>> carregarGruposPorId(List<String> idsDosGrupos) async{
-
+  Future<List<GrupoDeRedeirosDmo>> carregarGruposPorId(
+      List<String> idsDosGrupos) async {
     estaCarregando = true;
     notifyListeners();
 
     List<GrupoDeRedeirosDmo> listaDeGrupos = [];
 
-    for(int i = 0; i < idsDosGrupos.length; i++){
-      DocumentSnapshot grupo = await carregarGrupoPorId(idsDosGrupos[i]);
-      listaDeGrupos.add(GrupoDeRedeirosDmo.converterSnapshotEmGrupoDeRedeiro(grupo));
+    for (int i = 0; i < idsDosGrupos.length; i++) {
+      try {
+        DocumentSnapshot grupo = await carregarGrupoPorId(idsDosGrupos[i]);
+        listaDeGrupos
+            .add(GrupoDeRedeirosDmo.converterSnapshotEmGrupoDeRedeiro(grupo));
+      } catch (erro) {
+        listaDeGrupos.add(GrupoDeRedeirosDmo(idGrupo: "", nomeGrupo: "Grupo apagado"));
+      }
     }
 
     estaCarregando = false;
@@ -65,18 +92,20 @@ class GrupoDeRedeirosModel extends Model{
     return listaDeGrupos;
   }
 
-  Future<QuerySnapshot> carregarGruposDeRedeirosPaginados(DocumentSnapshot ultimoGrupo, String filtroPorNome) {
-
-    if(filtroPorNome != null && filtroPorNome.isNotEmpty){
-      if(ultimoGrupo == null)
-        return FirebaseFirestore.instance.collection(NOME_COLECAO)
+  Future<QuerySnapshot> carregarGruposDeRedeirosPaginados(
+      DocumentSnapshot? ultimoGrupo, String? filtroPorNome) {
+    if (filtroPorNome != null && filtroPorNome.isNotEmpty) {
+      if (ultimoGrupo == null)
+        return FirebaseFirestore.instance
+            .collection(NOME_COLECAO)
             .orderBy(CAMPO_NOME)
             .startAt([filtroPorNome])
             .endAt([filtroPorNome + "\uf8ff"])
             .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
             .get();
       else
-        return FirebaseFirestore.instance.collection(NOME_COLECAO)
+        return FirebaseFirestore.instance
+            .collection(NOME_COLECAO)
             .orderBy(CAMPO_NOME)
             .startAt([filtroPorNome])
             .endAt([filtroPorNome + "\uf8ff"])
@@ -85,25 +114,53 @@ class GrupoDeRedeirosModel extends Model{
             .get();
     }
 
-    if(ultimoGrupo == null)
-      return FirebaseFirestore.instance.collection(NOME_COLECAO)
+    if (ultimoGrupo == null)
+      return FirebaseFirestore.instance
+          .collection(NOME_COLECAO)
           .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
-          .orderBy(CAMPO_NOME).get();
+          .orderBy(CAMPO_NOME)
+          .get();
 
-    return FirebaseFirestore.instance.collection(NOME_COLECAO)
+    return FirebaseFirestore.instance
+        .collection(NOME_COLECAO)
         .orderBy(CAMPO_NOME)
         .startAfterDocument(ultimoGrupo)
         .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
         .get();
   }
 
-  GrupoDeRedeirosDmo converterSnapshotEmGrupoDeRedeiros(DocumentSnapshot grupoDeRedeiros){
+  GrupoDeRedeirosDmo converterSnapshotEmGrupoDeRedeiros(
+      DocumentSnapshot grupoDeRedeiros) {
     return GrupoDeRedeirosDmo(
-        idGrupo: grupoDeRedeiros.id,
-        nomeGrupo: grupoDeRedeiros[CAMPO_NOME]
-    );
+        idGrupo: grupoDeRedeiros.id, nomeGrupo: grupoDeRedeiros[CAMPO_NOME]);
   }
 
-  //#endregion Métodos
+  /// Apaga o grupo de redeiros do Firebase.
+  Future<void> apagarGrupoDeRedeiros(
+      {required String idGrupo,
+      required BuildContext context,
+      required Function onSuccess,
+      required VoidCallback onFail}) async {
+    estaCarregando = true; // Indicar início do processamento
+    notifyListeners();
+
+    FirebaseFirestore.instance
+        .collection(NOME_COLECAO)
+        .doc(idGrupo)
+        .delete()
+        .then((value) {
+      RecolhimentoModel.of(context).carregarRecolhimentoDoDia();
+      estaCarregando = false; // Indicar FIM do processamento
+      notifyListeners();
+      onSuccess();
+    }).catchError((e) {
+      estaCarregando = false; // Indicar FIM do processamento
+      notifyListeners();
+      print(e.toString());
+      onFail();
+    });
+  }
+
+//#endregion Métodos
 
 }

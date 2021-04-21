@@ -28,7 +28,7 @@ class CardRecolhimentoEmAndamento extends StatefulWidget {
   final RecolhimentoDmo recolhimento;
 
   /// Flag que indica se processo de cadastrar redeiros está em progresso.
-  bool cadastrandoRedeiros;
+  bool cadastrandoRedeiros = false;
   //#endregion Atributos
 
   //#region Construtor(es)
@@ -45,7 +45,6 @@ class _CardRecolhimentoEmAndamentoState extends State<CardRecolhimentoEmAndament
 
   @override
   Widget build(BuildContext context) {
-    print("Tamanho recolhimento: ${widget.recolhimento.redeirosDoRecolhimento.length}");
     return Expanded(
         child: Column(children: [
           Expanded(child: CarrouselDeItens(widget.recolhimento, _finalizarRecolhimento)),
@@ -76,7 +75,7 @@ class _CardRecolhimentoEmAndamentoState extends State<CardRecolhimentoEmAndament
   /// Callback chamado quando o recolhimento for finalizado.
   void _finalizarRecolhimento(){
     DateTime dataFinalizacao = DateTime.now();
-    RecolhimentoModel.of(context).finalizarRecolhimento(idRecolhimento: widget.recolhimento.id, dataFinalizacao: dataFinalizacao);
+    RecolhimentoModel.of(context).finalizarRecolhimento(idRecolhimento: widget.recolhimento.id!, dataFinalizacao: dataFinalizacao);
   }
 //#endregion Métodos
 }

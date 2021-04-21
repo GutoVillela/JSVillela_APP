@@ -21,29 +21,31 @@ class Preferencias{
 
   //#region Atributos
   /// Define se usuário optou por manter sessão de login ativa.
-  static bool manterUsuarioLogado;
+  static bool manterUsuarioLogado = false;
 
   /// Define o ID do usuário logado.
-  static String idUsuarioLogado;
+  static String? idUsuarioLogado;
 
   /// Define o aplicativo de mapa padrão do usuário.
-  static AplicativosDeMapa aplicativosDeMapa;
+  static AplicativosDeMapa aplicativosDeMapa = AplicativosDeMapa.googleMaps;
 
   //#endregion Atributos
 
   //#region Métodos
   /// Método responsável por carregar todas as preferências do usuário.
-  void carregarPreferencias() async{
+  Future<void> carregarPreferencias() async{
 
     final SharedPreferences preferencias = await SharedPreferences.getInstance();
 
+    // Obter preferência "manterUsuarioLogado"
     manterUsuarioLogado = preferencias.getBool(PREF_MANTER_LOGADO) ?? false;
-    aplicativosDeMapa = preferencias.getInt(PREF_APP_MAPAS) ?? AplicativosDeMapa.googleMaps;
+
+    // Obter preferência "aplicativosDeMapa"
+    int? appMapa = preferencias.getInt(PREF_APP_MAPAS);
+    aplicativosDeMapa =  appMapa != null ? AplicativosDeMapa.values[appMapa] : AplicativosDeMapa.googleMaps;
 
     if(manterUsuarioLogado)
       idUsuarioLogado = preferencias.getString(PREF_USUARIO_LOGADO);
-
-    print(manterUsuarioLogado);
   }
 
   /// Obtém localização atual do dispositivo do usuário
@@ -80,6 +82,39 @@ class Preferencias{
     // Todas as permissões de localização estão garantidas.
     // Prosseguir obtendo localização do usuário.
     return await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+  }
+
+  /// Salva um valor na preferência determinada.
+  Future<void> salvarPreferencia(PreferenciasDoApp preferencia, dynamic valor) async{
+
+    // Salvar preferência
+    final SharedPreferences preferencias = await SharedPreferences.getInstance();
+
+    // Salvar corretamente a preferência
+    switch(preferencia){
+      case PreferenciasDoApp.manterUsuarioLogado:
+        if(valor is bool){
+          preferencias.setBool(Preferencias.PREF_MANTER_LOGADO, valor);
+          Preferencias.manterUsuarioLogado = valor;
+        }
+        else{
+          throw Exception('O valor precisa ser do tipo boleano para uma preferência do tipo PreferenciasDoApp.manterUsuarioLogado');
+        }
+
+        break;
+
+      // Preferência de Aplicativo de mapa
+      case PreferenciasDoApp.appPadraoMapas:
+        if(valor is AplicativosDeMapa){
+          preferencias.setInt(Preferencias.PREF_APP_MAPAS, (valor).index);
+          Preferencias.aplicativosDeMapa = valor;
+        }
+        else{
+          throw Exception('O valor precisa ser do tipo enum AplicativosDeMapa para uma preferência do tipo PreferenciasDoApp.appPadraoMapas.');
+        }
+
+        break;
+    }
   }
   //#endregion Métodos
 

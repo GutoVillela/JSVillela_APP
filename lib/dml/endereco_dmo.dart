@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:jsvillela_app/dml/base_dmo.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -9,25 +10,25 @@ class EnderecoDmo implements BaseDmo{
   //#region Atributos
 
   /// Logradouro (normalmente nome da rua).
-  String logradouro;
+  String? logradouro;
 
   /// Número.
-  String numero;
+  String? numero;
 
   /// Bairro.
-  String bairro;
+  String? bairro;
 
   /// Cidade.
-  String cidade;
+  String? cidade;
 
   /// CEP.
-  String cep;
+  String? cep;
 
   /// Complemento para endereço do redeiro.
-  String complemento;
+  String? complemento;
 
   /// Posição exata do endereço no mapa.
-  Position posicao;
+  Position? posicao;
 
   //#endregion Atributos
 
@@ -38,7 +39,7 @@ class EnderecoDmo implements BaseDmo{
   //#region Métodos
   @override
   String toString() {
-    return '${logradouro ?? ""}, ${numero ?? "S/N"}, ${bairro != null ? "$bairro," : ""} ${cidade ?? ""}${cep != null && cep.isNotEmpty ? " - " + cep : ""}';
+    return '${logradouro ?? ""}, ${numero ?? "S/N"}, ${bairro != null ? "$bairro," : ""} ${cidade ?? ""}${cep != null ? " - $cep" : ""}';
   }
 
   @override
@@ -50,7 +51,7 @@ class EnderecoDmo implements BaseDmo{
       RedeiroModel.CAMPO_ENDERECO_CIDADE : this.cidade,
       RedeiroModel.CAMPO_ENDERECO_CEP : this.cep,
       RedeiroModel.CAMPO_ENDERECO_COMPLEMENTO : this.complemento,
-      RedeiroModel.CAMPO_ENDERECO_POSICAO : GeoPoint(this.posicao.latitude, this.posicao.longitude)
+      RedeiroModel.CAMPO_ENDERECO_POSICAO : this.posicao != null ? GeoPoint(this.posicao!.latitude, this.posicao!.longitude) : null
     };
   }
 

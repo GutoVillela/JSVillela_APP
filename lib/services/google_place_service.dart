@@ -18,7 +18,7 @@ class GooglePlaceServiceProvider {
   final sessionToken;
 
   /// Chave da API do Google para dispositivos Android.
-  static final String androidKey = '';
+  static final String androidKey = 'AIzaSyAtsWz3hEnP-lEZtJaBaV9EktLweLajEp4';
 
   /// Chave da API do Google para dispositivos IOS.
   static final String iosKey = 'YOUR_API_KEY_HERE';
@@ -92,7 +92,12 @@ class GooglePlaceServiceProvider {
 
         // Segunda forma de obter o endereço caso o campo "Location" não seja fornecido no retorno da requisição.
         if(endereco.posicao == null)
-          endereco.posicao = Position(longitude: result['results'][0]['geometry']['location']['lng'], latitude: result['results'][0]['geometry']['location']['lat']);
+          endereco.posicao = Position(
+
+            longitude: result['results'][0]['geometry']['location']['lng'],
+            latitude: result['results'][0]['geometry']['location']['lat'],
+            heading: 0, timestamp: DateTime.now(), speedAccuracy: 0, speed: 0, altitude: 0, accuracy: 0
+          );
 
         components.forEach((c) {
 

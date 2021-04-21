@@ -10,13 +10,13 @@ class RedeiroDoRecolhimentoDmo implements BaseDmo{
   //#region Atributos
 
   /// Id do redeiro do recolhimento.
-  String id;
+  String? id;
 
   /// Redeiro associado ao recolhimento.
-  RedeiroDmo redeiro;
+  RedeiroDmo? redeiro;
 
   /// Data e hora de finalização desde recolhimento.
-  DateTime dataFinalizacao;
+  DateTime? dataFinalizacao;
 
   //#endregion Atributos
 
@@ -27,7 +27,7 @@ class RedeiroDoRecolhimentoDmo implements BaseDmo{
   Map<String, dynamic> converterParaMapa() {
     return {
       RedeiroDoRecolhimentoModel.CAMPO_DATA_FINALIZACAO : dataFinalizacao,
-      RedeiroDoRecolhimentoModel.CAMPO_REDEIRO : redeiro.id
+      RedeiroDoRecolhimentoModel.CAMPO_REDEIRO : redeiro == null ? null : redeiro!.id
     };
   }
   //#endregion Construtor(es)

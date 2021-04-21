@@ -1,46 +1,50 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:jsvillela_app/dml/base_dmo.dart';
 import 'package:jsvillela_app/dml/grupo_de_redeiros_dmo.dart';
 import 'package:jsvillela_app/dml/redeiro_do_recolhimento_dmo.dart';
 import 'package:jsvillela_app/models/recolhimento_model.dart';
 
 /// Classe modelo para recolhimentos.
-class RecolhimentoDmo{
+class RecolhimentoDmo implements BaseDmo{
 
   //#region Atributos
 
   /// Id do Recolhimento.
-  String id;
+  String? id;
 
   /// Data do recolhimento.
-  DateTime dataDoRecolhimento;
+  DateTime? dataDoRecolhimento;
 
-  /// Data em que o recolhimento foi finalizado.
-  DateTime dataFinalizado;
+  /// Data em que o recolhimento foi iniciado.
+  DateTime? dataIniciado;
+
+/// Data em que o recolhimento foi finalizado.
+  DateTime? dataFinalizado;
 
   /// Lista de grupos associados ao recolhimento.
-  List<GrupoDeRedeirosDmo> gruposDoRecolhimento;
+  List<GrupoDeRedeirosDmo>? gruposDoRecolhimento;
 
   /// Lista de redeiros associados ao recolhimento.
-  List<RedeiroDoRecolhimentoDmo> redeirosDoRecolhimento;
+  List<RedeiroDoRecolhimentoDmo>? redeirosDoRecolhimento;
 
   //#endregion Atributos
 
   //#region Construtor(es)
-  RecolhimentoDmo({this.id, this.dataDoRecolhimento, this.dataFinalizado, this.gruposDoRecolhimento, this.redeirosDoRecolhimento});
+  RecolhimentoDmo({this.id, this.dataDoRecolhimento, this.dataIniciado, this.dataFinalizado, this.gruposDoRecolhimento, this.redeirosDoRecolhimento});
   //#endregion Construtor(es)
 
   //#region Métodos
 
   /// Converte um snapshot em um objeto RecolhimentoDmo.
   static RecolhimentoDmo converterSnapshotEmRecolhimento(DocumentSnapshot recolhimento){
-
     return RecolhimentoDmo(
         id: recolhimento.id,
         dataDoRecolhimento: recolhimento[RecolhimentoModel.CAMPO_DATA_RECOLHIMENTO] != null ? new DateTime.fromMillisecondsSinceEpoch((recolhimento[RecolhimentoModel.CAMPO_DATA_RECOLHIMENTO] as Timestamp).millisecondsSinceEpoch).toLocal() : null,// Obter data e converter para o fuso horário local
+        dataIniciado:  recolhimento[RecolhimentoModel.CAMPO_DATA_INICIADO] != null ? new DateTime.fromMillisecondsSinceEpoch((recolhimento[RecolhimentoModel.CAMPO_DATA_INICIADO] as Timestamp).millisecondsSinceEpoch).toLocal() : null,// Obter data e converter para o fuso horário local
         dataFinalizado:  recolhimento[RecolhimentoModel.CAMPO_DATA_FINALIZADO] != null ? new DateTime.fromMillisecondsSinceEpoch((recolhimento[RecolhimentoModel.CAMPO_DATA_FINALIZADO] as Timestamp).millisecondsSinceEpoch).toLocal() : null,// Obter data e converter para o fuso horário local
         gruposDoRecolhimento: (recolhimento[RecolhimentoModel.CAMPO_GRUPOS_DO_RECOLHIMENTO] as List)
             .map((e) => GrupoDeRedeirosDmo(
-            idGrupo: e)).toList()
+            idGrupo: e, nomeGrupo: "")).toList()
     );
   }
 
@@ -49,8 +53,19 @@ class RecolhimentoDmo{
     return 'id: $id, '
         'dataDoRecolhimento: $dataDoRecolhimento, '
         'dataFinalizado: $dataFinalizado, '
-        'gruposDoRecolhimento: ${ gruposDoRecolhimento == null ? "null" : ( gruposDoRecolhimento.map((e) => "{ id: " + (e.idGrupo ?? "null") + ", nomeGrupo: " + (e.nomeGrupo ?? "null") + "} ").toString() ) }.'
+        'dataIniciado: $dataIniciado, '
+        'gruposDoRecolhimento: ${ gruposDoRecolhimento == null ? "null" : ( gruposDoRecolhimento!.map((e) => "{ id: " + (e.idGrupo) + ", nomeGrupo: " + (e.nomeGrupo) + "} ").toString() ) }.'
     ;
+  }
+
+  @override
+  Map<String, dynamic> converterParaMapa() {
+    return{
+      RecolhimentoModel.CAMPO_DATA_RECOLHIMENTO : dataDoRecolhimento,
+      RecolhimentoModel.CAMPO_DATA_INICIADO: dataIniciado,
+      RecolhimentoModel.CAMPO_DATA_FINALIZADO : dataFinalizado,
+      RecolhimentoModel.CAMPO_GRUPOS_DO_RECOLHIMENTO : gruposDoRecolhimento == null ? null : gruposDoRecolhimento!.map((e) => e.idGrupo).toList()
+    };
   }
 
   //#endregion Métodos

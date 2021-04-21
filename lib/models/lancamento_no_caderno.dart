@@ -4,8 +4,7 @@ import 'package:jsvillela_app/models/redeiro_model.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 /// Model para grupo de redeiros.
-class LancamentoNoCadernoModel extends Model{
-
+class LancamentoNoCadernoModel extends Model {
   //#region Atributos
   //#endregion Atributos
 
@@ -35,37 +34,57 @@ class LancamentoNoCadernoModel extends Model{
   static const String CAMPO_DATA_PAGAMENTO = "data_pagamento";
 
   /// Nome do identificador para o campo "data_confirmacao_pagamento" utilizado na collection.
-  static const String CAMPO_DATA_CONFIRMACAO_PAGAMENTO = "data_confirmacao_pagamento";
+  static const String CAMPO_DATA_CONFIRMACAO_PAGAMENTO =
+      "data_confirmacao_pagamento";
   //#endregion Constantes
 
   //#region Métodos
   ///Cadastra um novo lançamento no caderno do Redeiro no Firebase.
-  void cadastrarNovoLancamento({@required Map<String, dynamic> dadosDoLancamento, @required String idDoRedeiro, @required VoidCallback onSuccess, @required VoidCallback onFail}){
-
+  void cadastrarNovoLancamento(
+      {required Map<String, dynamic> dadosDoLancamento,
+      required String idDoRedeiro,
+      required VoidCallback onSuccess,
+      required VoidCallback onFail}) {
     //TODO: Substituir o tipo do parâmetro "dadosDoLancamento" para List<LancamentoDoCadernoDmo>
 
-    FirebaseFirestore.instance.collection(RedeiroModel.NOME_COLECAO).doc(idDoRedeiro).collection(NOME_COLECAO).add({
-      CAMPO_ID_REDE : dadosDoLancamento[CAMPO_ID_REDE],
-      CAMPO_NOME_REDE : dadosDoLancamento[CAMPO_NOME_REDE],
-      CAMPO_QUANTIDADE : dadosDoLancamento[CAMPO_QUANTIDADE],
-      CAMPO_VALOR_UNITARIO : dadosDoLancamento[CAMPO_VALOR_UNITARIO],
-      CAMPO_DATA_LANCAMENTO : dadosDoLancamento[CAMPO_DATA_LANCAMENTO],
-      CAMPO_PAGO : dadosDoLancamento[CAMPO_PAGO],
-      CAMPO_DATA_PAGAMENTO : dadosDoLancamento[CAMPO_DATA_PAGAMENTO],
-      CAMPO_DATA_CONFIRMACAO_PAGAMENTO: dadosDoLancamento[CAMPO_DATA_CONFIRMACAO_PAGAMENTO]
-    }).then((value) => onSuccess()).catchError((e){
-      onFail();
-    });
+    FirebaseFirestore.instance
+        .collection(RedeiroModel.NOME_COLECAO)
+        .doc(idDoRedeiro)
+        .collection(NOME_COLECAO)
+        .add({
+          CAMPO_ID_REDE: dadosDoLancamento[CAMPO_ID_REDE],
+          CAMPO_NOME_REDE: dadosDoLancamento[CAMPO_NOME_REDE],
+          CAMPO_QUANTIDADE: dadosDoLancamento[CAMPO_QUANTIDADE],
+          CAMPO_VALOR_UNITARIO: dadosDoLancamento[CAMPO_VALOR_UNITARIO],
+          CAMPO_DATA_LANCAMENTO: dadosDoLancamento[CAMPO_DATA_LANCAMENTO],
+          CAMPO_PAGO: dadosDoLancamento[CAMPO_PAGO],
+          CAMPO_DATA_PAGAMENTO: dadosDoLancamento[CAMPO_DATA_PAGAMENTO],
+          CAMPO_DATA_CONFIRMACAO_PAGAMENTO:
+              dadosDoLancamento[CAMPO_DATA_CONFIRMACAO_PAGAMENTO]
+        })
+        .then((value) => onSuccess())
+        .catchError((e) {
+          onFail();
+        });
   }
 
   /// Informa o pagamento do Lançamento informado para o redeiro informado.
-  void informarPagamento({@required String idDoLancamento, @required String idDoRedeiro, @required Timestamp dataDoPagamento, @required VoidCallback onSuccess, @required VoidCallback onFail}) async{
-    FirebaseFirestore.instance.collection(RedeiroModel.NOME_COLECAO).doc(idDoRedeiro).collection(NOME_COLECAO).doc(idDoLancamento).update({
-      CAMPO_PAGO : true,
-      CAMPO_DATA_PAGAMENTO : dataDoPagamento
-    }).then((value) => onSuccess()).catchError((e){
-      onFail();
-    });
+  void informarPagamento(
+      {required String idDoLancamento,
+      required String idDoRedeiro,
+      required Timestamp dataDoPagamento,
+      required VoidCallback onSuccess,
+      required VoidCallback onFail}) async {
+    FirebaseFirestore.instance
+        .collection(RedeiroModel.NOME_COLECAO)
+        .doc(idDoRedeiro)
+        .collection(NOME_COLECAO)
+        .doc(idDoLancamento)
+        .update({CAMPO_PAGO: true, CAMPO_DATA_PAGAMENTO: dataDoPagamento})
+        .then((value) => onSuccess())
+        .catchError((e) {
+          onFail();
+        });
   }
   //#endregion Métodos
 

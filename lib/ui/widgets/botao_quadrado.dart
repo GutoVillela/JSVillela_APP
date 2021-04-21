@@ -5,26 +5,26 @@ class BotaoQuadrado extends StatelessWidget {
 
   //#region Atributos
   /// Altura do Widget.
-  final double altura;
+  final double? altura;
 
   /// Largura do Widget.
-  final double largura;
+  final double? largura;
 
   /// Texto principal do botão.
   final String textoPrincipal;
 
   /// Texto secundário do botão.
-  final String textoSecundario;
+  final String? textoSecundario;
 
   /// Ícone do botão.
-  final IconData icone;
+  final IconData? icone;
 
   /// Ação a ser realizada após clicar no botão
-  final VoidCallback acaoAoClicar;
+  final VoidCallback? acaoAoClicar;
   //#endregion Atributos
 
   //#region Construtor(es)
-  BotaoQuadrado({this.altura, this.largura, this.textoPrincipal, this.textoSecundario, this.icone, this.acaoAoClicar});
+  BotaoQuadrado({this.altura, this.largura, required this.textoPrincipal, this.textoSecundario, this.icone, this.acaoAoClicar});
   //#endregion Construtor(es)
 
   @override
@@ -51,7 +51,7 @@ class BotaoQuadrado extends StatelessWidget {
                     )
                 ),
                 SizedBox(height: 20),
-                Text(textoSecundario,
+                Text(textoSecundario ?? "",
                     style: TextStyle(
                         color: Theme.of(context).primaryColor,
                         fontSize: 14,

@@ -5,9 +5,10 @@ import 'package:jsvillela_app/infra/preferencias.dart';
 import 'package:jsvillela_app/dml/rede_dmo.dart';
 
 /// Model para rede.
-class RedeModel extends Model{
-
+class RedeModel extends Model {
   //#region Atributos
+  /// Indica que existe um processo em execução a partir desta classe.
+  bool estaCarregando = false;
   //#endregion Atributos
 
   //#region Constantes
@@ -22,28 +23,75 @@ class RedeModel extends Model{
 
   //#region Métodos
   ///Cadastra um redeiro no Firebase.
-  void cadastrarRede({@required Map<String, dynamic> dadosDaRede, @required VoidCallback onSuccess, @required VoidCallback onFail}){
-    FirebaseFirestore.instance.collection(NOME_COLECAO).add({
-      CAMPO_REDE : dadosDaRede[CAMPO_REDE],
-      CAMPO_VALOR_UNITARIO : dadosDaRede[CAMPO_VALOR_UNITARIO]
-    }).then((value) => onSuccess()).catchError((e){
+  void cadastrarRede(
+      {required RedeDmo dadosDaRede,
+      required VoidCallback onSuccess,
+      required VoidCallback onFail}) {
+    FirebaseFirestore.instance
+        .collection(NOME_COLECAO)
+        .add(dadosDaRede.converterParaMapa())
+        .then((value) => onSuccess())
+        .catchError((e) {
+      onFail();
+    });
+  }
+
+  ///Atualiza uma rede no Firebase.
+  void atualizarRede(
+      {required RedeDmo dadosDaRede,
+      required VoidCallback onSuccess,
+      required VoidCallback onFail}) {
+    FirebaseFirestore.instance
+        .collection(NOME_COLECAO)
+        .doc(dadosDaRede.id)
+        .update(dadosDaRede.converterParaMapa())
+        .then((value) => onSuccess())
+        .catchError((e) {
+      print(e.toString());
+      onFail();
+    });
+  }
+
+  /// Apaga a rede no Firebase.
+  Future<void> apagarRede(
+      {required String idRede,
+      required BuildContext context,
+      required Function onSuccess,
+      required VoidCallback onFail}) async {
+    estaCarregando = true; // Indicar início do processamento
+    notifyListeners();
+
+    FirebaseFirestore.instance
+        .collection(NOME_COLECAO)
+        .doc(idRede)
+        .delete()
+        .then((value) {
+      estaCarregando = false; // Indicar FIM do processamento
+      notifyListeners();
+      onSuccess();
+    }).catchError((e) {
+      estaCarregando = false; // Indicar FIM do processamento
+      notifyListeners();
+      print(e.toString());
       onFail();
     });
   }
 
   /// Carrega as redes de forma paginada
-  Future<QuerySnapshot> carregarRedesPaginadas(DocumentSnapshot ultimaRede, String filtroPorNome) {
-
-    if(filtroPorNome != null && filtroPorNome.isNotEmpty){
-      if(ultimaRede == null)
-        return FirebaseFirestore.instance.collection(NOME_COLECAO)
+  Future<QuerySnapshot> carregarRedesPaginadas(
+      DocumentSnapshot? ultimaRede, String? filtroPorNome) {
+    if (filtroPorNome != null && filtroPorNome.isNotEmpty) {
+      if (ultimaRede == null)
+        return FirebaseFirestore.instance
+            .collection(NOME_COLECAO)
             .orderBy(CAMPO_REDE)
             .startAt([filtroPorNome])
             .endAt([filtroPorNome + "\uf8ff"])
             .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
             .get();
       else
-        return FirebaseFirestore.instance.collection(NOME_COLECAO)
+        return FirebaseFirestore.instance
+            .collection(NOME_COLECAO)
             .orderBy(CAMPO_REDE)
             .startAt([filtroPorNome])
             .endAt([filtroPorNome + "\uf8ff"])
@@ -52,24 +100,26 @@ class RedeModel extends Model{
             .get();
     }
 
-    if(ultimaRede == null)
-      return FirebaseFirestore.instance.collection(NOME_COLECAO)
+    if (ultimaRede == null)
+      return FirebaseFirestore.instance
+          .collection(NOME_COLECAO)
           .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
-          .orderBy(CAMPO_REDE).get();
+          .orderBy(CAMPO_REDE)
+          .get();
 
-    return FirebaseFirestore.instance.collection(NOME_COLECAO)
+    return FirebaseFirestore.instance
+        .collection(NOME_COLECAO)
         .orderBy(CAMPO_REDE)
         .startAfterDocument(ultimaRede)
         .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
         .get();
   }
 
-  RedeDmo converterSnapshotEmRede(DocumentSnapshot rede){
+  RedeDmo converterSnapshotEmRede(DocumentSnapshot rede) {
     return RedeDmo(
         id: rede.id,
         nome_rede: rede[CAMPO_REDE],
-        valor_unitario_rede: rede[CAMPO_VALOR_UNITARIO]
-    );
+        valor_unitario_rede: rede[CAMPO_VALOR_UNITARIO]);
   }
 //#endregion Métodos
 }
