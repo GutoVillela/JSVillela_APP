@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:jsvillela_app/infra/enums.dart';
 import 'package:jsvillela_app/infra/paleta_de_cores.dart';
+import 'package:jsvillela_app/stores/navegacao_store.dart';
 import 'package:jsvillela_app/ui/menu_tabs/home_tab.dart';
 import 'package:jsvillela_app/ui/menu_tabs/tela_agendar_recolhimento.dart';
 import 'package:jsvillela_app/ui/menu_tabs/tela_cadastro_de_grupos_de_redeiros.dart';
@@ -15,7 +17,8 @@ import 'package:jsvillela_app/ui/tela_cadastrar_nova_rede.dart';
 import 'package:jsvillela_app/ui/tela_cadastrar_novo_grupo_de_redeiros.dart';
 import 'package:jsvillela_app/ui/widgets/custom_drawer.dart';
 import 'package:jsvillela_app/ui/tela_cadastrar_novo_redeiro.dart';
-import 'file:///C:/Users/gusta/AndroidStudioProjects/jsvillela_app/lib/ui/menu_tabs/tela_consultar_solicitacoes_redeiros.dart';
+import 'package:jsvillela_app/ui/menu_tabs/tela_consultar_solicitacoes_redeiros.dart';
+import 'package:mobx/mobx.dart';
 
 import 'menu_tabs/tela_cadastro_de_redeiros.dart';
 
@@ -46,6 +49,9 @@ class _TelaPrincipalState extends State<TelaPrincipal> {
 
   //#region Atributos
 
+  /// Store que é utilizada para navegar entre telas.
+  final NavegacaoStore navegacaoStore = GetIt.I<NavegacaoStore>();
+
   ///Page controller usado para alternar páginas dentro do aplicativo.
   final _homeScreenPageController = PageController();
 
@@ -67,6 +73,16 @@ class _TelaPrincipalState extends State<TelaPrincipal> {
   //#endregion Atributos
 
   //#region Métodos
+  
+  @override
+  void initState() {
+    super.initState();
+
+    /// Reaction que fica observando a página atual do aplicativo
+    reaction((_) => navegacaoStore.paginaAtual, (int pagina){
+      _homeScreenPageController.jumpToPage(pagina);
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return PageView(
@@ -80,19 +96,10 @@ class _TelaPrincipalState extends State<TelaPrincipal> {
               backgroundColor: PaletaDeCor.AZUL_BEM_CLARO,
             ),
             body: HomeTab(),
-            drawer: CustomDrawer(_homeScreenPageController),
+            drawer: CustomDrawer(),
             drawerScrimColor: Color.fromARGB(100, 100, 100, 100)
         ),
-        Scaffold(
-            appBar: AppBar(
-              title: Text("AGENDAR RECOLHIMENTO"),
-              centerTitle: true,
-              backgroundColor: PaletaDeCor.AZUL_BEM_CLARO,
-            ),
-            drawer: CustomDrawer(_homeScreenPageController),
-            drawerScrimColor: PaletaDeCor.AZUL_BEM_CLARO,
-            body: TelaAgendarRecolhimento()
-        ),
+        TelaAgendarRecolhimento(tipoDeManutencao: TipoDeManutencao.cadastro),
         Scaffold(
             appBar: AppBar(
               title: Text("CONSULTAR RECOLHIMENTOS"),
@@ -100,7 +107,7 @@ class _TelaPrincipalState extends State<TelaPrincipal> {
               //backgroundColor: PaletaDeCor.AZUL_BEM_CLARO,
             ),
             //drawerScrimColor: PaletaDeCor.AZUL_BEM_CLARO,
-            drawer: CustomDrawer(_homeScreenPageController),
+            drawer: CustomDrawer(),
             body: TelaConsultarRecolhimento()
         ),
         Scaffold(
@@ -108,7 +115,7 @@ class _TelaPrincipalState extends State<TelaPrincipal> {
               title: Text("NOTIFICAÇÕES"),
               centerTitle: true,
             ),
-            drawer: CustomDrawer(_homeScreenPageController),
+            drawer: CustomDrawer(),
             body: TelaNotificacoes()
         ),
         Scaffold(
@@ -136,7 +143,7 @@ class _TelaPrincipalState extends State<TelaPrincipal> {
                 )
               ],
             ),
-            drawer: CustomDrawer(_homeScreenPageController),
+            drawer: CustomDrawer(),
             body: TelaCadastroDeRedeiros()
         ),
         Scaffold(
@@ -164,7 +171,7 @@ class _TelaPrincipalState extends State<TelaPrincipal> {
                 )
               ],
             ),
-            drawer: CustomDrawer(_homeScreenPageController),
+            drawer: CustomDrawer(),
             body: TelaCadastroDeGruposDeRedeiros()
         ),
         Scaffold(
@@ -172,7 +179,7 @@ class _TelaPrincipalState extends State<TelaPrincipal> {
               title: Text("SOLICITAÇÕES DOS REDEIROS"),
               centerTitle: true,
             ),
-            drawer: CustomDrawer(_homeScreenPageController),
+            drawer: CustomDrawer(),
             body: TelaConsultarSolicitacoesRedeiros()
         ),
         Scaffold(
@@ -200,7 +207,7 @@ class _TelaPrincipalState extends State<TelaPrincipal> {
                 )
               ],
             ),
-            drawer: CustomDrawer(_homeScreenPageController),
+            drawer: CustomDrawer(),
             body: TelaCadastroDeMateriaPrima()
         ),
         Scaffold(
@@ -228,7 +235,7 @@ class _TelaPrincipalState extends State<TelaPrincipal> {
                 )
               ],
             ),
-            drawer: CustomDrawer(_homeScreenPageController),
+            drawer: CustomDrawer(),
             body: TelaCadastroDeRedes()
         ),
         Scaffold(
@@ -236,7 +243,7 @@ class _TelaPrincipalState extends State<TelaPrincipal> {
               title: Text("RELATÓRIOS"),
               centerTitle: true,
             ),
-            drawer: CustomDrawer(_homeScreenPageController),
+            drawer: CustomDrawer(),
             body: TelaRelatorios()
         ),
         Scaffold(
@@ -244,7 +251,7 @@ class _TelaPrincipalState extends State<TelaPrincipal> {
               title: Text("PREFERÊNCIAS"),
               centerTitle: true,
             ),
-            drawer: CustomDrawer(_homeScreenPageController),
+            drawer: CustomDrawer(),
             body: TelaPreferencias()
         ),
       ],

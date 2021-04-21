@@ -20,10 +20,6 @@ class HomeTab extends StatefulWidget {
 
 class _HomeTabState extends State<HomeTab> {
 
-  //#region Atributos
-
-  //#endregion Atributos
-
   //#region Métodos
 
   @override
@@ -48,7 +44,7 @@ class _HomeTabState extends State<HomeTab> {
                         Center(child: Icon(Icons.directions_car, size: 80, color: Theme.of(context).primaryColor)),
                         SizedBox(height: 20),
                         CardRecolhimento(),
-                        !modelRecolhimento.recolhimentoEmAndamento ?? false ?
+                        !modelRecolhimento.recolhimentoEmAndamento ?
                         Expanded(
                           child: Column(
                             children: [
@@ -99,7 +95,7 @@ class _HomeTabState extends State<HomeTab> {
                                               itemCount: modelSolicitacoes.solicitacoes.length,
                                               itemBuilder: (context, index){
                                                 return SlimListViewItemPesquisa(
-                                                  textoPrincipal: modelSolicitacoes.solicitacoes[index].materiasPrimasSolicitadas.first.nomeMateriaPrima ?? "",
+                                                  textoPrincipal: modelSolicitacoes.solicitacoes[index].materiasPrimasSolicitadas!.first.nomeMateriaPrima ?? "",
                                                   iconeEsquerda: Icons.dns_rounded,
                                                   acaoAoClicar: () {},
                                                 );

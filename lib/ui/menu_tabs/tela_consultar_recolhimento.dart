@@ -4,10 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
 import 'package:jsvillela_app/dml/recolhimento_dmo.dart';
+import 'package:jsvillela_app/infra/enums.dart';
 import 'package:jsvillela_app/infra/infraestrutura.dart';
 import 'package:jsvillela_app/infra/paleta_de_cores.dart';
 import 'package:jsvillela_app/infra/preferencias.dart';
 import 'package:jsvillela_app/models/recolhimento_model.dart';
+import 'package:jsvillela_app/ui/menu_tabs/tela_agendar_recolhimento.dart';
 import 'package:jsvillela_app/ui/tela_editar_recolhimento.dart';
 import 'package:jsvillela_app/ui/widgets/list_view_item_pesquisa.dart';
 
@@ -22,10 +24,10 @@ class _TelaConsultarRecolhimentoState extends State<TelaConsultarRecolhimento> {
   //#region Atributos
 
   /// Data inicial do filtro selecionado em tela pelo usuário.
-  DateTime _filtroDataInicial;
+  DateTime? _filtroDataInicial;
 
   /// Data final do filtro selecionado em tela pelo usuário.
-  DateTime _filtroDataFinal;
+  DateTime? _filtroDataFinal;
 
   /// Define se o checkbox "Incluir recolhimentos finalizados" foi marcado
   bool _incluirRecolhimentosFinalizados = false;
@@ -34,7 +36,7 @@ class _TelaConsultarRecolhimentoState extends State<TelaConsultarRecolhimento> {
   List<RecolhimentoDmo> _listaDeRecolhimentos = [];
 
   /// Último redeiro carregado em tela.
-  DocumentSnapshot _ultimoRecolhimentoCarregado;
+  DocumentSnapshot? _ultimoRecolhimentoCarregado;
 
   /// Define se existem mais registros a serem carregados na lista.
   bool _temMaisRegistros = true;
@@ -69,10 +71,6 @@ class _TelaConsultarRecolhimentoState extends State<TelaConsultarRecolhimento> {
     // Formatar para para dd/MM/yyyy
     final formatoData = new DateFormat('dd/MM/yyyy');
 
-    _listaDeRecolhimentos.forEach((element) {
-      print("ID: ${element.id} | Lista: ${element.gruposDoRecolhimento.length}");
-    });
-
     return Container(
         child:
         LayoutBuilder(
@@ -90,15 +88,15 @@ class _TelaConsultarRecolhimentoState extends State<TelaConsultarRecolhimento> {
                             padding: const EdgeInsets.only(right: 1),
                             child: ListTile(
                               leading: Icon(Icons.calendar_today, color: Theme.of(context).primaryColor),
-                              title: Text(_filtroDataInicial == null ? "De" : formatoData.format(_filtroDataInicial)),
+                              title: Text(_filtroDataInicial == null ? "De" : formatoData.format(_filtroDataInicial!)),
                               tileColor: PaletaDeCor.AZUL_BEM_CLARO,
                               onTap: () async{
-                                DateTime dataSelecionada = await showDatePicker(
+                                DateTime? dataSelecionada = await showDatePicker(
                                   context: context,
-                                  locale: Locale(WidgetsBinding.instance.window.locale.languageCode, WidgetsBinding.instance.window.locale.countryCode),
-                                  initialDate: _filtroDataInicial == null ? (_filtroDataFinal != null && _filtroDataFinal.isBefore(DateTime.now()) ? _filtroDataFinal : DateTime.now()) : _filtroDataInicial,
+                                  locale: Locale(WidgetsBinding.instance!.window.locale.languageCode, WidgetsBinding.instance!.window.locale.countryCode),
+                                  initialDate: _filtroDataInicial == null ? (_filtroDataFinal != null && _filtroDataFinal!.isBefore(DateTime.now()) ? _filtroDataFinal! : DateTime.now()) : _filtroDataInicial!,
                                   firstDate: DateTime(1900),
-                                  lastDate: _filtroDataFinal == null ? DateTime(3000) : _filtroDataFinal
+                                  lastDate: _filtroDataFinal == null ? DateTime(3000) : _filtroDataFinal!
                                 );
 
                                 // Atualizar estado da tela somente se uma data diferente for selecionada
@@ -117,14 +115,14 @@ class _TelaConsultarRecolhimentoState extends State<TelaConsultarRecolhimento> {
                             padding: const EdgeInsets.only(left: 1),
                             child: ListTile(
                               leading: Icon(Icons.calendar_today, color: Theme.of(context).primaryColor),
-                              title: Text(_filtroDataFinal == null ? "Até" : formatoData.format(_filtroDataFinal)),
+                              title: Text(_filtroDataFinal == null ? "Até" : formatoData.format(_filtroDataFinal!)),
                               tileColor: PaletaDeCor.AZUL_BEM_CLARO,
                               onTap: () async{
-                                DateTime dataSelecionada = await showDatePicker(
+                                DateTime? dataSelecionada = await showDatePicker(
                                   context: context,
-                                  locale: Locale(WidgetsBinding.instance.window.locale.languageCode, WidgetsBinding.instance.window.locale.countryCode),
-                                  initialDate: _filtroDataFinal == null ? (_filtroDataInicial == null ? DateTime.now() : _filtroDataInicial) : _filtroDataFinal,
-                                  firstDate: _filtroDataInicial == null ? DateTime(1900) : _filtroDataInicial,
+                                  locale: Locale(WidgetsBinding.instance!.window.locale.languageCode, WidgetsBinding.instance!.window.locale.countryCode),
+                                  initialDate: _filtroDataFinal == null ? (_filtroDataInicial == null ? DateTime.now() : _filtroDataInicial!) : _filtroDataFinal!,
+                                  firstDate: _filtroDataInicial == null ? DateTime(1900) : _filtroDataInicial!,
                                   lastDate: DateTime(3000)
                                 );
 
@@ -148,9 +146,9 @@ class _TelaConsultarRecolhimentoState extends State<TelaConsultarRecolhimento> {
                         secondary: Icon(Icons.av_timer, color: Theme.of(context).primaryColor),
                         tileColor: PaletaDeCor.AZUL_BEM_CLARO,
                         value: _incluirRecolhimentosFinalizados,
-                        onChanged: (bool valor) {
+                        onChanged: (bool? valor) {
                           setState(() {
-                            _incluirRecolhimentosFinalizados = valor;
+                            _incluirRecolhimentosFinalizados = valor ?? false;
                             resetarCamposDeBusca();
                             _obterRegistros(true);
                           });
@@ -182,8 +180,8 @@ class _TelaConsultarRecolhimentoState extends State<TelaConsultarRecolhimento> {
                               }
 
                               return ListViewItemPesquisa(
-                                textoPrincipal: formatoData.format(_listaDeRecolhimentos[index].dataDoRecolhimento.toLocal()),
-                                textoSecundario: _listaDeRecolhimentos[index].dataFinalizado != null ? ("Finalizado em ${formatoData.format(_listaDeRecolhimentos[index].dataFinalizado)}.") : "Não finalizado",
+                                textoPrincipal: formatoData.format(_listaDeRecolhimentos[index].dataDoRecolhimento!.toLocal()),
+                                textoSecundario: _listaDeRecolhimentos[index].dataFinalizado != null ? ("Finalizado em ${formatoData.format(_listaDeRecolhimentos[index].dataFinalizado!)}.") : "Não finalizado",
                                 iconeEsquerda: Icons.directions_car,
                                 iconeDireita: Icons.arrow_forward_ios_sharp,
                                 acaoAoClicar: (){
@@ -205,7 +203,7 @@ class _TelaConsultarRecolhimentoState extends State<TelaConsultarRecolhimento> {
                                     icon: Icons.edit,
                                     onTap: () {
                                       Navigator.of(context).push(
-                                          MaterialPageRoute(builder: (context) => TelaEditarRecolhimento(_listaDeRecolhimentos[index]))
+                                          MaterialPageRoute(builder: (context) => TelaAgendarRecolhimento(tipoDeManutencao: TipoDeManutencao.alteracao, recolhimentoASerEditado: _listaDeRecolhimentos[index]))
                                       );
                                     },
                                   )
@@ -296,7 +294,7 @@ class _TelaConsultarRecolhimentoState extends State<TelaConsultarRecolhimento> {
             );
 
             await RecolhimentoModel().apagarRecolhimento(
-                idRecolhimento: _listaDeRecolhimentos[indexRecolhimento].id,
+                idRecolhimento: _listaDeRecolhimentos[indexRecolhimento].id!,
                 context: context,
                 onSuccess: (){
                   // Fechar diálogo de carregamento.

@@ -10,19 +10,19 @@ class SolicitacaoDoRedeiroDmo implements BaseDmo{
   //#region Atributos
 
   /// Id da solicitação do redeiro.
-  String id;
+  String? id;
 
   /// Redeiro solicitante.
-  RedeiroDmo redeiroSolicitante;
+  RedeiroDmo? redeiroSolicitante;
 
   /// Data da solicitação.
-  DateTime dataDaSolicitacao;
+  DateTime? dataDaSolicitacao;
 
   /// Data da finalização da solicitação do redeiro.
-  DateTime dataFinalizacao;
+  DateTime? dataFinalizacao;
 
   /// Matérias-primas solicitadas.
-  List<MateriaPrimaDmo> materiasPrimasSolicitadas = [];
+  List<MateriaPrimaDmo>? materiasPrimasSolicitadas = [];
 
   //#endregion Atributos
 
@@ -34,10 +34,10 @@ class SolicitacaoDoRedeiroDmo implements BaseDmo{
   @override
   Map<String, dynamic> converterParaMapa() {
     return {
-      SolicitacaoDoRedeiroModel.CAMPO_REDEIRO_SOLICITANTE : redeiroSolicitante.id,
+      SolicitacaoDoRedeiroModel.CAMPO_REDEIRO_SOLICITANTE : redeiroSolicitante == null ? null : redeiroSolicitante!.id,
       SolicitacaoDoRedeiroModel.CAMPO_DATA_SOLICITACAO : dataDaSolicitacao,
       SolicitacaoDoRedeiroModel.CAMPO_DATA_FINALIZACAO : dataFinalizacao,
-      SolicitacaoDoRedeiroModel.CAMPO_MATERIAIS_SOLICITADOS : materiasPrimasSolicitadas.map((e) => e.id).toList()
+      SolicitacaoDoRedeiroModel.CAMPO_MATERIAIS_SOLICITADOS : materiasPrimasSolicitadas == null ? null : materiasPrimasSolicitadas!.map((e) => e.id).toList()
     };
   }
 

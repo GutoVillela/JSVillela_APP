@@ -64,10 +64,10 @@ class TelaInformacoesDoRecolhimento extends StatelessWidget {
 
                   return Column(
                     children: [
-                      _listTileDetalhesRecolhimento(context, Icons.calendar_today, "Agendado para ${formatoData.format(recolhimento.dataDoRecolhimento)}"),
-                      _listTileDetalhesRecolhimento(context, recolhimentoFinalizado ? Icons.check : Icons.access_time_sharp, recolhimentoFinalizado ? "Finalizado em ${formatoData.format(recolhimento.dataFinalizado)}" : "Não finalizado"),
+                      _listTileDetalhesRecolhimento(context, Icons.calendar_today, "Agendado para ${formatoData.format(recolhimento.dataDoRecolhimento!)}"),
+                      _listTileDetalhesRecolhimento(context, recolhimentoFinalizado ? Icons.check : Icons.access_time_sharp, recolhimentoFinalizado ? "Finalizado em ${formatoData.format(recolhimento.dataFinalizado!)}" : "Não finalizado"),
                       Column(
-                        children: this.recolhimento.gruposDoRecolhimento.map((e) => _listTileDetalhesRecolhimento(context, Icons.people_alt, e.nomeGrupo ?? "nulo")).toList(),
+                        children: this.recolhimento.gruposDoRecolhimento!.map((e) => _listTileDetalhesRecolhimento(context, Icons.people_alt, e.nomeGrupo)).toList(),
                       ),
                       SizedBox(height: 20),
                       Text("Redeiros do Recolhimento",
@@ -89,19 +89,19 @@ class TelaInformacoesDoRecolhimento extends StatelessWidget {
 
                               return ListView.builder(
                                 padding: EdgeInsets.symmetric(vertical: 8),
-                                itemCount: recolhimento.redeirosDoRecolhimento.length,
+                                itemCount: recolhimento.redeirosDoRecolhimento!.length,
                                 itemBuilder: (context, index){
 
-                                  bool redeiroExcluido = recolhimento.redeirosDoRecolhimento[index].redeiro == null;
+                                  bool redeiroExcluido = recolhimento.redeirosDoRecolhimento![index].redeiro == null;
 
                                   return ListViewItemPesquisa(
-                                      textoPrincipal: redeiroExcluido ? "Redeiro excluído" : recolhimento.redeirosDoRecolhimento[index].redeiro.nome,
-                                      textoSecundario: redeiroExcluido ? "" : recolhimento.redeirosDoRecolhimento[index].redeiro.endereco.cidade,
+                                      textoPrincipal: redeiroExcluido ? "Redeiro excluído" : recolhimento.redeirosDoRecolhimento![index].redeiro!.nome!,
+                                      textoSecundario: redeiroExcluido ? "" : recolhimento.redeirosDoRecolhimento![index].redeiro!.endereco!.cidade!,
                                       iconeEsquerda: redeiroExcluido ? Icons.remove_circle_outlined : Icons.person,
                                       iconeDireita: redeiroExcluido ? null : Icons.arrow_forward_ios_sharp,
                                       acaoAoClicar: (){
                                         if(!redeiroExcluido)
-                                          Navigator.of(context).push(MaterialPageRoute(builder: (context) => TelaInformacoesDoRedeiro(recolhimento.redeirosDoRecolhimento[index].redeiro)));
+                                          Navigator.of(context).push(MaterialPageRoute(builder: (context) => TelaInformacoesDoRedeiro(recolhimento.redeirosDoRecolhimento![index].redeiro!)));
                                         else
                                           Infraestrutura.mostrarMensagemDeErro(context, "Este redeiro foi excluído");
                                       }
@@ -133,12 +133,12 @@ class TelaInformacoesDoRecolhimento extends StatelessWidget {
 
   /// Carrega as informações dos grupos associados ao recolhimento.
   void _carregarGruposDoRecolhimento(BuildContext context) async{
-    this.recolhimento.gruposDoRecolhimento = await GrupoDeRedeirosModel.of(context).carregarGruposPorId(this.recolhimento.gruposDoRecolhimento.map((e) => e.idGrupo).toList());
+    this.recolhimento.gruposDoRecolhimento = await GrupoDeRedeirosModel.of(context).carregarGruposPorId(this.recolhimento.gruposDoRecolhimento!.map((e) => e.idGrupo).toList());
   }
 
   /// Carrega as informações dos redeiros associados ao recolhimento.
   void _carregarRedeirosDoRecolhimento(BuildContext context) async{
-    this.recolhimento.redeirosDoRecolhimento = await RedeiroDoRecolhimentoModel.of(context).carregarRedeirosDeUmRecolhimentoComDetalhes(this.recolhimento.id);
+    this.recolhimento.redeirosDoRecolhimento = await RedeiroDoRecolhimentoModel.of(context).carregarRedeirosDeUmRecolhimentoComDetalhes(this.recolhimento.id!);
   }
 
 }

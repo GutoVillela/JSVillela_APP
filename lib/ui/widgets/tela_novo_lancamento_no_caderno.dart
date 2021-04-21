@@ -10,7 +10,6 @@ import 'package:jsvillela_app/ui/widgets/campo_de_texto_com_icone.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class TelaNovoLancamentoNoCaderno extends StatefulWidget {
-
   //#region Atributos
 
   /// Define qual o ID do Redeiro associado ao Caderno para Lançamento.
@@ -18,7 +17,7 @@ class TelaNovoLancamentoNoCaderno extends StatefulWidget {
   //#endregion Atributos
 
   //#region Contrutor(es)
-  TelaNovoLancamentoNoCaderno({@required this.idDoRedeiro});
+  TelaNovoLancamentoNoCaderno({required this.idDoRedeiro});
   //#endregion Contrutor(es)
 
   @override
@@ -39,10 +38,10 @@ class _TelaNovoLancamentoNoCadernoState
   final _valorUnitarioController = TextEditingController();
 
   // Lista de redes a serem carregadas na caixa de seleção "Rede".
-  List<Map<String, String>> redes;
+  List<Map<String, String>>? redes;
 
   // Define qual o ID da rede selecionada em tela.
-  String idRedeSelecionada;
+  String? idRedeSelecionada;
 
   //#endregion Atributos
 
@@ -53,10 +52,8 @@ class _TelaNovoLancamentoNoCadernoState
 
   //#endregion Constantes
 
-
   @override
   Widget build(BuildContext context) {
-
     return Container(
       color: Colors.black12.withOpacity(.6),
       child: LayoutBuilder(builder: (context, constraints) {
@@ -69,7 +66,8 @@ class _TelaNovoLancamentoNoCadernoState
                 height: constraints.maxHeight - constraints.maxHeight * .05,
                 padding: EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                    color: Colors.white, borderRadius: BorderRadius.circular(5)),
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(5)),
                 child: Column(
                   children: [
                     Center(
@@ -89,65 +87,73 @@ class _TelaNovoLancamentoNoCadernoState
                       height: 20,
                     ),
                     FutureBuilder<QuerySnapshot>(
-                      future: FirebaseFirestore.instance.collection(RedeModel.NOME_COLECAO).orderBy(RedeModel.CAMPO_REDE).get(),
-                      builder: (context, snapshot){
-                        if(!snapshot.hasData)
+                      future: FirebaseFirestore.instance
+                          .collection(RedeModel.NOME_COLECAO)
+                          .orderBy(RedeModel.CAMPO_REDE)
+                          .get(),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData)
                           return Container(
                             height: 200,
                             alignment: Alignment.center,
                             child: Center(
                               child: CircularProgressIndicator(
-                                valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                    Theme.of(context).primaryColor),
                               ),
                             ),
                           );
-                        else{
-
+                        else {
                           // Carregar redes somente uma vez
-                          if(redes == null || redes.isEmpty){
+                          if (redes == null || redes!.isEmpty) {
                             redes = [];
-                            snapshot.data.docs.forEach((element) {
-
+                            snapshot.data!.docs.forEach((element) {
                               var novaRede = Map<String, String>();
                               novaRede[CAMPO_ID_REDE] = element.id;
-                              novaRede[RedeModel.CAMPO_REDE] = element[RedeModel.CAMPO_REDE];
+                              novaRede[RedeModel.CAMPO_REDE] =
+                                  element[RedeModel.CAMPO_REDE];
 
-                              redes.add(novaRede);
+                              redes!.add(novaRede);
                             });
                           }
 
                           return ScopedModel<LancamentoNoCadernoModel>(
                               model: LancamentoNoCadernoModel(),
-                              child: ScopedModelDescendant<LancamentoNoCadernoModel>(
-                                builder: (context, child, model){
+                              child: ScopedModelDescendant<
+                                  LancamentoNoCadernoModel>(
+                                builder: (context, child, model) {
                                   return Form(
                                     key: _formKey,
                                     child: Column(
                                       children: [
                                         DropdownButtonFormField(
                                             icon: Icon(Icons.arrow_drop_down),
-                                            dropdownColor: PaletaDeCor.AZUL_BEM_CLARO,
+                                            dropdownColor:
+                                                PaletaDeCor.AZUL_BEM_CLARO,
                                             isExpanded: true,
                                             decoration: InputDecoration(
                                                 prefixIcon: Icon(Icons.grid_on),
                                                 contentPadding:
-                                                EdgeInsets.symmetric(vertical: 20),
+                                                    EdgeInsets.symmetric(
+                                                        vertical: 20),
                                                 isDense: true,
                                                 border: OutlineInputBorder(),
                                                 hintText: "Rede"),
-                                            items: redes.map((rede) {
+                                            items: redes!.map((rede) {
                                               return DropdownMenuItem(
                                                 value: rede[CAMPO_ID_REDE],
-                                                child: Text(rede[RedeModel.CAMPO_REDE]),
+                                                child: Text(
+                                                    rede[RedeModel.CAMPO_REDE]!),
                                               );
                                             }).toList(),
                                             value: idRedeSelecionada,
-                                            validator: (valorSelecionado) {
-                                              if (valorSelecionado == null || valorSelecionado.isEmpty)
+                                            validator: (String? valorSelecionado) {
+                                              if (valorSelecionado == null ||
+                                                  valorSelecionado.isEmpty)
                                                 return "Selecione uma rede!";
                                               return null;
                                             },
-                                            onChanged: (novoValor) {
+                                            onChanged: (String? novoValor) {
                                               setState(() {
                                                 idRedeSelecionada = novoValor;
                                               });
@@ -160,13 +166,14 @@ class _TelaNovoLancamentoNoCadernoState
                                           decoration: InputDecoration(
                                               prefixIcon: Icon(Icons.add),
                                               contentPadding:
-                                              EdgeInsets.symmetric(vertical: 20),
+                                                  EdgeInsets.symmetric(
+                                                      vertical: 20),
                                               isDense: true,
                                               border: OutlineInputBorder(),
                                               hintText: "Quantidade"),
                                           keyboardType: TextInputType.number,
                                           validator: (text) {
-                                            if (text.isEmpty)
+                                            if (text!.isEmpty)
                                               return "Quantidade obrigatória!";
                                             return null;
                                           },
@@ -177,15 +184,17 @@ class _TelaNovoLancamentoNoCadernoState
                                         TextFormField(
                                           controller: _valorUnitarioController,
                                           decoration: InputDecoration(
-                                              prefixIcon: Icon(Icons.attach_money),
+                                              prefixIcon:
+                                                  Icon(Icons.attach_money),
                                               contentPadding:
-                                              EdgeInsets.symmetric(vertical: 20),
+                                                  EdgeInsets.symmetric(
+                                                      vertical: 20),
                                               isDense: true,
                                               border: OutlineInputBorder(),
                                               hintText: "Valor unitário"),
                                           keyboardType: TextInputType.number,
                                           validator: (text) {
-                                            if (text.isEmpty)
+                                            if (text!.isEmpty)
                                               return "Valor unitário obrigatório!";
                                             return null;
                                           },
@@ -194,59 +203,87 @@ class _TelaNovoLancamentoNoCadernoState
                                           height: 20,
                                         ),
                                         Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
                                           children: [
-                                            FlatButton(
-                                              onPressed: () {
-                                                Navigator.of(context).pop();
-                                              },
-                                              child: Text(
-                                                "Cancelar",
-                                                style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontWeight: FontWeight.bold),
-                                              ),
-                                              color: Colors.red,
-                                            ),
-                                            SizedBox(width: 10),
-                                            FlatButton(
-                                                color: Theme.of(context).primaryColor,
+                                            TextButton(
                                                 onPressed: () {
-                                                  if(_formKey.currentState.validate()){
+                                                  Navigator.of(context).pop();
+                                                },
+                                                child: Text(
+                                                  "Cancelar",
+                                                  style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                )),
+                                            SizedBox(width: 10),
+                                            TextButton(
+                                                onPressed: () {
+                                                  if (_formKey.currentState!
+                                                      .validate()) {
                                                     //TODO: Implementar ação de concluir Novo Lançamento no caderno.
-                                                    Map<String, dynamic> dadosDoLancamento = {
-                                                      LancamentoNoCadernoModel.CAMPO_ID_REDE : idRedeSelecionada,
-                                                      LancamentoNoCadernoModel.CAMPO_NOME_REDE : redes.where((element) => element[CAMPO_ID_REDE] == idRedeSelecionada).first[RedeModel.CAMPO_REDE],
-                                                      LancamentoNoCadernoModel.CAMPO_QUANTIDADE : int.parse(_quantidadeController.text),
-                                                      LancamentoNoCadernoModel.CAMPO_VALOR_UNITARIO : double.parse(_valorUnitarioController.text),
-                                                      LancamentoNoCadernoModel.CAMPO_DATA_LANCAMENTO : DateTime.now(),
-                                                      LancamentoNoCadernoModel.CAMPO_PAGO : false,
-                                                      LancamentoNoCadernoModel.CAMPO_DATA_PAGAMENTO : null,
-                                                      LancamentoNoCadernoModel.CAMPO_DATA_CONFIRMACAO_PAGAMENTO: null
+                                                    Map<String, dynamic>
+                                                        dadosDoLancamento = {
+                                                      LancamentoNoCadernoModel
+                                                              .CAMPO_ID_REDE:
+                                                          idRedeSelecionada,
+                                                      LancamentoNoCadernoModel
+                                                          .CAMPO_NOME_REDE: redes!
+                                                              .where((element) =>
+                                                                  element[
+                                                                      CAMPO_ID_REDE] ==
+                                                                  idRedeSelecionada)
+                                                              .first[
+                                                          RedeModel.CAMPO_REDE],
+                                                      LancamentoNoCadernoModel
+                                                              .CAMPO_QUANTIDADE:
+                                                          int.parse(
+                                                              _quantidadeController
+                                                                  .text),
+                                                      LancamentoNoCadernoModel
+                                                              .CAMPO_VALOR_UNITARIO:
+                                                          double.parse(
+                                                              _valorUnitarioController
+                                                                  .text),
+                                                      LancamentoNoCadernoModel
+                                                              .CAMPO_DATA_LANCAMENTO:
+                                                          DateTime.now(),
+                                                      LancamentoNoCadernoModel
+                                                          .CAMPO_PAGO: false,
+                                                      LancamentoNoCadernoModel
+                                                              .CAMPO_DATA_PAGAMENTO:
+                                                          null,
+                                                      LancamentoNoCadernoModel
+                                                              .CAMPO_DATA_CONFIRMACAO_PAGAMENTO:
+                                                          null
                                                     };
 
                                                     model.cadastrarNovoLancamento(
-                                                        dadosDoLancamento: dadosDoLancamento,
-                                                        idDoRedeiro: widget.idDoRedeiro,
-                                                        onSuccess: _finalizarCadastroNovoLancamento,
-                                                        onFail: _informarErroDeCadastro);
+                                                        dadosDoLancamento:
+                                                            dadosDoLancamento,
+                                                        idDoRedeiro:
+                                                            widget.idDoRedeiro,
+                                                        onSuccess:
+                                                            _finalizarCadastroNovoLancamento,
+                                                        onFail:
+                                                            _informarErroDeCadastro);
                                                   }
                                                 },
                                                 child: Text(
                                                   "Concluir",
                                                   style: TextStyle(
                                                       color: Colors.white,
-                                                      fontWeight: FontWeight.bold),
-                                                )
-                                            )
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ))
                                           ],
                                         )
                                       ],
                                     ),
                                   );
                                 },
-                              )
-                          );
+                              ));
                         }
                       },
                     )
@@ -261,14 +298,10 @@ class _TelaNovoLancamentoNoCadernoState
   }
 
   /// É chamado após o cadastro do Novo Lançamento ser efetuado com sucesso.
-  void _finalizarCadastroNovoLancamento(){
-
+  void _finalizarCadastroNovoLancamento() {
     Navigator.of(context).pop();
   }
 
   /// Informa usuário que ocorreu uma falha no cadastro do novo lançamento.
-  void _informarErroDeCadastro(){
-
-  }
-
+  void _informarErroDeCadastro() {}
 }

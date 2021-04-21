@@ -31,7 +31,7 @@ class _TelaCadastroDeRedeirosState extends State<TelaCadastroDeRedeiros> {
   List<RedeiroDmo> _listaDeRedeiros = [];
 
   /// Último redeiro carregado em tela.
-  DocumentSnapshot _ultimoRedeiroCarregado;
+  DocumentSnapshot? _ultimoRedeiroCarregado;
 
   /// Define se existem mais registros a serem carregados na lista.
   bool _temMaisRegistros = true;
@@ -116,7 +116,7 @@ class _TelaCadastroDeRedeirosState extends State<TelaCadastroDeRedeiros> {
                             }
 
                             return ListViewItemPesquisa(
-                              textoPrincipal: _listaDeRedeiros[index].nome,
+                              textoPrincipal: _listaDeRedeiros[index].nome!,
                               textoSecundario: _listaDeRedeiros[index].endereco.toString(),
                               iconeEsquerda: Icons.person,
                               iconeDireita: Icons.search,
@@ -145,7 +145,7 @@ class _TelaCadastroDeRedeirosState extends State<TelaCadastroDeRedeiros> {
                                   onTap: () async {
                                     //Recuperar informações dos grupos do redeiro antes de iniciar edição
                                     _listaDeRedeiros[index].gruposDoRedeiro = await GrupoDeRedeirosModel().carregarGruposPorId(
-                                      _listaDeRedeiros[index].gruposDoRedeiro.map((e) => e.idGrupo).toList()
+                                      _listaDeRedeiros[index].gruposDoRedeiro!.map((e) => e.idGrupo).toList()
                                     );
 
                                     Navigator.of(context).push(
@@ -231,7 +231,7 @@ class _TelaCadastroDeRedeirosState extends State<TelaCadastroDeRedeiros> {
             titulo: "Desativando o redeiro ${_listaDeRedeiros[indexRedeiro].nome}..."
           );
 
-          await RedeiroModel().desativarRedeiro(_listaDeRedeiros[indexRedeiro].id);
+          await RedeiroModel().desativarRedeiro(_listaDeRedeiros[indexRedeiro].id!);
 
           // Fechar diálogo de carregamento.
           Navigator.of(context).pop();
@@ -256,7 +256,7 @@ class _TelaCadastroDeRedeirosState extends State<TelaCadastroDeRedeiros> {
               titulo: "Desativando o redeiro ${_listaDeRedeiros[indexRedeiro].nome}..."
           );
 
-          await RedeiroModel().ativarRedeiro(_listaDeRedeiros[indexRedeiro].id);
+          await RedeiroModel().ativarRedeiro(_listaDeRedeiros[indexRedeiro].id!);
 
           // Fechar diálogo de carregamento.
           Navigator.of(context).pop();
@@ -281,7 +281,7 @@ class _TelaCadastroDeRedeirosState extends State<TelaCadastroDeRedeiros> {
           );
 
           await RedeiroModel().apagarRedeiro(
-              idRedeiro: _listaDeRedeiros[indexRedeiro].id,
+              idRedeiro: _listaDeRedeiros[indexRedeiro].id!,
               onSuccess: (){
                 // Fechar diálogo de carregamento.
                 Navigator.of(context).pop();

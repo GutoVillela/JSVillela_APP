@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
-class CampoDeTextoComIcone extends StatefulWidget {
-
+class CampoDeTextoComIcone extends StatelessWidget {
   //#region Atributos
   /// Ícone do campo de texto a ser exibido na tela.
   final Icon icone;
@@ -16,44 +15,54 @@ class CampoDeTextoComIcone extends StatefulWidget {
   final Color cor;
 
   /// Controller para o campo de texto.
-  final TextEditingController controller;
+  final TextEditingController? controller;
 
   /// Regra que será utilizada na validação do formulário.
-  final Function regraDeValidacao;
+  final String? Function(String?)? regraDeValidacao;
 
   /// Ação ao submeter o campo de texto (clicar com Enter).
-  final Function acaoAoSubmeter;
+  final Function(String)? acaoAoSubmeter;
+
+  /// Evento de onChanged do campo de texto.
+  final Function(String)? onChanged;
+
+  /// Widget de sufixo que será exibido à direito do campo de texto.
+  final Widget? sufixo;
   //#endregion Atributos
 
   //#region Construtor(es)
-  CampoDeTextoComIcone({@required this.icone, @required this.texto, @required this.campoDeSenha, @required this.cor, @required this.controller, this.regraDeValidacao, this.acaoAoSubmeter});
+  CampoDeTextoComIcone(
+      {required this.icone,
+      required this.texto,
+      required this.campoDeSenha,
+      required this.cor,
+      this.controller,
+      this.regraDeValidacao,
+      this.acaoAoSubmeter,
+      this.onChanged,
+      this.sufixo});
   //#endregion Construtor(es)
 
-  @override
-  _CampoDeTextoComIconeState createState() => _CampoDeTextoComIconeState();
-}
-
-class _CampoDeTextoComIconeState extends State<CampoDeTextoComIcone> {
   @override
   Widget build(BuildContext context) {
     return Container(
       child: TextFormField(
-        onFieldSubmitted: widget.acaoAoSubmeter,
-        controller: widget.controller,
-        obscureText: widget.campoDeSenha,
+        onFieldSubmitted: acaoAoSubmeter,
+        controller: controller,
+        obscureText: campoDeSenha,
         obscuringCharacter: '•',
-        enableSuggestions: !widget.campoDeSenha,
-        autocorrect: !widget.campoDeSenha,
+        enableSuggestions: !campoDeSenha,
+        autocorrect: !campoDeSenha,
         decoration: InputDecoration(
-          prefixIcon: widget.icone,
+          prefixIcon: icone,
+          suffixIcon: sufixo,
           contentPadding: EdgeInsets.symmetric(vertical: 20),
           isDense: true,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(50)
-          ),
-          hintText: widget.texto
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(50)),
+          hintText: texto,
         ),
-        validator: widget.regraDeValidacao,
+        validator: regraDeValidacao,
+        onChanged: onChanged,
       ),
     );
   }

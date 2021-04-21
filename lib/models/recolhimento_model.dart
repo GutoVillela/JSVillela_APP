@@ -11,16 +11,15 @@ import 'package:jsvillela_app/models/redeiro_model.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 /// Model para recolhimentos.
-class RecolhimentoModel extends Model{
-
+class RecolhimentoModel extends Model {
   //#region Construtor(es)
-  RecolhimentoModel(){
+  RecolhimentoModel() {
     carregarRecolhimentoDoDia();
   }
   //#endregion Construtor(es)
 
   //#region Constantes
-  
+
   /// Nome do identificador para a coleção "recolhimentos" utilizado no Firebase.
   static const String NOME_COLECAO = "recolhimentos";
 
@@ -46,29 +45,34 @@ class RecolhimentoModel extends Model{
   bool recolhimentoEmAndamento = false;
 
   /// Recolhimento do dia associado ao model.
-  RecolhimentoDmo recolhimentoDoDia;
+  RecolhimentoDmo? recolhimentoDoDia;
   //#endregion Atributos
 
   //#region Métodos
-  static RecolhimentoModel of (BuildContext context) => ScopedModel.of<RecolhimentoModel>(context);
+  static RecolhimentoModel of(BuildContext context) =>
+      ScopedModel.of<RecolhimentoModel>(context);
 
   ///Cadastra um recolhimento no Firebase.
-  void cadastrarRecolhimento({@required RecolhimentoDmo dadosDoRecolhimento, @required Function onSuccess, @required Function onFail}){
-
+  void cadastrarRecolhimento(
+      {required RecolhimentoDmo dadosDoRecolhimento,
+      required Function onSuccess,
+      required Function onFail}) {
     estaCarregando = true;
     notifyListeners();
 
     FirebaseFirestore.instance.collection(NOME_COLECAO).add({
-      CAMPO_DATA_RECOLHIMENTO : dadosDoRecolhimento.dataDoRecolhimento,
+      CAMPO_DATA_RECOLHIMENTO: dadosDoRecolhimento.dataDoRecolhimento,
       CAMPO_DATA_INICIADO: null,
-      CAMPO_DATA_FINALIZADO : null,
-      CAMPO_GRUPOS_DO_RECOLHIMENTO : dadosDoRecolhimento.gruposDoRecolhimento.map((e) => e.idGrupo).toList()
-    }).then((value) async{
+      CAMPO_DATA_FINALIZADO: null,
+      CAMPO_GRUPOS_DO_RECOLHIMENTO: dadosDoRecolhimento.gruposDoRecolhimento!
+          .map((e) => e.idGrupo)
+          .toList()
+    }).then((value) async {
       estaCarregando = false;
       notifyListeners();
       onSuccess();
       await carregarRecolhimentoDoDia();
-    }).catchError((e){
+    }).catchError((e) {
       estaCarregando = false;
       notifyListeners();
       print(e.toString());
@@ -77,19 +81,23 @@ class RecolhimentoModel extends Model{
   }
 
   ///Atualiza um recolhimento no Firebase.
-  void atualizarRecolhimento({@required RecolhimentoDmo dadosDoRecolhimento, @required Function onSuccess, @required Function onFail}){
-
+  void atualizarRecolhimento(
+      {required RecolhimentoDmo dadosDoRecolhimento,
+      required Function onSuccess,
+      required Function onFail}) {
     estaCarregando = true;
     notifyListeners();
 
-    FirebaseFirestore.instance.collection(NOME_COLECAO).doc(dadosDoRecolhimento.id). update(
-      dadosDoRecolhimento.converterParaMapa()
-    ).then((value) async{
+    FirebaseFirestore.instance
+        .collection(NOME_COLECAO)
+        .doc(dadosDoRecolhimento.id)
+        .update(dadosDoRecolhimento.converterParaMapa())
+        .then((value) async {
       estaCarregando = false;
       notifyListeners();
       onSuccess();
       await carregarRecolhimentoDoDia();
-    }).catchError((e){
+    }).catchError((e) {
       estaCarregando = false;
       notifyListeners();
       print(e.toString());
@@ -98,25 +106,31 @@ class RecolhimentoModel extends Model{
   }
 
   /// Apaga o recolhimento do Firebase.
-  Future<void> apagarRecolhimento({@required String idRecolhimento, @required BuildContext context, @required Function onSuccess, @required VoidCallback onFail}) async{
-
-    estaCarregando = true;// Indicar início do processamento
+  Future<void> apagarRecolhimento(
+      {required String idRecolhimento,
+      required BuildContext context,
+      required Function onSuccess,
+      required VoidCallback onFail}) async {
+    estaCarregando = true; // Indicar início do processamento
     notifyListeners();
 
-    FirebaseFirestore.instance.collection(NOME_COLECAO).doc(idRecolhimento).delete()
-    .then((value) {
-
+    FirebaseFirestore.instance
+        .collection(NOME_COLECAO)
+        .doc(idRecolhimento)
+        .delete()
+        .then((value) {
       // Parar recolhimento do dia caso este seja o recolhimento apagado
-      if(idRecolhimento == RecolhimentoModel.of(context).recolhimentoDoDia.id){
+      if (RecolhimentoModel.of(context).recolhimentoDoDia != null && idRecolhimento ==
+          RecolhimentoModel.of(context).recolhimentoDoDia!.id) {
         RecolhimentoModel.of(context).recolhimentoDoDia = null;
         RecolhimentoModel.of(context).recolhimentoEmAndamento = false;
       }
 
-      estaCarregando = false;// Indicar FIM do processamento
+      estaCarregando = false; // Indicar FIM do processamento
       notifyListeners();
       onSuccess();
-    }).catchError((e){
-      estaCarregando = false;// Indicar FIM do processamento
+    }).catchError((e) {
+      estaCarregando = false; // Indicar FIM do processamento
       notifyListeners();
       print(e.toString());
       onFail();
@@ -124,45 +138,56 @@ class RecolhimentoModel extends Model{
   }
 
   /// Carrega os recolhimentos de forma paginada diretamente do Firebase.
-  Future<QuerySnapshot> carregarRecolhimentosPaginados(DocumentSnapshot ultimoRecolhimento, DateTime filtroDataInicial, DateTime filtroDataFinal, bool incluirFinalizados) {
-
+  Future<QuerySnapshot> carregarRecolhimentosPaginados(
+      DocumentSnapshot? ultimoRecolhimento,
+      DateTime? filtroDataInicial,
+      DateTime? filtroDataFinal,
+      bool incluirFinalizados) {
     //#region Filtro com data inicial e final
-    if(filtroDataInicial != null && filtroDataFinal != null){
-      
-      if(ultimoRecolhimento == null){
-        if(incluirFinalizados){
-          return FirebaseFirestore.instance.collection(NOME_COLECAO)
+    if (filtroDataInicial != null && filtroDataFinal != null) {
+      if (ultimoRecolhimento == null) {
+        if (incluirFinalizados) {
+          return FirebaseFirestore.instance
+              .collection(NOME_COLECAO)
               .orderBy(CAMPO_DATA_RECOLHIMENTO)
-              .where(CAMPO_DATA_RECOLHIMENTO, isGreaterThanOrEqualTo: filtroDataInicial)
-              .where(CAMPO_DATA_RECOLHIMENTO, isLessThanOrEqualTo: filtroDataFinal)
+              .where(CAMPO_DATA_RECOLHIMENTO,
+                  isGreaterThanOrEqualTo: filtroDataInicial)
+              .where(CAMPO_DATA_RECOLHIMENTO,
+                  isLessThanOrEqualTo: filtroDataFinal)
               .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
               .get();
-        }
-        else{
-          return FirebaseFirestore.instance.collection(NOME_COLECAO)
+        } else {
+          return FirebaseFirestore.instance
+              .collection(NOME_COLECAO)
               .orderBy(CAMPO_DATA_RECOLHIMENTO)
-              .where(CAMPO_DATA_RECOLHIMENTO, isGreaterThanOrEqualTo: filtroDataInicial)
-              .where(CAMPO_DATA_RECOLHIMENTO, isLessThanOrEqualTo: filtroDataFinal)
+              .where(CAMPO_DATA_RECOLHIMENTO,
+                  isGreaterThanOrEqualTo: filtroDataInicial)
+              .where(CAMPO_DATA_RECOLHIMENTO,
+                  isLessThanOrEqualTo: filtroDataFinal)
               .where(CAMPO_DATA_FINALIZADO, isNull: true)
               .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
               .get();
         }
-      }
-      else{
-        if(incluirFinalizados){
-          return FirebaseFirestore.instance.collection(NOME_COLECAO)
+      } else {
+        if (incluirFinalizados) {
+          return FirebaseFirestore.instance
+              .collection(NOME_COLECAO)
               .orderBy(CAMPO_DATA_RECOLHIMENTO)
-              .where(CAMPO_DATA_RECOLHIMENTO, isGreaterThanOrEqualTo: filtroDataInicial)
-              .where(CAMPO_DATA_RECOLHIMENTO, isLessThanOrEqualTo: filtroDataFinal)
+              .where(CAMPO_DATA_RECOLHIMENTO,
+                  isGreaterThanOrEqualTo: filtroDataInicial)
+              .where(CAMPO_DATA_RECOLHIMENTO,
+                  isLessThanOrEqualTo: filtroDataFinal)
               .startAfterDocument(ultimoRecolhimento)
               .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
               .get();
-        }
-        else{
-          return FirebaseFirestore.instance.collection(NOME_COLECAO)
+        } else {
+          return FirebaseFirestore.instance
+              .collection(NOME_COLECAO)
               .orderBy(CAMPO_DATA_RECOLHIMENTO)
-              .where(CAMPO_DATA_RECOLHIMENTO, isGreaterThanOrEqualTo: filtroDataInicial)
-              .where(CAMPO_DATA_RECOLHIMENTO, isLessThanOrEqualTo: filtroDataFinal)
+              .where(CAMPO_DATA_RECOLHIMENTO,
+                  isGreaterThanOrEqualTo: filtroDataInicial)
+              .where(CAMPO_DATA_RECOLHIMENTO,
+                  isLessThanOrEqualTo: filtroDataFinal)
               .where(CAMPO_DATA_FINALIZADO, isNull: true)
               .startAfterDocument(ultimoRecolhimento)
               .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
@@ -173,37 +198,42 @@ class RecolhimentoModel extends Model{
     //#endregion Filtro com data inicial e final
 
     //#region Filtro com data inicial
-    if(filtroDataInicial != null){
-      if(ultimoRecolhimento == null){
-        if(incluirFinalizados){
-          return FirebaseFirestore.instance.collection(NOME_COLECAO)
+    if (filtroDataInicial != null) {
+      if (ultimoRecolhimento == null) {
+        if (incluirFinalizados) {
+          return FirebaseFirestore.instance
+              .collection(NOME_COLECAO)
               .orderBy(CAMPO_DATA_RECOLHIMENTO)
-              .where(CAMPO_DATA_RECOLHIMENTO, isGreaterThanOrEqualTo: filtroDataInicial)
+              .where(CAMPO_DATA_RECOLHIMENTO,
+                  isGreaterThanOrEqualTo: filtroDataInicial)
               .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
               .get();
-        }
-        else{
-          return FirebaseFirestore.instance.collection(NOME_COLECAO)
+        } else {
+          return FirebaseFirestore.instance
+              .collection(NOME_COLECAO)
               .orderBy(CAMPO_DATA_RECOLHIMENTO)
-              .where(CAMPO_DATA_RECOLHIMENTO, isGreaterThanOrEqualTo: filtroDataInicial)
+              .where(CAMPO_DATA_RECOLHIMENTO,
+                  isGreaterThanOrEqualTo: filtroDataInicial)
               .where(CAMPO_DATA_FINALIZADO, isNull: true)
               .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
               .get();
         }
-      }
-      else{
-        if(incluirFinalizados){
-          return FirebaseFirestore.instance.collection(NOME_COLECAO)
+      } else {
+        if (incluirFinalizados) {
+          return FirebaseFirestore.instance
+              .collection(NOME_COLECAO)
               .orderBy(CAMPO_DATA_RECOLHIMENTO)
-              .where(CAMPO_DATA_RECOLHIMENTO, isGreaterThanOrEqualTo: filtroDataInicial)
+              .where(CAMPO_DATA_RECOLHIMENTO,
+                  isGreaterThanOrEqualTo: filtroDataInicial)
               .startAfterDocument(ultimoRecolhimento)
               .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
               .get();
-        }
-        else{
-          return FirebaseFirestore.instance.collection(NOME_COLECAO)
+        } else {
+          return FirebaseFirestore.instance
+              .collection(NOME_COLECAO)
               .orderBy(CAMPO_DATA_RECOLHIMENTO)
-              .where(CAMPO_DATA_RECOLHIMENTO, isGreaterThanOrEqualTo: filtroDataInicial)
+              .where(CAMPO_DATA_RECOLHIMENTO,
+                  isGreaterThanOrEqualTo: filtroDataInicial)
               .where(CAMPO_DATA_FINALIZADO, isNull: true)
               .startAfterDocument(ultimoRecolhimento)
               .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
@@ -214,37 +244,42 @@ class RecolhimentoModel extends Model{
     //#endregion Filtro com data inicial
 
     //#region Filtro com data final
-    if(filtroDataFinal != null){
-      if(ultimoRecolhimento == null){
-        if(incluirFinalizados){
-          return FirebaseFirestore.instance.collection(NOME_COLECAO)
+    if (filtroDataFinal != null) {
+      if (ultimoRecolhimento == null) {
+        if (incluirFinalizados) {
+          return FirebaseFirestore.instance
+              .collection(NOME_COLECAO)
               .orderBy(CAMPO_DATA_RECOLHIMENTO)
-              .where(CAMPO_DATA_RECOLHIMENTO, isLessThanOrEqualTo: filtroDataFinal)
+              .where(CAMPO_DATA_RECOLHIMENTO,
+                  isLessThanOrEqualTo: filtroDataFinal)
               .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
               .get();
-        }
-        else{
-          return FirebaseFirestore.instance.collection(NOME_COLECAO)
+        } else {
+          return FirebaseFirestore.instance
+              .collection(NOME_COLECAO)
               .orderBy(CAMPO_DATA_RECOLHIMENTO)
-              .where(CAMPO_DATA_RECOLHIMENTO, isLessThanOrEqualTo: filtroDataFinal)
+              .where(CAMPO_DATA_RECOLHIMENTO,
+                  isLessThanOrEqualTo: filtroDataFinal)
               .where(CAMPO_DATA_FINALIZADO, isNull: true)
               .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
               .get();
         }
-      }
-      else{
-        if(incluirFinalizados){
-          return FirebaseFirestore.instance.collection(NOME_COLECAO)
+      } else {
+        if (incluirFinalizados) {
+          return FirebaseFirestore.instance
+              .collection(NOME_COLECAO)
               .orderBy(CAMPO_DATA_RECOLHIMENTO)
-              .where(CAMPO_DATA_RECOLHIMENTO, isLessThanOrEqualTo: filtroDataFinal)
+              .where(CAMPO_DATA_RECOLHIMENTO,
+                  isLessThanOrEqualTo: filtroDataFinal)
               .startAfterDocument(ultimoRecolhimento)
               .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
               .get();
-        }
-        else{
-          return FirebaseFirestore.instance.collection(NOME_COLECAO)
+        } else {
+          return FirebaseFirestore.instance
+              .collection(NOME_COLECAO)
               .orderBy(CAMPO_DATA_RECOLHIMENTO)
-              .where(CAMPO_DATA_RECOLHIMENTO, isLessThanOrEqualTo: filtroDataFinal)
+              .where(CAMPO_DATA_RECOLHIMENTO,
+                  isLessThanOrEqualTo: filtroDataFinal)
               .where(CAMPO_DATA_FINALIZADO, isNull: true)
               .startAfterDocument(ultimoRecolhimento)
               .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
@@ -254,15 +289,16 @@ class RecolhimentoModel extends Model{
     }
     //#endregion Filtro com data final
 
-    if(ultimoRecolhimento == null){
-      if(incluirFinalizados){
-        return FirebaseFirestore.instance.collection(NOME_COLECAO)
+    if (ultimoRecolhimento == null) {
+      if (incluirFinalizados) {
+        return FirebaseFirestore.instance
+            .collection(NOME_COLECAO)
             .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
             .orderBy(CAMPO_DATA_RECOLHIMENTO)
             .get();
-      }
-      else{
-        return FirebaseFirestore.instance.collection(NOME_COLECAO)
+      } else {
+        return FirebaseFirestore.instance
+            .collection(NOME_COLECAO)
             .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
             .orderBy(CAMPO_DATA_RECOLHIMENTO)
             .where(CAMPO_DATA_FINALIZADO, isNull: true)
@@ -270,14 +306,16 @@ class RecolhimentoModel extends Model{
       }
     }
 
-    if(incluirFinalizados)
-      return FirebaseFirestore.instance.collection(NOME_COLECAO)
+    if (incluirFinalizados)
+      return FirebaseFirestore.instance
+          .collection(NOME_COLECAO)
           .orderBy(ultimoRecolhimento)
           .startAfterDocument(ultimoRecolhimento)
           .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
           .get();
     else
-      return FirebaseFirestore.instance.collection(NOME_COLECAO)
+      return FirebaseFirestore.instance
+          .collection(NOME_COLECAO)
           .orderBy(ultimoRecolhimento)
           .startAfterDocument(ultimoRecolhimento)
           .limit(Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
@@ -286,88 +324,109 @@ class RecolhimentoModel extends Model{
   }
 
   /// Carrega os recolhimentos por grupos.
-  Future<QuerySnapshot> carregarRecolhimentosPorGrupos(List<String> idsDosGrupos){
-
-    return FirebaseFirestore.instance.collection(NOME_COLECAO)
+  Future<QuerySnapshot> carregarRecolhimentosPorGrupos(
+      List<String> idsDosGrupos) {
+    return FirebaseFirestore.instance
+        .collection(NOME_COLECAO)
         .where(CAMPO_GRUPOS_DO_RECOLHIMENTO, arrayContainsAny: idsDosGrupos)
         .get();
   }
 
   /// Carrega os recolhimentos agendados em uma data específica diretamente do Firebase.
-  Future<QuerySnapshot> carregarRecolhimentosAgendadosNaData(DateTime dataRecolhimento) async {
-    return await FirebaseFirestore.instance.collection(NOME_COLECAO)
+  Future<QuerySnapshot> carregarRecolhimentosAgendadosNaData(
+      DateTime dataRecolhimento) async {
+    return await FirebaseFirestore.instance
+        .collection(NOME_COLECAO)
         .where(CAMPO_DATA_RECOLHIMENTO, isEqualTo: dataRecolhimento.toLocal())
         .get();
   }
 
   /// Busca um recolhimento por ID.
-  Future<DocumentSnapshot> carregarRecolhimentoPorId(String idDoRecolhimento){
-
-    return FirebaseFirestore.instance.collection(NOME_COLECAO)
+  Future<DocumentSnapshot> carregarRecolhimentoPorId(String idDoRecolhimento) {
+    return FirebaseFirestore.instance
+        .collection(NOME_COLECAO)
         .doc(idDoRecolhimento)
         .get();
   }
 
   /// Atualiza a data de Finalização para um Recolhimento.
-  Future<void> finalizarRecolhimento({@required String idRecolhimento, @required DateTime dataFinalizacao}) {
-
-    estaCarregando = true;// Indicar início do processamento
+  Future<void> finalizarRecolhimento(
+      {required String idRecolhimento, required DateTime dataFinalizacao}) {
+    estaCarregando = true; // Indicar início do processamento
     notifyListeners();
 
-    return FirebaseFirestore.instance.collection(RecolhimentoModel.NOME_COLECAO)
-      .doc(idRecolhimento)
-      .update({ CAMPO_DATA_FINALIZADO: dataFinalizacao })
-      .then((value){
-        estaCarregando = false;
-        this.recolhimentoDoDia.dataFinalizado = dataFinalizacao;
-        recolhimentoEmAndamento = false;
-        notifyListeners();
-      })
-      .catchError((erro) {
-        estaCarregando = false;
-        notifyListeners();
-      });
+    return FirebaseFirestore.instance
+        .collection(RecolhimentoModel.NOME_COLECAO)
+        .doc(idRecolhimento)
+        .update({CAMPO_DATA_FINALIZADO: dataFinalizacao}).then((value) {
+      estaCarregando = false;
+      this.recolhimentoDoDia!.dataFinalizado = dataFinalizacao;
+      recolhimentoEmAndamento = false;
+      notifyListeners();
+    }).catchError((erro) {
+      estaCarregando = false;
+      notifyListeners();
+    });
   }
 
   // Busca o recolhimento do dia.
-  Future<QuerySnapshot> _buscarRecolhimentoDoDia() async{
-    return await FirebaseFirestore.instance.collection(NOME_COLECAO)
-        .where(CAMPO_DATA_RECOLHIMENTO, isEqualTo: DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day).toLocal())
+  Future<QuerySnapshot> _buscarRecolhimentoDoDia() async {
+    return await FirebaseFirestore.instance
+        .collection(NOME_COLECAO)
+        .where(CAMPO_DATA_RECOLHIMENTO,
+            isEqualTo: DateTime(DateTime.now().year, DateTime.now().month,
+                    DateTime.now().day)
+                .toLocal())
         .get();
   }
 
   /// Carrega o recolhimento do dia.
-  Future<void> carregarRecolhimentoDoDia() async{
-
+  Future<void> carregarRecolhimentoDoDia() async {
     estaCarregando = true;
     notifyListeners();
 
     QuerySnapshot recolhimento = await _buscarRecolhimentoDoDia();
 
-    if(recolhimento != null && recolhimento.docs.any((element) => true)){
-      this.recolhimentoDoDia = RecolhimentoDmo.converterSnapshotEmRecolhimento(recolhimento.docs.first);
+    if (recolhimento.docs.any((element) => true)) {
+      this.recolhimentoDoDia = RecolhimentoDmo.converterSnapshotEmRecolhimento(
+          recolhimento.docs.first);
 
       List<GrupoDeRedeirosDmo> listaDeGrupos = [];
 
       // Verificar se o grupo associado ao recolhimento não foi apagado
-      if(this.recolhimentoDoDia.gruposDoRecolhimento != null && this.recolhimentoDoDia.gruposDoRecolhimento.isNotEmpty){
-
-        for(var grupo in this.recolhimentoDoDia.gruposDoRecolhimento){
-          try{
-            DocumentSnapshot grupoCarregado = await GrupoDeRedeirosModel().carregarGrupoPorId(grupo.idGrupo);
-            listaDeGrupos.add(GrupoDeRedeirosDmo.converterSnapshotEmGrupoDeRedeiro(grupoCarregado));
-          }
-          catch(erro){
-            listaDeGrupos.add(GrupoDeRedeirosDmo(nomeGrupo: "Grupo apagado"));
+      if (this.recolhimentoDoDia != null && this.recolhimentoDoDia!.gruposDoRecolhimento != null &&
+          this.recolhimentoDoDia!.gruposDoRecolhimento!.isNotEmpty) {
+        for (var grupo in this.recolhimentoDoDia!.gruposDoRecolhimento!) {
+          try {
+            DocumentSnapshot grupoCarregado =
+                await GrupoDeRedeirosModel().carregarGrupoPorId(grupo.idGrupo);
+            listaDeGrupos.add(
+                GrupoDeRedeirosDmo.converterSnapshotEmGrupoDeRedeiro(
+                    grupoCarregado));
+          } catch (erro) {
+            listaDeGrupos.add(GrupoDeRedeirosDmo(idGrupo: "", nomeGrupo: "Grupo apagado"));
           }
         }
       }
 
-      this.recolhimentoDoDia.gruposDoRecolhimento = listaDeGrupos;
+      this.recolhimentoDoDia!.gruposDoRecolhimento = listaDeGrupos;
+
+      // Verificar se recolhimento do dia está em andamento
+      recolhimentoEmAndamento = recolhimentoDoDia != null &&
+          recolhimentoDoDia!.dataFinalizado == null &&
+          recolhimentoDoDia!.dataIniciado != null;
 
       // Carregar redeiros do recolhimento
-      if(this.recolhimentoDoDia.gruposDoRecolhimento.where((element) => element.idGrupo != null).isNotEmpty){
-        QuerySnapshot redeirosDoRecolhimento = await RedeiroModel().carregarRedeirosPorGrupos(this.recolhimentoDoDia.gruposDoRecolhimento.where((element) => element.idGrupo != null).map((e) => e.idGrupo).toList());
+      if (this
+          .recolhimentoDoDia!
+          .gruposDoRecolhimento!
+          .isNotEmpty && !recolhimentoEmAndamento) {
+        QuerySnapshot redeirosDoRecolhimento = await RedeiroModel()
+            .carregarRedeirosPorGrupos(this
+                .recolhimentoDoDia!
+                .gruposDoRecolhimento!
+                .map((e) => e.idGrupo)
+                .toList());
 
         // Obter redeiros dos grupos
         List<RedeiroDmo> listaDeRedeiros = [];
@@ -376,12 +435,17 @@ class RecolhimentoModel extends Model{
         });
 
         // Converter redeiros em Redeiros do Recolhimento
-        recolhimentoDoDia.redeirosDoRecolhimento = listaDeRedeiros.map((e) => RedeiroDoRecolhimentoDmo(redeiro: e)).toList();
+        recolhimentoDoDia!.redeirosDoRecolhimento = listaDeRedeiros
+            .map((e) => RedeiroDoRecolhimentoDmo(redeiro: e))
+            .toList();
+      }
+      else if(recolhimentoEmAndamento){
+        // Se recolhimento já tiver sido iniciado, carregar redeiros do recolhimento.
+        await _carregarRedeirosDoRecolhimentoDoDia();
       }
     }
 
-    // Verificar se recolhimento do dia está em andamento
-    recolhimentoEmAndamento = recolhimentoDoDia != null && recolhimentoDoDia.dataFinalizado == null && recolhimentoDoDia.dataIniciado != null;
+
 
     estaCarregando = false;
     notifyListeners();
@@ -389,17 +453,19 @@ class RecolhimentoModel extends Model{
 
   /// Carrega os redeiros associados ao recolhimento do dia.
   Future<void> _carregarRedeirosDoRecolhimentoDoDia() async {
-
-    estaCarregando = true;// Indicar início do processamento
+    estaCarregando = true; // Indicar início do processamento
     notifyListeners();
 
-    recolhimentoDoDia.redeirosDoRecolhimento = [];
+    recolhimentoDoDia!.redeirosDoRecolhimento = [];
 
-    QuerySnapshot snapshotRedeiros = await RedeiroDoRecolhimentoModel().carregarRedeirosDeUmRecolhimento(recolhimentoDoDia.id);
+    QuerySnapshot snapshotRedeiros = await RedeiroDoRecolhimentoModel()
+        .carregarRedeirosDeUmRecolhimento(recolhimentoDoDia!.id ?? "");
 
     // Obter os redeiros do recolhimento cadastrados no recolhimento
     snapshotRedeiros.docs.forEach((element) {
-      recolhimentoDoDia.redeirosDoRecolhimento.add(RedeiroDoRecolhimentoDmo.converterSnapshotEmRedeiroDoRecolhimento(element));
+      recolhimentoDoDia!.redeirosDoRecolhimento!.add(
+          RedeiroDoRecolhimentoDmo.converterSnapshotEmRedeiroDoRecolhimento(
+              element));
     });
 
     estaCarregando = false;
@@ -407,14 +473,15 @@ class RecolhimentoModel extends Model{
   }
 
   /// Define a flag "recolhimentoEmAndamento" para true e notifica os listeners.
-  Future<void> iniciarRecolhimento(String idRecolhimento) async{
-
-    await FirebaseFirestore.instance.collection(RecolhimentoModel.NOME_COLECAO)
+  Future<void> iniciarRecolhimento(String idRecolhimento) async {
+    await FirebaseFirestore.instance
+        .collection(RecolhimentoModel.NOME_COLECAO)
         .doc(idRecolhimento)
-        .update({ CAMPO_DATA_INICIADO: DateTime.now() });
+        .update({CAMPO_DATA_INICIADO: DateTime.now()});
 
     // Carregar os redeiros do recolhimento caso não existam.
-    if(recolhimentoDoDia.redeirosDoRecolhimento == null || recolhimentoDoDia.redeirosDoRecolhimento.any((element) => true)){
+    if (recolhimentoDoDia!.redeirosDoRecolhimento == null ||
+        recolhimentoDoDia!.redeirosDoRecolhimento!.any((element) => true)) {
       await _carregarRedeirosDoRecolhimentoDoDia();
     }
     recolhimentoEmAndamento = true;
@@ -423,8 +490,10 @@ class RecolhimentoModel extends Model{
 
   /// Valida se já existe um recolhimento agendado na data fornecida.
   /// Retorna true caso seja uma data válida (ou seja, não esteja agendada ainda) e false caso não seja.
-  Future<bool> validarSeExisteRecolhimentoAgendadoParaAData(DateTime data) async {
-    QuerySnapshot recolhimentosDaData = await carregarRecolhimentosAgendadosNaData(data);
+  Future<bool> validarSeExisteRecolhimentoAgendadoParaAData(
+      DateTime data) async {
+    QuerySnapshot recolhimentosDaData =
+        await carregarRecolhimentosAgendadosNaData(data);
 
     return !recolhimentosDaData.docs.any((element) => true);
   }

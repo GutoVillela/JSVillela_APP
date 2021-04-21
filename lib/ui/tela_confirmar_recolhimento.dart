@@ -100,7 +100,7 @@ class TelaConfirmarRecolhimento extends StatelessWidget {
 
                               if(_recolhimento.dataDoRecolhimento == null)
                                 Infraestrutura.mostrarMensagemDeErro(context, "Data do recolhimento não fornecida.");
-                              else if(_recolhimento.gruposDoRecolhimento == null || _recolhimento.gruposDoRecolhimento.isEmpty)
+                              else if(_recolhimento.gruposDoRecolhimento == null || _recolhimento.gruposDoRecolhimento!.isEmpty)
                                 Infraestrutura.mostrarMensagemDeErro(context, "Selecione pelo menos um grupo de redeiros para prosseguir.");
                               else{
 

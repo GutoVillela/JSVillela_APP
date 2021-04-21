@@ -4,13 +4,13 @@ import 'package:jsvillela_app/models/rede_model.dart';
 class RedeDmo implements BaseDmo{
 
   //Id da rede
-  String id;
+  String? id;
 
   /// Nome da Rede
-  String nome_rede;
+  String? nome_rede;
 
   /// Valor da Rede
-  double valor_unitario_rede;
+  double? valor_unitario_rede;
 
   RedeDmo({this.id, this.nome_rede, this.valor_unitario_rede});
 

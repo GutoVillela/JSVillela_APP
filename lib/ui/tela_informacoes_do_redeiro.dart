@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:jsvillela_app/dml/redeiro_dmo.dart';
 import 'package:jsvillela_app/infra/infraestrutura.dart';
@@ -84,7 +83,7 @@ class TelaInformacoesDoRedeiro extends StatelessWidget {
                     ],
                   ),
                   SizedBox(height: overflowIconePerfil + 20),
-                  Text(redeiro.nome,
+                  Text(redeiro.nome!,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Theme.of(context).primaryColor,
@@ -130,7 +129,7 @@ class TelaInformacoesDoRedeiro extends StatelessWidget {
                         textoSecundario: redeiro.celular,
                         icone: Icons.chat,
                         acaoAoClicar: (){
-                          String numeroWpp = "55" + redeiro.celular.replaceAll(new RegExp(r'\('), '')
+                          String numeroWpp = "55" + redeiro.celular!.replaceAll(new RegExp(r'\('), '')
                           .replaceAll(new RegExp(r'\)'), '').replaceAll(new RegExp(r'-'), '').replaceAll(' ', '');
 
                           launch("https://wa.me/${numeroWpp}?text=${"Boa tarde, tudo bem?"}");
@@ -162,7 +161,7 @@ class TelaInformacoesDoRedeiro extends StatelessWidget {
                             showDialog(
                                 context: context,
                                 builder: (BuildContext context){
-                                  return TelaBuscaGruposDeRedeiros(gruposJaSelecionados: redeiro.gruposDoRedeiro);
+                                  return TelaBuscaGruposDeRedeiros(gruposJaSelecionados: redeiro.gruposDoRedeiro ?? []);
                                 }
                             ).then((gruposSelecionados) {
                                 if(gruposSelecionados != null){

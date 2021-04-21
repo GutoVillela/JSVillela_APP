@@ -10,22 +10,22 @@ class RecolhimentoDmo implements BaseDmo{
   //#region Atributos
 
   /// Id do Recolhimento.
-  String id;
+  String? id;
 
   /// Data do recolhimento.
-  DateTime dataDoRecolhimento;
+  DateTime? dataDoRecolhimento;
 
   /// Data em que o recolhimento foi iniciado.
-  DateTime dataIniciado;
+  DateTime? dataIniciado;
 
 /// Data em que o recolhimento foi finalizado.
-  DateTime dataFinalizado;
+  DateTime? dataFinalizado;
 
   /// Lista de grupos associados ao recolhimento.
-  List<GrupoDeRedeirosDmo> gruposDoRecolhimento;
+  List<GrupoDeRedeirosDmo>? gruposDoRecolhimento;
 
   /// Lista de redeiros associados ao recolhimento.
-  List<RedeiroDoRecolhimentoDmo> redeirosDoRecolhimento;
+  List<RedeiroDoRecolhimentoDmo>? redeirosDoRecolhimento;
 
   //#endregion Atributos
 
@@ -44,7 +44,7 @@ class RecolhimentoDmo implements BaseDmo{
         dataFinalizado:  recolhimento[RecolhimentoModel.CAMPO_DATA_FINALIZADO] != null ? new DateTime.fromMillisecondsSinceEpoch((recolhimento[RecolhimentoModel.CAMPO_DATA_FINALIZADO] as Timestamp).millisecondsSinceEpoch).toLocal() : null,// Obter data e converter para o fuso horário local
         gruposDoRecolhimento: (recolhimento[RecolhimentoModel.CAMPO_GRUPOS_DO_RECOLHIMENTO] as List)
             .map((e) => GrupoDeRedeirosDmo(
-            idGrupo: e)).toList()
+            idGrupo: e, nomeGrupo: "")).toList()
     );
   }
 
@@ -54,7 +54,7 @@ class RecolhimentoDmo implements BaseDmo{
         'dataDoRecolhimento: $dataDoRecolhimento, '
         'dataFinalizado: $dataFinalizado, '
         'dataIniciado: $dataIniciado, '
-        'gruposDoRecolhimento: ${ gruposDoRecolhimento == null ? "null" : ( gruposDoRecolhimento.map((e) => "{ id: " + (e.idGrupo ?? "null") + ", nomeGrupo: " + (e.nomeGrupo ?? "null") + "} ").toString() ) }.'
+        'gruposDoRecolhimento: ${ gruposDoRecolhimento == null ? "null" : ( gruposDoRecolhimento!.map((e) => "{ id: " + (e.idGrupo) + ", nomeGrupo: " + (e.nomeGrupo) + "} ").toString() ) }.'
     ;
   }
 
@@ -64,7 +64,7 @@ class RecolhimentoDmo implements BaseDmo{
       RecolhimentoModel.CAMPO_DATA_RECOLHIMENTO : dataDoRecolhimento,
       RecolhimentoModel.CAMPO_DATA_INICIADO: dataIniciado,
       RecolhimentoModel.CAMPO_DATA_FINALIZADO : dataFinalizado,
-      RecolhimentoModel.CAMPO_GRUPOS_DO_RECOLHIMENTO : gruposDoRecolhimento.map((e) => e.idGrupo).toList()
+      RecolhimentoModel.CAMPO_GRUPOS_DO_RECOLHIMENTO : gruposDoRecolhimento == null ? null : gruposDoRecolhimento!.map((e) => e.idGrupo).toList()
     };
   }
 

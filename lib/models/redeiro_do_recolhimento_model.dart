@@ -7,8 +7,7 @@ import 'package:jsvillela_app/models/redeiro_model.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 /// Model para redeiros do recolhimento.
-class RedeiroDoRecolhimentoModel extends Model{
-
+class RedeiroDoRecolhimentoModel extends Model {
   //#region Atributos
   /// Indica que existe um processo em execução a partir desta classe.
   bool estaCarregando = false;
@@ -27,7 +26,8 @@ class RedeiroDoRecolhimentoModel extends Model{
 
   //#region Métodos
 
-  static RedeiroDoRecolhimentoModel of (BuildContext context) => ScopedModel.of<RedeiroDoRecolhimentoModel>(context);
+  static RedeiroDoRecolhimentoModel of(BuildContext context) =>
+      ScopedModel.of<RedeiroDoRecolhimentoModel>(context);
 
   @override
   void addListener(VoidCallback listener) {
@@ -35,31 +35,38 @@ class RedeiroDoRecolhimentoModel extends Model{
   }
 
   ///Cadastra uma lista de redeiro do recolhimento na collection de Recolhimentos no Firebase.
-  void cadastrarRedeirosDoRecolhimento({@required String idRecolhimento, @required List<RedeiroDoRecolhimentoDmo> redeirosDoRecolhimento, @required Function onSuccess, @required VoidCallback onFail}){
-
-    estaCarregando = true;// Indicar início do processamento
+  void cadastrarRedeirosDoRecolhimento(
+      {required String idRecolhimento,
+      required List<RedeiroDoRecolhimentoDmo> redeirosDoRecolhimento,
+      required Function onSuccess,
+      required VoidCallback onFail}) {
+    estaCarregando = true; // Indicar início do processamento
     notifyListeners();
 
-    var batch = FirebaseFirestore.instance.batch();// Batch para criação de uma transação
+    var batch = FirebaseFirestore.instance
+        .batch(); // Batch para criação de uma transação
 
     redeirosDoRecolhimento.forEach((redeiro) {
-
       // Validar se o redeiro está ativo.
-      if(redeiro.redeiro.ativo){
-        var idUnico = FirebaseFirestore.instance.collection(RecolhimentoModel.NOME_COLECAO).doc(idRecolhimento).collection(NOME_COLECAO).doc();
-        redeiro.id = idUnico.id;// Após gerar ID único, atribuir ID na lista de redeiros que será devolvida no CallBack
+      if (redeiro.redeiro!.ativo) {
+        var idUnico = FirebaseFirestore.instance
+            .collection(RecolhimentoModel.NOME_COLECAO)
+            .doc(idRecolhimento)
+            .collection(NOME_COLECAO)
+            .doc();
+        redeiro.id = idUnico
+            .id; // Após gerar ID único, atribuir ID na lista de redeiros que será devolvida no CallBack
         batch.set(idUnico, redeiro.converterParaMapa());
       }
     });
 
     // Comitar batch em caso de sucesso
-    batch.commit()
-    .then((value) {
-      estaCarregando = false;// Indicar FIM do processamento
+    batch.commit().then((value) {
+      estaCarregando = false; // Indicar FIM do processamento
       notifyListeners();
       onSuccess(redeirosDoRecolhimento);
-    }).catchError((e){
-      estaCarregando = false;// Indicar FIM do processamento
+    }).catchError((e) {
+      estaCarregando = false; // Indicar FIM do processamento
       notifyListeners();
       print(e.toString());
       onFail();
@@ -67,53 +74,65 @@ class RedeiroDoRecolhimentoModel extends Model{
   }
 
   /// Atualiza a data de Finalização para um Redeiro do Recolhimento.
-  Future<void> finalizarRecolhimentoDoRedeiro({@required String idRecolhimento, @required String idRedeiroDoRecolhimento, @required DateTime dataFinalizacao}) {
-
-    estaCarregando = true;// Indicar início do processamento
+  Future<void> finalizarRecolhimentoDoRedeiro(
+      {required String idRecolhimento,
+      required String idRedeiroDoRecolhimento,
+      required DateTime dataFinalizacao}) {
+    estaCarregando = true; // Indicar início do processamento
     notifyListeners();
 
-    return FirebaseFirestore.instance.collection(RecolhimentoModel.NOME_COLECAO)
-        .doc(idRecolhimento).collection(NOME_COLECAO).doc(idRedeiroDoRecolhimento)
-        .update({ CAMPO_DATA_FINALIZACAO: dataFinalizacao })
-        .then((value){
-          estaCarregando = false;
-          notifyListeners();
-        })
-        .catchError((erro) {
-          estaCarregando = false;
-          notifyListeners();
-        });
+    return FirebaseFirestore.instance
+        .collection(RecolhimentoModel.NOME_COLECAO)
+        .doc(idRecolhimento)
+        .collection(NOME_COLECAO)
+        .doc(idRedeiroDoRecolhimento)
+        .update({CAMPO_DATA_FINALIZACAO: dataFinalizacao}).then((value) {
+      estaCarregando = false;
+      notifyListeners();
+    }).catchError((erro) {
+      estaCarregando = false;
+      notifyListeners();
+    });
   }
 
   /// Busca os redeiros de um recolhimento específico.
-  Future<QuerySnapshot> carregarRedeirosDeUmRecolhimento(String idDoRecolhimento) async{
-    return await FirebaseFirestore.instance.collection(RecolhimentoModel.NOME_COLECAO)
-        .doc(idDoRecolhimento).collection(NOME_COLECAO)
+  Future<QuerySnapshot> carregarRedeirosDeUmRecolhimento(
+      String idDoRecolhimento) async {
+    return await FirebaseFirestore.instance
+        .collection(RecolhimentoModel.NOME_COLECAO)
+        .doc(idDoRecolhimento)
+        .collection(NOME_COLECAO)
         .get();
   }
 
   /// Busca os redeiros de um recolhimento específico.
-  Future<List<RedeiroDoRecolhimentoDmo>> carregarRedeirosDeUmRecolhimentoComDetalhes(String idDoRecolhimento) async{
+  Future<List<RedeiroDoRecolhimentoDmo>>
+      carregarRedeirosDeUmRecolhimentoComDetalhes(
+          String idDoRecolhimento) async {
     estaCarregando = true;
     notifyListeners();
 
     // Consultar redeiros do recolhimento diretamente no Firebase
-    QuerySnapshot snapshotRedeiros = await carregarRedeirosDeUmRecolhimento(idDoRecolhimento);
+    QuerySnapshot snapshotRedeiros =
+        await carregarRedeirosDeUmRecolhimento(idDoRecolhimento);
 
     // Inicializar lista de redeiros
     List<RedeiroDoRecolhimentoDmo> redeirosDoRecolhimento = [];
 
     // Converter lista de redeiros para uma lista de objetos RedeiroDoRecolhimentoDmo.
     snapshotRedeiros.docs.forEach((element) {
-      redeirosDoRecolhimento.add(RedeiroDoRecolhimentoDmo.converterSnapshotEmRedeiroDoRecolhimento(element));
+      redeirosDoRecolhimento.add(
+          RedeiroDoRecolhimentoDmo.converterSnapshotEmRedeiroDoRecolhimento(
+              element));
     });
 
     // Obter detalhes de todos os redeiros obtidos
-    for(int i = 0; i < redeirosDoRecolhimento.length; i++){
-      try{
-        redeirosDoRecolhimento[i].redeiro =  RedeiroDmo.converterSnapshotEmRedeiro(await RedeiroModel().carregarRedeiroPorId(redeirosDoRecolhimento[i].redeiro.id));
-      }
-      catch(erro){
+    for (int i = 0; i < redeirosDoRecolhimento.length; i++) {
+      try {
+        redeirosDoRecolhimento[i].redeiro =
+            RedeiroDmo.converterSnapshotEmRedeiro(await RedeiroModel()
+                .carregarRedeiroPorId(redeirosDoRecolhimento[i].redeiro!.id ?? ""));
+      } catch (erro) {
         // Caso aconteça algum erro ao obter as informações do redeiro, assumir que redeiro foi excluído.
         redeirosDoRecolhimento[i].redeiro = null;
       }
@@ -123,21 +142,6 @@ class RedeiroDoRecolhimentoModel extends Model{
     notifyListeners();
 
     return redeirosDoRecolhimento;
-  }
-
-  /// Carrega as informações do redeiro por ID.
-  Future<RedeiroDmo> carregarInformacoesDoRedeiro(String idDoRedeiro){
-
-    estaCarregando = true;
-    notifyListeners();
-
-    RedeiroModel().carregarRedeiroPorId(idDoRedeiro)
-      .then((value){
-
-      })
-      .catchError((erro){
-
-      });
   }
   //#endregion Métodos
 

@@ -3,7 +3,6 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:jsvillela_app/infra/paleta_de_cores.dart';
 
 class ListViewItemPesquisa extends StatelessWidget {
-
   //#region Atributos
   /// Texto principal a ser exibido no item.
   final String textoPrincipal;
@@ -15,22 +14,27 @@ class ListViewItemPesquisa extends StatelessWidget {
   final IconData iconeEsquerda;
 
   /// Ícone a ser exibido do lado direito do item.
-  final IconData iconeDireita;
+  final IconData? iconeDireita;
 
   /// Ação a ser executada ao clicar no item.
-  final Function acaoAoClicar;
+  final Function()? acaoAoClicar;
 
   /// Ações disponíveis no Slidable do item.
-  List<Widget> acoesDoSlidable;
+  List<Widget>? acoesDoSlidable;
   //#endregion Atributos
 
   //#region Construtor(es)
-  ListViewItemPesquisa({@required this.textoPrincipal, @required this.textoSecundario, @required this.iconeEsquerda, @required this.iconeDireita, @required this.acaoAoClicar, this.acoesDoSlidable});
+  ListViewItemPesquisa(
+      {required this.textoPrincipal,
+      required this.textoSecundario,
+      required this.iconeEsquerda,
+      required this.iconeDireita,
+      required this.acaoAoClicar,
+      this.acoesDoSlidable});
   //#endregion Construtor(es)
 
   @override
   Widget build(BuildContext context) {
-
     return Padding(
       padding: EdgeInsets.only(bottom: 10),
       child: Slidable(
@@ -47,14 +51,11 @@ class ListViewItemPesquisa extends StatelessWidget {
             ),
             title: Text(
               textoPrincipal,
-              style: TextStyle(
-                  fontWeight: FontWeight.bold
-              ),
+              style: TextStyle(fontWeight: FontWeight.bold),
             ),
             subtitle: Text(textoSecundario),
             trailing: Icon(iconeDireita, color: Theme.of(context).primaryColor),
-            onTap: acaoAoClicar
-        ),
+            onTap: acaoAoClicar),
       ),
     );
 
@@ -63,24 +64,21 @@ class ListViewItemPesquisa extends StatelessWidget {
       child: Ink(
         color: PaletaDeCor.AZUL_BEM_CLARO,
         child: ListTile(
-          contentPadding: EdgeInsets.all(10),
-          tileColor: PaletaDeCor.AZUL_BEM_CLARO,
-          hoverColor: Colors.grey,
-          leading: Icon(
+            contentPadding: EdgeInsets.all(10),
+            tileColor: PaletaDeCor.AZUL_BEM_CLARO,
+            hoverColor: Colors.grey,
+            leading: Icon(
               iconeEsquerda,
               color: Theme.of(context).primaryColor,
-            size: 40,
-          ),
-          title: Text(
-              textoPrincipal,
-            style: TextStyle(
-              fontWeight: FontWeight.bold
+              size: 40,
             ),
-          ),
-          subtitle: Text(textoSecundario),
-          trailing: Icon(iconeDireita, color: Theme.of(context).primaryColor),
-          onTap: acaoAoClicar
-        ),
+            title: Text(
+              textoPrincipal,
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            subtitle: Text(textoSecundario),
+            trailing: Icon(iconeDireita, color: Theme.of(context).primaryColor),
+            onTap: () => acaoAoClicar),
       ),
     );
   }

@@ -13,10 +13,10 @@ class UsuarioModel extends Model{
   FirebaseAuth _autenticacao = FirebaseAuth.instance;
 
   /// Usuário autenticado com Firebase.
-  User usuario;
+  User? usuario;
 
   /// Mapa contendo informações do usuário logado.
-  Map<String, dynamic> dadosDoUsuario = Map();
+  Map<String, dynamic>? dadosDoUsuario = Map();
 
   /// Indica que existe um processo em execução a partir desta classe.
   bool estaCarregando = false;
@@ -44,7 +44,7 @@ class UsuarioModel extends Model{
   ///
   /// Caso a autenticação seja efetuada com sucesso o CallBack [onSuccess] é chamado.
   /// Caso a autenticação falhe o CallBack [onFail] é chamado.
-   void logar({@required String email, @required String senha, @required VoidCallback onSuccess, @required VoidCallback onFail}) async {
+   void logar({required String email, required String senha, required VoidCallback onSuccess, required VoidCallback onFail}) async {
      estaCarregando = true;
       notifyListeners();
 
@@ -68,13 +68,13 @@ class UsuarioModel extends Model{
   }
 
   ///Carrega as informações do usuário atual a partir do login.
-  Future<bool> _carregarUsuarioAtual() async{
+  Future<void> _carregarUsuarioAtual() async{
     if(usuario == null)
       usuario = _autenticacao.currentUser;
 
     if(usuario != null){
-      if(dadosDoUsuario[CAMPO_NOME] == null){
-        DocumentSnapshot docUser = await FirebaseFirestore.instance.collection(NOME_COLECAO).doc(usuario.uid).get();
+      if(dadosDoUsuario![CAMPO_NOME] == null){
+        DocumentSnapshot docUser = await FirebaseFirestore.instance.collection(NOME_COLECAO).doc(usuario!.uid).get();
         dadosDoUsuario = docUser.data();
       }
 
@@ -82,7 +82,7 @@ class UsuarioModel extends Model{
 
       // Salvar ID do Usuário caso preferência "Manter Usuário Logado" tenha sido selecionada.
       if(Preferencias.manterUsuarioLogado)
-        preferencias.setString(Preferencias.PREF_USUARIO_LOGADO, usuario.uid);
+        preferencias.setString(Preferencias.PREF_USUARIO_LOGADO, usuario!.uid);
       // Senão, remover ID salvo
       else
         preferencias.setString(Preferencias.PREF_USUARIO_LOGADO, "");
@@ -96,7 +96,7 @@ class UsuarioModel extends Model{
   Future<bool> autoLogarUsuario() async{
 
     // Conferir preferências do usuário para então realizar login
-    if(Preferencias.manterUsuarioLogado && Preferencias.idUsuarioLogado != null && Preferencias.idUsuarioLogado.isNotEmpty){
+    if(Preferencias.manterUsuarioLogado && Preferencias.idUsuarioLogado != null && Preferencias.idUsuarioLogado!.isNotEmpty){
       DocumentSnapshot docUser = await FirebaseFirestore.instance.collection(NOME_COLECAO).doc(Preferencias.idUsuarioLogado).get();
       dadosDoUsuario = docUser.data();
       return Future<bool>.value(true);

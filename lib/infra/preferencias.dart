@@ -21,13 +21,13 @@ class Preferencias{
 
   //#region Atributos
   /// Define se usuário optou por manter sessão de login ativa.
-  static bool manterUsuarioLogado;
+  static bool manterUsuarioLogado = false;
 
   /// Define o ID do usuário logado.
-  static String idUsuarioLogado;
+  static String? idUsuarioLogado;
 
   /// Define o aplicativo de mapa padrão do usuário.
-  static AplicativosDeMapa aplicativosDeMapa;
+  static AplicativosDeMapa aplicativosDeMapa = AplicativosDeMapa.googleMaps;
 
   //#endregion Atributos
 
@@ -41,7 +41,7 @@ class Preferencias{
     manterUsuarioLogado = preferencias.getBool(PREF_MANTER_LOGADO) ?? false;
 
     // Obter preferência "aplicativosDeMapa"
-    int appMapa = preferencias.getInt(PREF_APP_MAPAS);
+    int? appMapa = preferencias.getInt(PREF_APP_MAPAS);
     aplicativosDeMapa =  appMapa != null ? AplicativosDeMapa.values[appMapa] : AplicativosDeMapa.googleMaps;
 
     if(manterUsuarioLogado)

@@ -47,7 +47,7 @@ class _TabelaDeLancamentosState extends State<TabelaDeLancamentos> {
     // Calcular total
     double total = 0;
     widget.listaDeLancamentos.forEach((element) {
-      total += element.quantidade * element.valorUnitario;
+      total += element.quantidade! * element.valorUnitario!;
     });
 
     // Formato de moeda
@@ -83,13 +83,13 @@ class _TabelaDeLancamentosState extends State<TabelaDeLancamentos> {
 
                           // Formatar para para dd/MM
                           final formatoData = new DateFormat('dd/MM');
-                          DateTime dataLancamentoFormatada = new DateTime.fromMillisecondsSinceEpoch(e.dataLancamento.millisecondsSinceEpoch);
+                          DateTime dataLancamentoFormatada = new DateTime.fromMillisecondsSinceEpoch(e.dataLancamento!.millisecondsSinceEpoch);
 
                           return DataRow(
                               selected: true,
                               cells: [
                                 DataCell(Text(formatoData.format(dataLancamentoFormatada.toLocal()))),
-                                DataCell(Text(e.nomeRede)),
+                                DataCell(Text(e.nomeRede!)),
                                 DataCell(Text(e.quantidade.toString())),
                                 DataCell(Text("R\$${e.valorUnitario}")),
                               ]);
@@ -255,7 +255,7 @@ class _TabelaDeLancamentosState extends State<TabelaDeLancamentos> {
     widget.listaDeLancamentos.forEach((element) {
       widget.listaDeLancamentos.firstWhere((e) => e.idLancamento == element.idLancamento).dataPagamento = dataDePagamento;
       widget.listaDeLancamentos.firstWhere((e) => e.idLancamento == element.idLancamento).pago = true;
-      model.informarPagamento(idDoLancamento: element.idLancamento, idDoRedeiro: widget.idDoRedeiro, dataDoPagamento: dataDePagamento, onSuccess: informarSucesso, onFail: informarErro);
+      model.informarPagamento(idDoLancamento: element.idLancamento!, idDoRedeiro: widget.idDoRedeiro, dataDoPagamento: dataDePagamento, onSuccess: informarSucesso, onFail: informarErro);
     });
 
     setState(() {

@@ -8,18 +8,21 @@ class BotaoRedondo extends StatelessWidget {
   final IconData icone;
 
   /// Tamanho do botão.
-  final double tamanho;
+  final double? tamanho;
 
   /// Ação ao clicar no botão.
-  Function acaoAoClicar;
+  Function()? acaoAoClicar;
 
   /// Cor do botão.
-  final Color corDoBotao;
+  final Color? corDoBotao;
+
+  /// Cor do icone.
+  final Color? corDoIcone;
 
   //#endregion Atributos
 
   //#region Construtor(es)
-  BotaoRedondo({this.icone, this.tamanho, this.acaoAoClicar, this.corDoBotao});
+  BotaoRedondo({required this.icone, this.tamanho, this.acaoAoClicar, this.corDoBotao, this.corDoIcone});
   //#endregion Construtor(es)
 
   @override
@@ -35,7 +38,7 @@ class BotaoRedondo extends StatelessWidget {
             child: Icon(
               icone,
               size: tamanho,
-              color: Colors.white,
+              color: corDoIcone ?? Colors.white,
             ),
           ),
         ),

@@ -15,6 +15,6 @@ class CheckListItemModel{
 
   //#region Contrutor(es)
   /// Classe de modelo para os 
-  CheckListItemModel({@required this.texto, @required this.checado, @required this.id});
+  CheckListItemModel({required this.texto, required this.checado, required this.id});
   //#endregion Contrutor(es)
 }

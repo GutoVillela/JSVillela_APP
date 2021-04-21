@@ -27,7 +27,7 @@ class _TelaCadastroDeGruposDeRedeirosState extends State<TelaCadastroDeGruposDeR
   List<GrupoDeRedeirosDmo> _listaDeGruposDeRedeiros = [];
 
   /// Último grupo carregado em tela.
-  DocumentSnapshot _ultimoGrupoCarregado;
+  DocumentSnapshot? _ultimoGrupoCarregado;
 
   /// Define se existem mais registros a serem carregados na lista.
   bool _temMaisRegistros = true;
@@ -107,6 +107,7 @@ class _TelaCadastroDeGruposDeRedeirosState extends State<TelaCadastroDeGruposDeR
                           }
 
                           return ListViewItemPesquisa(
+                            acaoAoClicar: null,
                               textoPrincipal: _listaDeGruposDeRedeiros[index].nomeGrupo,
                               textoSecundario: "Id: " + _listaDeGruposDeRedeiros[index].idGrupo.toString(),
                               iconeEsquerda: Icons.group,

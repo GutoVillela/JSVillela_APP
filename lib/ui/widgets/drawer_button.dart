@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:jsvillela_app/infra/enums.dart';
 import 'package:jsvillela_app/models/usuario_model.dart';
+import 'package:jsvillela_app/stores/navegacao_store.dart';
 import 'package:jsvillela_app/ui/tela_de_login.dart';
 
 /// Cria um Item de Menu a ser utilizado no Drawer (menu) da aplicação.
@@ -14,17 +16,16 @@ class ItemDeMenu extends StatelessWidget {
   ///Texto a ser exibido.
   final String _texto;
 
-  /// PageController usado para troca de telas.
-  final PageController _pageController;
-
   /// Define para qual página o aplicativo será direcionado após clicar no botão.
   final AppPages _page;
 
+  /// Store que é utilizada para navegar entre telas.
+  final NavegacaoStore navegacaoStore = GetIt.I<NavegacaoStore>();
   //#endregion Atributos
 
   //#region Construtores
 
-  ItemDeMenu(this._icone, this._texto, this._pageController, this._page);
+  ItemDeMenu(this._icone, this._texto, this._page);
 
   //#endregion Construtores
 
@@ -76,13 +77,12 @@ class ItemDeMenu extends StatelessWidget {
                 new UsuarioModel().deslogarUsuario();
                 Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (BuildContext context) => TelaDeLogin()), (route) => false);
                 return;
-                break;
               default:
                 pagina = 0;
                 break;
             }
             Navigator.of(context).pop();
-            _pageController.jumpToPage(pagina);
+            navegacaoStore.setPaginaAtual(pagina);
           },
           child: Container(
             padding: EdgeInsets.only(left: 20),

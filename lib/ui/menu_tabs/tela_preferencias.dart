@@ -35,7 +35,7 @@ class _TelaPreferenciasState extends State<TelaPreferencias> {
   }
 
   /// Modelo de ExpandedTile padrão para ser reaproveitado em todas as preferências.
-  Widget tilePreferenciaPadrao({BuildContext context, String titulo, IconData icone, List<Widget> filhos}) => ExpansionTile(
+  Widget tilePreferenciaPadrao({required BuildContext context, required String titulo, required IconData icone, required List<Widget> filhos}) => ExpansionTile(
     title: Text(titulo,
         style: TextStyle(
             //color: Theme.of(context).primaryColor,
@@ -53,10 +53,10 @@ class _TelaPreferenciasState extends State<TelaPreferencias> {
           title: const Text("Google Maps"),
             value: AplicativosDeMapa.googleMaps,
             groupValue: _appPadrao,
-            onChanged: (AplicativosDeMapa valor) async{
+            onChanged: (AplicativosDeMapa? valor) async{
 
               setState(() {
-                _appPadrao = valor;
+                _appPadrao = valor ?? AplicativosDeMapa.googleMaps;
               });
               await Preferencias().salvarPreferencia(PreferenciasDoApp.appPadraoMapas, _appPadrao);
             }
@@ -65,10 +65,10 @@ class _TelaPreferenciasState extends State<TelaPreferencias> {
           title: const Text("Waze"),
             value: AplicativosDeMapa.waze,
             groupValue: _appPadrao,
-            onChanged: (AplicativosDeMapa valor) async{
+            onChanged: (AplicativosDeMapa? valor) async{
 
               setState(() {
-                _appPadrao = valor;
+                _appPadrao = valor ?? AplicativosDeMapa.googleMaps;
               });
               await Preferencias().salvarPreferencia(PreferenciasDoApp.appPadraoMapas, _appPadrao);
             }

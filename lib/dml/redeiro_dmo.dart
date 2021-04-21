@@ -11,33 +11,33 @@ class RedeiroDmo implements BaseDmo{
   //#region Atributos
 
   /// Id do Redeiro.
-  String id;
+  String? id;
 
   /// Nome do redeiro.
-  String nome;
+  String? nome;
 
   /// Celular do redeiro.
-  String celular;
+  String? celular;
 
   /// Email do redeiro.
-  String email;
+  String? email;
 
   /// Indica se o celular do redeiro recebe mensagens via WhatsApp.
   bool whatsApp;
 
   /// Endereço do Cliente.
-  EnderecoDmo endereco;
+  EnderecoDmo? endereco;
 
   /// Indica se o redeiro está ativo ou não.
   bool ativo;
 
   /// Lista de grupos associados ao redeiro.
-  List<GrupoDeRedeirosDmo> gruposDoRedeiro;
+  List<GrupoDeRedeirosDmo>? gruposDoRedeiro;
 
   //#endregion Atributos
 
   //#region Construtor(es)
-  RedeiroDmo({this.id, this.nome, this.celular, this.email, this.whatsApp, this.endereco, this.ativo, this.gruposDoRedeiro});
+  RedeiroDmo({this.id, this.nome, this.celular, this.email, this.whatsApp = false, this.endereco, this.ativo = true, this.gruposDoRedeiro});
   //#endregion Construtor(es)
 
   //#region Métodos
@@ -59,6 +59,12 @@ class RedeiroDmo implements BaseDmo{
             cep: redeiro[RedeiroModel.CAMPO_ENDERECO][RedeiroModel.CAMPO_ENDERECO_CEP],
             complemento: redeiro[RedeiroModel.CAMPO_ENDERECO][RedeiroModel.CAMPO_ENDERECO_COMPLEMENTO],
             posicao: Position(
+                accuracy: 0,
+                speedAccuracy: 0,
+                altitude: 0,
+                heading: 0,
+                speed: 0,
+                timestamp: DateTime.now(),
                 longitude: (redeiro[RedeiroModel.CAMPO_ENDERECO][RedeiroModel.CAMPO_ENDERECO_POSICAO] as GeoPoint).longitude,
                 latitude: (redeiro[RedeiroModel.CAMPO_ENDERECO][RedeiroModel.CAMPO_ENDERECO_POSICAO] as GeoPoint).latitude
             )
@@ -66,7 +72,7 @@ class RedeiroDmo implements BaseDmo{
         ativo: redeiro[RedeiroModel.CAMPO_ATIVO],
         gruposDoRedeiro: (redeiro[RedeiroModel.SUBCOLECAO_GRUPOS] as List)
             .map((e) => GrupoDeRedeirosDmo(
-            idGrupo: e)).toList()
+            idGrupo: e, nomeGrupo: "")).toList()
     );
   }
 
@@ -77,7 +83,7 @@ class RedeiroDmo implements BaseDmo{
         'celular: $celular, '
         'email: $email, '
         'endereco: ${endereco.toString()}, '
-        'gruposDoRedeiro: [${gruposDoRedeiro.map((e) => "{ id: " + e.idGrupo + ", nomeGrupo: " + e.nomeGrupo + "} ")}].';
+        'gruposDoRedeiro: [${gruposDoRedeiro == null ? "null" : (gruposDoRedeiro!.map((e) => "{ id: ${e.idGrupo}, nomeGrupo: ${e.nomeGrupo} } ")) }].';
   }
 
   @override
@@ -87,9 +93,9 @@ class RedeiroDmo implements BaseDmo{
       RedeiroModel.CAMPO_CELULAR : celular,
       RedeiroModel.CAMPO_EMAIL : email,
       RedeiroModel.CAMPO_WHATSAPP : whatsApp,
-      RedeiroModel.CAMPO_ENDERECO : endereco.converterParaMapa(),
+      RedeiroModel.CAMPO_ENDERECO : endereco == null ? null : endereco!.converterParaMapa(),
       RedeiroModel.CAMPO_ATIVO : ativo,
-      RedeiroModel.SUBCOLECAO_GRUPOS : gruposDoRedeiro.map((e) => e.idGrupo).toList()
+      RedeiroModel.SUBCOLECAO_GRUPOS : gruposDoRedeiro == null ? null : gruposDoRedeiro!.map((e) => e.idGrupo).toList()
     };
   }
   //#endregion Métodos

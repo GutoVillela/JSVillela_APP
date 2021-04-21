@@ -29,7 +29,7 @@ class _TelaCadastroDeRedesState extends State<TelaCadastroDeRedes> {
   List<RedeDmo> _listaDeRedes = [];
 
   /// Última rede carregada em tela.
-  DocumentSnapshot _ultimaRedeCarregada;
+  DocumentSnapshot? _ultimaRedeCarregada;
 
   /// Define se existem mais registros a serem carregados na lista.
   bool _temMaisRegistros = true;
@@ -108,7 +108,8 @@ class _TelaCadastroDeRedesState extends State<TelaCadastroDeRedes> {
                           }
 
                           return ListViewItemPesquisa(
-                              textoPrincipal: _listaDeRedes[index].nome_rede,
+                            acaoAoClicar: null,
+                              textoPrincipal: _listaDeRedes[index].nome_rede!,
                               textoSecundario: "R\$ " + _listaDeRedes[index].valor_unitario_rede.toString(),
                               iconeEsquerda: Icons.person,
                               iconeDireita: Icons.search,
@@ -201,7 +202,7 @@ class _TelaCadastroDeRedesState extends State<TelaCadastroDeRedes> {
           );
 
           await RedeModel().apagarRede(
-              idRede: _listaDeRedes[indexGrupo].id,
+              idRede: _listaDeRedes[indexGrupo].id!,
               context: context,
               onSuccess: (){
                 // Fechar diálogo de carregamento.

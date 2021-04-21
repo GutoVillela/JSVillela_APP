@@ -14,6 +14,13 @@ enum AppPages{
     preferencias
 }
 
+/// Enum que define os possíveis estados para esta página de login.
+enum EstadoDaPaginaDeLogin{
+    inicio,
+    login,
+    esqueciASenha
+}
+
 /// Enum que define os aplicativos da mapas instalados pelo usuário.
 enum AplicativosDeMapa{
     googleMaps,

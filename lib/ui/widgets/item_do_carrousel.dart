@@ -40,7 +40,7 @@ class _ItemDoCarrouselState extends State<ItemDoCarrousel> with AutomaticKeepAli
   //#region Atributos
 
   ///Indica se aplicação está carregando aplicativo de mapa.
-  bool carregandoMapa;
+  bool carregandoMapa = false;
 
   //#endregion Atributos
 
@@ -58,7 +58,7 @@ class _ItemDoCarrouselState extends State<ItemDoCarrousel> with AutomaticKeepAli
     super.build(context);
 
     return FutureBuilder<DocumentSnapshot>(
-      future: RedeiroModel().carregarRedeiroPorId(widget.redeiroDoRecolhimento.redeiro.id),
+      future: RedeiroModel().carregarRedeiroPorId(widget.redeiroDoRecolhimento.redeiro!.id!),
       builder: (context, snapshotRedeiro){
 
         if(!snapshotRedeiro.hasData)
@@ -69,7 +69,7 @@ class _ItemDoCarrouselState extends State<ItemDoCarrousel> with AutomaticKeepAli
           );
 
         // Recuperar informações atualizadas do redeiro
-        widget.redeiroDoRecolhimento.redeiro = RedeiroDmo.converterSnapshotEmRedeiro(snapshotRedeiro.data);
+        widget.redeiroDoRecolhimento.redeiro = RedeiroDmo.converterSnapshotEmRedeiro(snapshotRedeiro.data!);
 
         return ScopedModelDescendant<RedeiroDoRecolhimentoModel>(
             builder: (context, child, model){
@@ -89,7 +89,7 @@ class _ItemDoCarrouselState extends State<ItemDoCarrousel> with AutomaticKeepAli
                   padding: const EdgeInsets.all(10.0),
                   child: Column(
                     children: [
-                      Text(widget.redeiroDoRecolhimento.redeiro.nome,
+                      Text(widget.redeiroDoRecolhimento.redeiro!.nome!,
                           style:  TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -97,14 +97,14 @@ class _ItemDoCarrouselState extends State<ItemDoCarrousel> with AutomaticKeepAli
                           )
                       ),
                       SizedBox(height: 20),
-                      Text(widget.redeiroDoRecolhimento.redeiro.endereco.toString(),
+                      Text(widget.redeiroDoRecolhimento.redeiro!.endereco.toString(),
                           textAlign: TextAlign.center,
                           style:  TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold
                           )
                       ),
-                      carregandoMapa ?? false ?
+                      carregandoMapa ?
                       Column(
                         children: [
                           SizedBox(height: 20),
@@ -123,7 +123,7 @@ class _ItemDoCarrouselState extends State<ItemDoCarrousel> with AutomaticKeepAli
                             corDoBotao: Theme.of(context).primaryColor,
                             acaoAoClicar: (){
                               Navigator.of(context).push(
-                                  MaterialPageRoute(builder: (context) => TelaCadernoDoRedeiro(widget.redeiroDoRecolhimento.redeiro))
+                                  MaterialPageRoute(builder: (context) => TelaCadernoDoRedeiro(widget.redeiroDoRecolhimento.redeiro!))
                               );
                             },
                           ),
@@ -133,7 +133,7 @@ class _ItemDoCarrouselState extends State<ItemDoCarrousel> with AutomaticKeepAli
                             corDoBotao: Theme.of(context).primaryColor,
                             acaoAoClicar: () async{
                               setState(() => carregandoMapa = true);
-                              await Infraestrutura.abrirMapa(widget.redeiroDoRecolhimento.redeiro.endereco.posicao);
+                              await Infraestrutura.abrirMapa(widget.redeiroDoRecolhimento.redeiro!.endereco!.posicao!);
                               setState(() => carregandoMapa = false);
                             },
                           ),
@@ -146,16 +146,17 @@ class _ItemDoCarrouselState extends State<ItemDoCarrousel> with AutomaticKeepAli
                               Infraestrutura.confirmar(
                                   context: context,
                                   titulo: "Finalizar recolhimento",
-                                  mensagem: "Gostaria de finalizar o recolhimento para o(a) redeiro(a) ${widget.redeiroDoRecolhimento.redeiro.nome}?",
+                                  mensagem: "Gostaria de finalizar o recolhimento para o(a) redeiro(a) ${widget.redeiroDoRecolhimento.redeiro!.nome}?",
                                   acaoAoConfirmar: (){
                                     Navigator.of(context).pop();//Fechar mensagem de diálogo
 
                                     widget.redeiroDoRecolhimento.dataFinalizacao = DateTime.now();
 
+                                    print("ID redeiro do recolhimento: ${widget.redeiroDoRecolhimento.id}");
                                     model.finalizarRecolhimentoDoRedeiro(
                                         idRecolhimento: widget.idDoRecolhimento,
-                                        idRedeiroDoRecolhimento: widget.redeiroDoRecolhimento.id,
-                                        dataFinalizacao: widget.redeiroDoRecolhimento.dataFinalizacao
+                                        idRedeiroDoRecolhimento: widget.redeiroDoRecolhimento.id!,
+                                        dataFinalizacao: widget.redeiroDoRecolhimento.dataFinalizacao!
                                     ).then((value) {
 
                                       // Executar callback

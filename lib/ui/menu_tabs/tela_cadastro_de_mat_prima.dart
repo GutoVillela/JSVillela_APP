@@ -29,7 +29,7 @@ class _TelaCadastroDeMateriaPrimaState
   List<MateriaPrimaDmo> _listaDeMP = [];
 
   /// Última mp carregada em tela.
-  DocumentSnapshot _ultimaMpCarregada;
+  DocumentSnapshot? _ultimaMpCarregada;
 
   /// Define se existem mais registros a serem carregados na lista.
   bool _temMaisRegistros = true;
@@ -113,8 +113,9 @@ class _TelaCadastroDeMateriaPrimaState
                           }
 
                           return ListViewItemPesquisa(
-                              textoPrincipal: _listaDeMP[index].nomeMateriaPrima,
-                              textoSecundario: _listaDeMP[index].iconeMateriaPrima,
+                            acaoAoClicar: null,
+                              textoPrincipal: _listaDeMP[index].nomeMateriaPrima!,
+                              textoSecundario: _listaDeMP[index].iconeMateriaPrima!,
                               iconeEsquerda: Icons.person,
                               iconeDireita: Icons.search,
                               acoesDoSlidable:[
@@ -208,7 +209,7 @@ class _TelaCadastroDeMateriaPrimaState
           );
 
           await MateriaPrimaModel().apagarMateriaPrima(
-              idMateriaPrima: _listaDeMP[indexGrupo].id,
+              idMateriaPrima: _listaDeMP[indexGrupo].id!,
               context: context,
               onSuccess: (){
                 // Fechar diálogo de carregamento.

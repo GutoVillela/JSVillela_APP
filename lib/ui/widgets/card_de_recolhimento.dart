@@ -6,12 +6,14 @@ import 'package:jsvillela_app/dml/grupo_de_redeiros_dmo.dart';
 import 'package:jsvillela_app/dml/recolhimento_dmo.dart';
 import 'package:jsvillela_app/dml/redeiro_dmo.dart';
 import 'package:jsvillela_app/dml/redeiro_do_recolhimento_dmo.dart';
+import 'package:jsvillela_app/infra/enums.dart';
 import 'package:jsvillela_app/infra/infraestrutura.dart';
 import 'package:jsvillela_app/infra/paleta_de_cores.dart';
 import 'package:jsvillela_app/models/grupo_de_redeiros_model.dart';
 import 'package:jsvillela_app/models/recolhimento_model.dart';
 import 'package:jsvillela_app/models/redeiro_do_recolhimento_model.dart';
 import 'package:jsvillela_app/models/redeiro_model.dart';
+import 'package:jsvillela_app/ui/menu_tabs/tela_agendar_recolhimento.dart';
 import 'package:jsvillela_app/ui/widgets/botao_arredondado.dart';
 import 'package:jsvillela_app/ui/widgets/card_recolhimento_em_andamento.dart';
 import 'package:scoped_model/scoped_model.dart';
@@ -29,7 +31,7 @@ class CardRecolhimento extends StatelessWidget {
           bool existeRecolhimento = modelRecolhimento.recolhimentoDoDia != null;
 
           // Verificar se recolhimento do dia já foi finalizado
-          bool recolhimentoDoDiaFinalizado = existeRecolhimento && modelRecolhimento.recolhimentoDoDia.dataFinalizado != null;
+          bool recolhimentoDoDiaFinalizado = existeRecolhimento && modelRecolhimento.recolhimentoDoDia!.dataFinalizado != null;
 
           if(!existeRecolhimento || recolhimentoDoDiaFinalizado)
             return _cardNaoExisteRecolhimento(context, formatoData, recolhimentoDoDiaFinalizado);
@@ -37,8 +39,8 @@ class CardRecolhimento extends StatelessWidget {
             // Obter cidades dos redeiros
             List<String> cidadesDoRecolhimento = [];
 
-            if(modelRecolhimento.recolhimentoDoDia.redeirosDoRecolhimento != null && modelRecolhimento.recolhimentoDoDia.redeirosDoRecolhimento.isNotEmpty)
-              cidadesDoRecolhimento = RedeiroModel().obterCidadesAPartirDosRedeiros(modelRecolhimento.recolhimentoDoDia.redeirosDoRecolhimento.map((e) => e.redeiro).toList());
+            if(modelRecolhimento.recolhimentoDoDia!.redeirosDoRecolhimento != null && modelRecolhimento.recolhimentoDoDia!.redeirosDoRecolhimento!.isNotEmpty)
+              cidadesDoRecolhimento = RedeiroModel().obterCidadesAPartirDosRedeiros(modelRecolhimento.recolhimentoDoDia!.redeirosDoRecolhimento!.map((e) => e.redeiro!).toList());
 
             // Verificar se para este recolhimento existe algum redeiro já cadastrado
             return ScopedModel<RedeiroDoRecolhimentoModel>(
@@ -91,7 +93,7 @@ class CardRecolhimento extends StatelessWidget {
                               onTap: (){
 
                                 //Validar se existem grupos associados ao recolhimento
-                                if(modelRecolhimento.recolhimentoDoDia.gruposDoRecolhimento == null || modelRecolhimento.recolhimentoDoDia.gruposDoRecolhimento.isEmpty || modelRecolhimento.recolhimentoDoDia.gruposDoRecolhimento.any((element) => element.idGrupo == null)){
+                                if(modelRecolhimento.recolhimentoDoDia!.gruposDoRecolhimento == null || modelRecolhimento.recolhimentoDoDia!.gruposDoRecolhimento!.isEmpty || modelRecolhimento.recolhimentoDoDia!.gruposDoRecolhimento!.any((element) => element.idGrupo == "")){
                                   Infraestrutura.mostrarAviso(
                                     context: context,
                                     titulo: "Grupo do recolhimento apagado",
@@ -99,26 +101,26 @@ class CardRecolhimento extends StatelessWidget {
                                     acaoAoConfirmar: (){
                                       Navigator.of(context).pop();// Fechar diálogo
                                       Navigator.of(context).push(
-                                          MaterialPageRoute(builder: (context) => TelaEditarRecolhimento(modelRecolhimento.recolhimentoDoDia))
+                                          MaterialPageRoute(builder: (context) => TelaAgendarRecolhimento(tipoDeManutencao: TipoDeManutencao.alteracao, recolhimentoASerEditado: modelRecolhimento.recolhimentoDoDia!))
                                       );
                                     }
                                   );
                                 }
                                 else{
                                   print("INICIOU RECOLHIMENTO");
-                                  modelRecolhimento.recolhimentoDoDia.gruposDoRecolhimento..forEach((element) {
+                                  modelRecolhimento.recolhimentoDoDia!.gruposDoRecolhimento!..forEach((element) {
                                     print("REC: ${element.idGrupo} | GRUPO: ${element.nomeGrupo}");
                                   });
                                   model.cadastrarRedeirosDoRecolhimento(
-                                      idRecolhimento: modelRecolhimento.recolhimentoDoDia.id,
-                                      redeirosDoRecolhimento: modelRecolhimento.recolhimentoDoDia.redeirosDoRecolhimento,
+                                      idRecolhimento: modelRecolhimento.recolhimentoDoDia!.id!,
+                                      redeirosDoRecolhimento: modelRecolhimento.recolhimentoDoDia!.redeirosDoRecolhimento!,
                                       onSuccess: (redeirosCadastrados) async {
                                         // Após a Model cadastrar os Redeiros do Recolhimento ela devolve
                                         //no callback uma nova lista dos redeiros cadastrados com ID's preenchidos.
                                         // Portanto esses IDs são recuperados e atribuídos aqui.
-                                        modelRecolhimento.recolhimentoDoDia.redeirosDoRecolhimento = redeirosCadastrados;
+                                        modelRecolhimento.recolhimentoDoDia!.redeirosDoRecolhimento = redeirosCadastrados;
 
-                                        await _iniciarRecolhimento(context, modelRecolhimento.recolhimentoDoDia.id);
+                                        await _iniciarRecolhimento(context, modelRecolhimento.recolhimentoDoDia!.id!);
                                       },
                                       onFail: () => _informarFalhaAoIniciarRecolhimento(context));
                                 }
@@ -146,7 +148,7 @@ class CardRecolhimento extends StatelessWidget {
                   ],
                 ),
               ) :
-              CardRecolhimentoEmAndamento(modelRecolhimento.recolhimentoDoDia),
+              CardRecolhimentoEmAndamento(modelRecolhimento.recolhimentoDoDia!),
             );
           }
         }

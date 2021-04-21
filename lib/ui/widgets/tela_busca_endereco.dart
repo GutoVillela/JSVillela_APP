@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:jsvillela_app/dml/sugestao_endereco_dmo.dart';
 import 'package:jsvillela_app/services/google_place_service.dart';
 
-class TelaBuscaEndereco extends SearchDelegate<SugestaoEnderecoDmo>{
+class TelaBuscaEndereco extends SearchDelegate<SugestaoEnderecoDmo?>{
 
   //#region Atributos
 
@@ -10,7 +10,7 @@ class TelaBuscaEndereco extends SearchDelegate<SugestaoEnderecoDmo>{
   final sessionToken;
 
   /// Instâcia da classe de serviço do Google Places.
-  GooglePlaceServiceProvider servicoGooglePlaces;
+  late GooglePlaceServiceProvider servicoGooglePlaces;
 
   /// Lista de sugestões de endereço obtidas na busca (para evitar nova requisição no método buildResults.
   List<SugestaoEnderecoDmo> sugestoesDeEndereco = [];
@@ -93,24 +93,24 @@ class TelaBuscaEndereco extends SearchDelegate<SugestaoEnderecoDmo>{
                 )
             );
 
-          sugestoesDeEndereco = [];
+          sugestoesDeEndereco = snapshot.data as List<SugestaoEnderecoDmo>;
 
           return ListView.builder(
             itemBuilder: (context, index) {
 
               // Adicionar endereço à lista de sugestões de endereço.
-              sugestoesDeEndereco.add((snapshot.data[index] as SugestaoEnderecoDmo));
+              //sugestoesDeEndereco.add((snapshot.data[index] as SugestaoEnderecoDmo));
 
               return ListTile(
                 leading: Icon(Icons.location_on_outlined),
                 title:
-                Text((snapshot.data[index] as SugestaoEnderecoDmo).descricaoEndereco),
+                Text(sugestoesDeEndereco[index].descricaoEndereco),
                 onTap: () {
-                  close(context, snapshot.data[index] as SugestaoEnderecoDmo);
+                  close(context, sugestoesDeEndereco[index]);
                 },
               );
             },
-            itemCount: snapshot.data.length,
+            itemCount: sugestoesDeEndereco.length,
           );
         }
     );

@@ -8,19 +8,6 @@ import 'package:scoped_model/scoped_model.dart';
 /// Custom Drawer usado como menu principal da aplicação.
 class CustomDrawer extends StatelessWidget {
 
-  //#region Atributos
-
-  ///Page controller usado para alternar entre as páginas da aplicação.
-  final PageController _customDrawerPageController;
-
-  //#endregion Atributos
-
-  //#region Construtor(es)
-
-  CustomDrawer(this._customDrawerPageController);
-
-  //#endregion Construtor(es)
-
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -42,13 +29,13 @@ class CustomDrawer extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text("${model.dadosDoUsuario[UsuarioModel.CAMPO_NOME]}",
+                          Text("${model.dadosDoUsuario![UsuarioModel.CAMPO_NOME]}",
                             style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold
                             ),
                           ),
-                          Text(model.dadosDoUsuario[UsuarioModel.CAMPO_ATIVO] ? "Recolhedor ativo" : "Recolhedor inativo")
+                          Text(model.dadosDoUsuario![UsuarioModel.CAMPO_ATIVO] ? "Recolhedor ativo" : "Recolhedor inativo")
                         ],
                       ),
                     )
@@ -59,18 +46,18 @@ class CustomDrawer extends StatelessWidget {
                 color: Theme.of(context).primaryColor,
                 child: Column(
                   children: [
-                    ItemDeMenu(Icons.home, "Início", _customDrawerPageController, AppPages.inicio),
-                    ItemDeMenu(Icons.directions_car, "Agendar recolhimento", _customDrawerPageController, AppPages.agendarRecolhimento),
-                    ItemDeMenu(Icons.search, "Consultar recolhimentos", _customDrawerPageController, AppPages.consultarRecolhimentos),
-                    ItemDeMenu(Icons.notifications, "Notificações", _customDrawerPageController, AppPages.notificacoes),
-                    ItemDeMenu(Icons.person, "Cadastro de redeiros", _customDrawerPageController, AppPages.cadastroDeRedeiros),
-                    ItemDeMenu(Icons.people_sharp, "Grupos de redeiros", _customDrawerPageController, AppPages.gruposDeRedeiros),
-                    ItemDeMenu(Icons.bookmark, "Solicitações dos redeiros", _customDrawerPageController, AppPages.solicitacoesDosRedeiros),
-                    ItemDeMenu(Icons.dns_rounded, "Cadastro de matéria-prima", _customDrawerPageController, AppPages.cadastroDeMateriaPrima),
-                    ItemDeMenu(Icons.grid_on, "Cadastro de redes", _customDrawerPageController, AppPages.cadastroDeRedes),
-                    ItemDeMenu(Icons.bar_chart, "Relatórios", _customDrawerPageController, AppPages.relatorios),
-                    ItemDeMenu(Icons.settings, "Preferências", _customDrawerPageController, AppPages.preferencias),
-                    ItemDeMenu(Icons.logout, "Sair", _customDrawerPageController, AppPages.login),
+                    ItemDeMenu(Icons.home, "Início", AppPages.inicio),
+                    ItemDeMenu(Icons.directions_car, "Agendar recolhimento", AppPages.agendarRecolhimento),
+                    ItemDeMenu(Icons.search, "Consultar recolhimentos", AppPages.consultarRecolhimentos),
+                    ItemDeMenu(Icons.notifications, "Notificações", AppPages.notificacoes),
+                    ItemDeMenu(Icons.person, "Cadastro de redeiros", AppPages.cadastroDeRedeiros),
+                    ItemDeMenu(Icons.people_sharp, "Grupos de redeiros", AppPages.gruposDeRedeiros),
+                    ItemDeMenu(Icons.bookmark, "Solicitações dos redeiros", AppPages.solicitacoesDosRedeiros),
+                    ItemDeMenu(Icons.dns_rounded, "Cadastro de matéria-prima", AppPages.cadastroDeMateriaPrima),
+                    ItemDeMenu(Icons.grid_on, "Cadastro de redes", AppPages.cadastroDeRedes),
+                    ItemDeMenu(Icons.bar_chart, "Relatórios", AppPages.relatorios),
+                    ItemDeMenu(Icons.settings, "Preferências", AppPages.preferencias),
+                    ItemDeMenu(Icons.logout, "Sair", AppPages.login),
                   ],
                 ),
               ),

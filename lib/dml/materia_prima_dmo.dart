@@ -8,13 +8,13 @@ class MateriaPrimaDmo implements BaseDmo{
   //#region Atributos
 
   /// Id da matéria-prima.
-  String id;
+  String? id;
 
   /// Nome da matéria-prima.
-  String nomeMateriaPrima;
+  String? nomeMateriaPrima;
 
   /// Ícone da matéria-prima.
-  String iconeMateriaPrima;
+  String? iconeMateriaPrima;
 
   //#endregion Atributos
 

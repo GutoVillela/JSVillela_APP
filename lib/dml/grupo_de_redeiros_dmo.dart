@@ -16,7 +16,7 @@ class GrupoDeRedeirosDmo implements BaseDmo {
   //#endregion Atributos
 
   //#region Construtor(es)
-  GrupoDeRedeirosDmo({this.idGrupo, this.nomeGrupo});
+  GrupoDeRedeirosDmo({required this.idGrupo, required this.nomeGrupo});
   //#endregion Construtor(es)
 
   //#region Métodos
@@ -25,7 +25,7 @@ class GrupoDeRedeirosDmo implements BaseDmo {
 
     return GrupoDeRedeirosDmo(
         idGrupo: grupo.id,
-        nomeGrupo: grupo[GrupoDeRedeirosModel.CAMPO_NOME]
+        nomeGrupo: grupo[GrupoDeRedeirosModel.CAMPO_NOME] ?? ""
     );
   }
 
