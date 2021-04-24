@@ -35,7 +35,7 @@ class CustomDrawer extends StatelessWidget {
                                 fontWeight: FontWeight.bold
                             ),
                           ),
-                          Text(model.dadosDoUsuario![UsuarioModel.CAMPO_ATIVO] ? "Recolhedor ativo" : "Recolhedor inativo")
+                          Text(model.dadosDoUsuario![UsuarioModel.CAMPO_ATIVO] ?? false ? "Recolhedor ativo" : "Recolhedor inativo")
                         ],
                       ),
                     )
