@@ -24,8 +24,6 @@ class _TelaCadastroDeRedesState extends State<TelaCadastroDeRedes> {
   /// Controller utilizado no campo de texto de Busca.
   final _buscaController = TextEditingController();
 
-  //List<DocumentSnapshot> _listaDeRedes = [];
-
   List<RedeDmo> _listaDeRedes = [];
 
   /// Última rede carregada em tela.

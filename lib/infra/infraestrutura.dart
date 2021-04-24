@@ -26,7 +26,7 @@ class Infraestrutura {
     ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(mensagem),
-            backgroundColor: Colors.green,
+            backgroundColor: Theme.of(context).primaryColor,
             duration: Duration(seconds: 2))
     );
   }
