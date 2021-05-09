@@ -34,12 +34,6 @@ class TelaInformacoesDoRecolhimento extends StatelessWidget {
     // Indica se o recolhimento já foi finalizado.
     bool recolhimentoFinalizado = recolhimento.dataFinalizado != null;
 
-    // Carregar informações dos grupos de recolhimento
-    _carregarGruposDoRecolhimento(context);
-
-    // Carregar informações dos redeiros do recolhimento.
-    _carregarRedeirosDoRecolhimento(context);
-
     return Scaffold(
       appBar: AppBar(
           backgroundColor: Colors.transparent,
@@ -52,68 +46,45 @@ class TelaInformacoesDoRecolhimento extends StatelessWidget {
           return Container(
             height: constraints.maxHeight,
             padding: const EdgeInsets.all(8.0),
-            child: ScopedModelDescendant<GrupoDeRedeirosModel>(
-                builder: (context, child, modelGrupos){
+            child: Column(
+              children: [
+                _listTileDetalhesRecolhimento(context, Icons.calendar_today, "Agendado para ${formatoData.format(recolhimento.dataDoRecolhimento)}"),
+                _listTileDetalhesRecolhimento(context, recolhimentoFinalizado ? Icons.check : Icons.access_time_sharp, recolhimentoFinalizado ? "Finalizado em ${formatoData.format(recolhimento.dataFinalizado!)}" : "Não finalizado"),
+                Column(
+                  children: this.recolhimento.gruposDoRecolhimento.map((e) => _listTileDetalhesRecolhimento(context, Icons.people_alt, e.nomeGrupo)).toList(),
+                ),
+                SizedBox(height: 20),
+                Text("Redeiros do Recolhimento",
+                  style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).primaryColor
+                  ),
+                ),
+                Expanded(
+                  child: ListView.builder(
+                      padding: EdgeInsets.symmetric(vertical: 8),
+                      itemCount: recolhimento.redeirosDoRecolhimento.length,
+                      itemBuilder: (context, index){
 
-                  if(modelGrupos.estaCarregando)
-                    return Center(
-                      child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
-                      ),
-                    );
+                        bool redeiroExcluido = recolhimento.redeirosDoRecolhimento[index].redeiro == null;
 
-                  return Column(
-                    children: [
-                      _listTileDetalhesRecolhimento(context, Icons.calendar_today, "Agendado para ${formatoData.format(recolhimento.dataDoRecolhimento!)}"),
-                      _listTileDetalhesRecolhimento(context, recolhimentoFinalizado ? Icons.check : Icons.access_time_sharp, recolhimentoFinalizado ? "Finalizado em ${formatoData.format(recolhimento.dataFinalizado!)}" : "Não finalizado"),
-                      Column(
-                        children: this.recolhimento.gruposDoRecolhimento!.map((e) => _listTileDetalhesRecolhimento(context, Icons.people_alt, e.nomeGrupo)).toList(),
-                      ),
-                      SizedBox(height: 20),
-                      Text("Redeiros do Recolhimento",
-                        style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).primaryColor
-                        ),
-                      ),
-                      Expanded(
-                        child: ScopedModelDescendant<RedeiroDoRecolhimentoModel>(
-                            builder: (context, child, modelRedeiro){
-                              if(modelRedeiro.estaCarregando)
-                                return Center(
-                                  child: CircularProgressIndicator(
-                                    valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
-                                  ),
-                                );
-
-                              return ListView.builder(
-                                padding: EdgeInsets.symmetric(vertical: 8),
-                                itemCount: recolhimento.redeirosDoRecolhimento!.length,
-                                itemBuilder: (context, index){
-
-                                  bool redeiroExcluido = recolhimento.redeirosDoRecolhimento![index].redeiro == null;
-
-                                  return ListViewItemPesquisa(
-                                      textoPrincipal: redeiroExcluido ? "Redeiro excluído" : recolhimento.redeirosDoRecolhimento![index].redeiro!.nome!,
-                                      textoSecundario: redeiroExcluido ? "" : recolhimento.redeirosDoRecolhimento![index].redeiro!.endereco!.cidade!,
-                                      iconeEsquerda: redeiroExcluido ? Icons.remove_circle_outlined : Icons.person,
-                                      iconeDireita: redeiroExcluido ? null : Icons.arrow_forward_ios_sharp,
-                                      acaoAoClicar: (){
-                                        if(!redeiroExcluido)
-                                          Navigator.of(context).push(MaterialPageRoute(builder: (context) => TelaInformacoesDoRedeiro(recolhimento.redeirosDoRecolhimento![index].redeiro!)));
-                                        else
-                                          Infraestrutura.mostrarMensagemDeErro(context, "Este redeiro foi excluído");
-                                      }
-                                  );
-                                }
-                              );
+                        return ListViewItemPesquisa(
+                            textoPrincipal: redeiroExcluido ? "Redeiro excluído" : recolhimento.redeirosDoRecolhimento[index].redeiro!.nome,
+                            textoSecundario: redeiroExcluido ? "" : recolhimento.redeirosDoRecolhimento[index].redeiro!.endereco.cidade!,
+                            iconeEsquerda: redeiroExcluido ? Icons.remove_circle_outlined : Icons.person,
+                            iconeDireita: redeiroExcluido ? null : Icons.arrow_forward_ios_sharp,
+                            acaoAoClicar: (){
+                              if(!redeiroExcluido)
+                                Navigator.of(context).push(MaterialPageRoute(builder: (context) => TelaInformacoesDoRedeiro(recolhimento.redeirosDoRecolhimento[index].redeiro!)));
+                              else
+                                Infraestrutura.mostrarMensagemDeErro(context, "Este redeiro foi excluído");
                             }
-                        ),
-                      )
-                    ],
-                  );
-                }
+                        );
+                      }
+                  ),
+                )
+              ],
             ),
           );
         },
@@ -130,15 +101,5 @@ class TelaInformacoesDoRecolhimento extends StatelessWidget {
       tileColor: PaletaDeCor.AZUL_BEM_CLARO
     )
   );
-
-  /// Carrega as informações dos grupos associados ao recolhimento.
-  void _carregarGruposDoRecolhimento(BuildContext context) async{
-    this.recolhimento.gruposDoRecolhimento = await GrupoDeRedeirosModel.of(context).carregarGruposPorId(this.recolhimento.gruposDoRecolhimento!.map((e) => e.idGrupo).toList());
-  }
-
-  /// Carrega as informações dos redeiros associados ao recolhimento.
-  void _carregarRedeirosDoRecolhimento(BuildContext context) async{
-    this.recolhimento.redeirosDoRecolhimento = await RedeiroDoRecolhimentoModel.of(context).carregarRedeirosDeUmRecolhimentoComDetalhes(this.recolhimento.id!);
-  }
 
 }

@@ -89,16 +89,7 @@ class _TelaPrincipalState extends State<TelaPrincipal> {
       physics: NeverScrollableScrollPhysics(),
       controller: _homeScreenPageController,
       children: [
-        Scaffold(
-            appBar: AppBar(
-              title: Text("RECOLHEDOR"),
-              centerTitle: true,
-              backgroundColor: PaletaDeCor.AZUL_BEM_CLARO,
-            ),
-            body: HomeTab(),
-            drawer: CustomDrawer(),
-            drawerScrimColor: Color.fromARGB(100, 100, 100, 100)
-        ),
+        HomeTab(),
         TelaAgendarRecolhimento(tipoDeManutencao: TipoDeManutencao.cadastro),
         Scaffold(
             appBar: AppBar(

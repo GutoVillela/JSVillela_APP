@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:jsvillela_app/dml/usuario_dmo.dart';
 import 'package:jsvillela_app/infra/enums.dart';
 import 'package:jsvillela_app/infra/infraestrutura.dart';
 import 'package:jsvillela_app/infra/paleta_de_cores.dart';
 import 'package:jsvillela_app/models/usuario_model.dart';
+import 'package:jsvillela_app/parse_server/usuario_parse.dart';
 import 'package:jsvillela_app/stores/login_store.dart';
 import 'package:jsvillela_app/ui/tela_principal.dart';
 import 'package:jsvillela_app/ui/widgets/botao_arredondado.dart';
@@ -199,39 +201,48 @@ class _TelaDeLoginState extends State<TelaDeLogin> {
                                                 ],
                                               ),
                                             ),
-                                            Container(
-                                              padding: EdgeInsets.all(32),
-                                              child: Column(
-                                                children: [
-                                                  GestureDetector(
-                                                      onTap: (){
-                                                        if(_chaveFormulario.currentState!.validate()){
-                                                          model.logar(
-                                                              email: _usuarioController.text,
-                                                              senha: _senhaController.text,
-                                                              onSuccess: _logarUsuario,
-                                                              onFail: _informarErroDeLogin
-                                                          );
-                                                        }
-                                                      },
-                                                      child: BotaoArredondado(
-                                                          textoDoBotao: "ENTRAR"
-                                                      )
-                                                  ),
-                                                  SizedBox(height: 10),
-                                                  GestureDetector(
-                                                      onTap: (){
-                                                        FocusScope.of(context).unfocus();// Remover foco do campo atual
-                                                        _loginStore.setEstadoDaPagina(EstadoDaPaginaDeLogin.esqueciASenha);
-                                                      },
-                                                      child: BotaoSemPreenchimento(
-                                                          textoDoBotao:"ESQUECI A SENHA"
-                                                      )
-                                                  ),
-                                                  SizedBox(height: 10)
-                                                ],
-                                              ),
-                                            )
+                                            Observer(builder: (_){
+                                              return                                             Container(
+                                                padding: EdgeInsets.all(32),
+                                                child: Column(
+                                                  children: [
+                                                    !_loginStore.processando ?
+                                                    GestureDetector(
+                                                        onTap: () async{
+                                                          if(_chaveFormulario.currentState!.validate()){
+                                                            if(await _loginStore.logarUsuario())
+                                                              _logarUsuario();
+                                                            else
+                                                              Infraestrutura.mostrarMensagemDeErro(context, _loginStore.erro ?? "Falha ao entrar!");
+
+                                                            // model.logar(
+                                                            //     email: _usuarioController.text,
+                                                            //     senha: _senhaController.text,
+                                                            //     onSuccess: _logarUsuario,
+                                                            //     onFail: _informarErroDeLogin
+                                                            // );
+                                                          }
+                                                        },
+                                                        child:  BotaoArredondado(
+                                                            textoDoBotao: "ENTRAR"
+                                                        )
+                                                    )
+                                                        : CircularProgressIndicator(),
+                                                    SizedBox(height: 10),
+                                                    GestureDetector(
+                                                        onTap: (){
+                                                          FocusScope.of(context).unfocus();// Remover foco do campo atual
+                                                          _loginStore.setEstadoDaPagina(EstadoDaPaginaDeLogin.esqueciASenha);
+                                                        },
+                                                        child: BotaoSemPreenchimento(
+                                                            textoDoBotao:"ESQUECI A SENHA"
+                                                        )
+                                                    ),
+                                                    SizedBox(height: 10)
+                                                  ],
+                                                ),
+                                              );
+                                            })
                                           ],
                                         )
                                     );

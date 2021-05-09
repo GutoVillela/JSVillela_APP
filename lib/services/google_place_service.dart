@@ -88,7 +88,8 @@ class GooglePlaceServiceProvider {
         // Converter informações obtidas em um objeto EnderecoDmo.
         final endereco = EnderecoDmo();
 
-        endereco.posicao = result['results'][0]['location'] as Position;
+        var posicaoNoMapa = result['results'][0]['location'];
+        endereco.posicao = posicaoNoMapa != null ? posicaoNoMapa as Position : null;
 
         // Segunda forma de obter o endereço caso o campo "Location" não seja fornecido no retorno da requisição.
         if(endereco.posicao == null)

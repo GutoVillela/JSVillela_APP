@@ -46,3 +46,13 @@ enum TipoDeManutencao{
     /// Define que será realizada alteração em um registro já existente.
     alteracao
 }
+
+/// Enum que define os tipos de usuário possíveis de cadastro no sistema.
+enum TipoDeUsuario{
+
+    /// Usuário com privilégios de acesso de um recolhedor.
+    recolhedor,
+
+    /// Usuário com privilégios de acesso de um redeiro.
+    redeiro
+}

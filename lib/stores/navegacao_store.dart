@@ -4,6 +4,7 @@ part 'navegacao_store.g.dart';
 
 class NavegacaoStore = _NavegacaoStore with _$NavegacaoStore;
 
+/// Classe que contém a Store usada na navegação entre telas.
 abstract class _NavegacaoStore with Store{
 
   //#region Observables

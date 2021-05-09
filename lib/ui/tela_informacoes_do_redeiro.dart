@@ -83,7 +83,7 @@ class TelaInformacoesDoRedeiro extends StatelessWidget {
                     ],
                   ),
                   SizedBox(height: overflowIconePerfil + 20),
-                  Text(redeiro.nome!,
+                  Text(redeiro.nome,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Theme.of(context).primaryColor,
@@ -161,7 +161,7 @@ class TelaInformacoesDoRedeiro extends StatelessWidget {
                             showDialog(
                                 context: context,
                                 builder: (BuildContext context){
-                                  return TelaBuscaGruposDeRedeiros(gruposJaSelecionados: redeiro.gruposDoRedeiro ?? []);
+                                  return TelaBuscaGruposDeRedeiros(gruposJaSelecionados: redeiro.gruposDoRedeiro);
                                 }
                             ).then((gruposSelecionados) {
                                 if(gruposSelecionados != null){

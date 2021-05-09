@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
 import 'package:jsvillela_app/dml/recolhimento_dmo.dart';
 import 'package:jsvillela_app/infra/enums.dart';
@@ -9,8 +11,8 @@ import 'package:jsvillela_app/infra/infraestrutura.dart';
 import 'package:jsvillela_app/infra/paleta_de_cores.dart';
 import 'package:jsvillela_app/infra/preferencias.dart';
 import 'package:jsvillela_app/models/recolhimento_model.dart';
+import 'package:jsvillela_app/stores/consultar_recolhimentos_store.dart';
 import 'package:jsvillela_app/ui/menu_tabs/tela_agendar_recolhimento.dart';
-import 'package:jsvillela_app/ui/tela_editar_recolhimento.dart';
 import 'package:jsvillela_app/ui/widgets/list_view_item_pesquisa.dart';
 
 import '../tela_informacoes_do_recolhimento.dart';
@@ -21,31 +23,14 @@ class TelaConsultarRecolhimento extends StatefulWidget {
 }
 
 class _TelaConsultarRecolhimentoState extends State<TelaConsultarRecolhimento> {
+
   //#region Atributos
 
-  /// Data inicial do filtro selecionado em tela pelo usuário.
-  DateTime? _filtroDataInicial;
-
-  /// Data final do filtro selecionado em tela pelo usuário.
-  DateTime? _filtroDataFinal;
-
-  /// Define se o checkbox "Incluir recolhimentos finalizados" foi marcado
-  bool _incluirRecolhimentosFinalizados = false;
-
-  /// Lista de recolhimentos a ser carregada no ListView
-  List<RecolhimentoDmo> _listaDeRecolhimentos = [];
-
-  /// Último redeiro carregado em tela.
-  DocumentSnapshot? _ultimoRecolhimentoCarregado;
-
-  /// Define se existem mais registros a serem carregados na lista.
-  bool _temMaisRegistros = true;
-
-  /// Indica que registros estão sendo carregados.
-  bool _carregandoRegistros = false;
+  /// Store que controla tela de consulta de recolhimentos.
+  ConsultarRecolhimentosStore store = GetIt.I<ConsultarRecolhimentosStore>();
 
   /// ScrollController usado para saber se usuário scrollou a lista até o final.
-  ScrollController _scrollController = ScrollController();
+  final ScrollController _scrollController = ScrollController();
   //#endregion Atributos
 
   //#region Métodos
@@ -56,20 +41,20 @@ class _TelaConsultarRecolhimentoState extends State<TelaConsultarRecolhimento> {
 
     // Adicionando evento de Scroll ao ScrollController
     _scrollController.addListener(() {
-      if(_scrollController.position.pixels == _scrollController.position.maxScrollExtent){
-        if(_temMaisRegistros)
-          _obterMaisRegistros();
+      if (_scrollController.position.pixels ==
+          _scrollController.position.maxScrollExtent) {
+        // Quando usuário chegar ao final da lista, obter mais registros
+        if (store.temMaisRegistros && store.listaDeRecolhimentos.isNotEmpty){
+          store.obterListaPaginadaDeRecolhimentos(false);
+        }
       }
     });
 
-    _obterRegistros(true);
+    store.obterListaPaginadaDeRecolhimentos(true);
   }
 
   @override
   Widget build(BuildContext context) {
-
-    // Formatar para para dd/MM/yyyy
-    final formatoData = new DateFormat('dd/MM/yyyy');
 
     return Container(
         child:
@@ -86,53 +71,49 @@ class _TelaConsultarRecolhimentoState extends State<TelaConsultarRecolhimento> {
                         Expanded(
                           child: Padding(
                             padding: const EdgeInsets.only(right: 1),
-                            child: ListTile(
-                              leading: Icon(Icons.calendar_today, color: Theme.of(context).primaryColor),
-                              title: Text(_filtroDataInicial == null ? "De" : formatoData.format(_filtroDataInicial!)),
-                              tileColor: PaletaDeCor.AZUL_BEM_CLARO,
-                              onTap: () async{
-                                DateTime? dataSelecionada = await showDatePicker(
-                                  context: context,
-                                  locale: Locale(WidgetsBinding.instance!.window.locale.languageCode, WidgetsBinding.instance!.window.locale.countryCode),
-                                  initialDate: _filtroDataInicial == null ? (_filtroDataFinal != null && _filtroDataFinal!.isBefore(DateTime.now()) ? _filtroDataFinal! : DateTime.now()) : _filtroDataInicial!,
-                                  firstDate: DateTime(1900),
-                                  lastDate: _filtroDataFinal == null ? DateTime(3000) : _filtroDataFinal!
-                                );
+                            child: Observer(
+                              builder: (context){
+                                return ListTile(
+                                  leading: Icon(Icons.calendar_today, color: Theme.of(context).primaryColor),
+                                  title: Text(store.textoFiltroDataInicial),
+                                  tileColor: PaletaDeCor.AZUL_BEM_CLARO,
+                                  onTap: () async{
+                                    DateTime? dataSelecionada = await showDatePicker(
+                                        context: context,
+                                        locale: Locale(WidgetsBinding.instance!.window.locale.languageCode, WidgetsBinding.instance!.window.locale.countryCode),
+                                        initialDate: store.filtroDataInicial == null ? (store.filtroDataFinal != null && store.filtroDataFinal!.isBefore(DateTime.now()) ? store.filtroDataFinal! : DateTime.now()) : store.filtroDataInicial!,
+                                        firstDate: DateTime(1900),
+                                        lastDate: store.filtroDataFinal == null ? DateTime(3000) : store.filtroDataFinal!
+                                    );
 
-                                // Atualizar estado da tela somente se uma data diferente for selecionada
-                                if(dataSelecionada != _filtroDataInicial)
-                                  setState((){
-                                    _filtroDataInicial = dataSelecionada;
-                                    resetarCamposDeBusca();
-                                    _obterRegistros(true);
-                                  });
-                              },
+                                    store.setFiltroDataInicial(dataSelecionada);
+                                  },
+                                );
+                              }
                             ),
                           ),
                         ),
                         Expanded(
                           child: Padding(
                             padding: const EdgeInsets.only(left: 1),
-                            child: ListTile(
-                              leading: Icon(Icons.calendar_today, color: Theme.of(context).primaryColor),
-                              title: Text(_filtroDataFinal == null ? "Até" : formatoData.format(_filtroDataFinal!)),
-                              tileColor: PaletaDeCor.AZUL_BEM_CLARO,
-                              onTap: () async{
-                                DateTime? dataSelecionada = await showDatePicker(
-                                  context: context,
-                                  locale: Locale(WidgetsBinding.instance!.window.locale.languageCode, WidgetsBinding.instance!.window.locale.countryCode),
-                                  initialDate: _filtroDataFinal == null ? (_filtroDataInicial == null ? DateTime.now() : _filtroDataInicial!) : _filtroDataFinal!,
-                                  firstDate: _filtroDataInicial == null ? DateTime(1900) : _filtroDataInicial!,
-                                  lastDate: DateTime(3000)
-                                );
+                            child: Observer(
+                              builder: (context){
+                                return ListTile(
+                                  leading: Icon(Icons.calendar_today, color: Theme.of(context).primaryColor),
+                                  title: Text(store.textoFiltroDataFinal),
+                                  tileColor: PaletaDeCor.AZUL_BEM_CLARO,
+                                  onTap: () async{
+                                    DateTime? dataSelecionada = await showDatePicker(
+                                        context: context,
+                                        locale: Locale(WidgetsBinding.instance!.window.locale.languageCode, WidgetsBinding.instance!.window.locale.countryCode),
+                                        initialDate: store.filtroDataFinal == null ? (store.filtroDataInicial == null ? DateTime.now() : store.filtroDataInicial!) : store.filtroDataFinal!,
+                                        firstDate: store.filtroDataInicial == null ? DateTime(1900) : store.filtroDataInicial!,
+                                        lastDate: DateTime(3000)
+                                    );
 
-                                // Atualizar estado da tela somente se uma data diferente for selecionada
-                                if(dataSelecionada != _filtroDataFinal)
-                                  setState((){
-                                    _filtroDataFinal = dataSelecionada;
-                                    resetarCamposDeBusca();
-                                    _obterRegistros(true);
-                                  });
+                                    store.setFiltroDataFinal(dataSelecionada);
+                                  },
+                                );
                               },
                             ),
                           ),
@@ -141,132 +122,110 @@ class _TelaConsultarRecolhimentoState extends State<TelaConsultarRecolhimento> {
                     ),
                     Padding(
                       padding: const EdgeInsets.only(top: 2),
-                      child: CheckboxListTile(
-                        title: Text("Incluir recolhimentos finalizados"),
-                        secondary: Icon(Icons.av_timer, color: Theme.of(context).primaryColor),
-                        tileColor: PaletaDeCor.AZUL_BEM_CLARO,
-                        value: _incluirRecolhimentosFinalizados,
-                        onChanged: (bool? valor) {
-                          setState(() {
-                            _incluirRecolhimentosFinalizados = valor ?? false;
-                            resetarCamposDeBusca();
-                            _obterRegistros(true);
-                          });
+                      child: Observer(
+                        builder: (_){
+                          return CheckboxListTile(
+                            title: const Text("Incluir recolhimentos finalizados"),
+                            secondary: Icon(Icons.av_timer, color: Theme.of(context).primaryColor),
+                            tileColor: PaletaDeCor.AZUL_BEM_CLARO,
+                            value: store.incluirRecolhimentosFinalizados,
+                            onChanged: store.setIncluirRecolhimentosFinalizados,
+                          );
                         },
                       ),
                     ),
                     Divider(),
-                    _carregandoRegistros ?
-                    Center(
-                        child: CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
-                        )
-                    ) :
-                    Expanded(
-                      child: Container(
-                        child: ListView.builder(
-                            controller: _scrollController,
-                            scrollDirection: Axis.vertical,
-                            shrinkWrap: true,
-                            padding: EdgeInsets.only(top: 10),
-                            itemCount:  _listaDeRecolhimentos.length + 1, // É somado um pois o último widget será um item de carregamento
-                            itemBuilder: (context, index){
+                    Observer(builder: (_){
 
-                              if(index == _listaDeRecolhimentos.length){
-                                if(_temMaisRegistros)
-                                  return CupertinoActivityIndicator();
-                                else
-                                  return Divider();
-                              }
+                      return Container(
+                        child: store.processando ?
+                        Center(
+                            child: CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                  Theme.of(context).primaryColor
+                              ),
+                            )
+                        ) :
+                        Expanded(
+                          child: Container(
+                            child: Observer(
+                              builder: (_){
+                                return ListView.builder(
+                                    controller: _scrollController,
+                                    scrollDirection: Axis.vertical,
+                                    shrinkWrap: true,
+                                    padding: EdgeInsets.only(top: 10),
+                                    itemCount:  store.listaDeRecolhimentos.length + 1, // É somado um pois o último widget será um item de carregamento
+                                    itemBuilder: (context, index){
 
-                              return ListViewItemPesquisa(
-                                textoPrincipal: formatoData.format(_listaDeRecolhimentos[index].dataDoRecolhimento!.toLocal()),
-                                textoSecundario: _listaDeRecolhimentos[index].dataFinalizado != null ? ("Finalizado em ${formatoData.format(_listaDeRecolhimentos[index].dataFinalizado!)}.") : "Não finalizado",
-                                iconeEsquerda: Icons.directions_car,
-                                iconeDireita: Icons.arrow_forward_ios_sharp,
-                                acaoAoClicar: (){
-                                  Navigator.of(context).push(
-                                      MaterialPageRoute(builder: (context) => TelaInformacoesDoRecolhimento(_listaDeRecolhimentos[index]))
-                                  );
-                                },
-                                acoesDoSlidable:
-                                _listaDeRecolhimentos[index].dataFinalizado == null ? [
-                                  IconSlideAction(
-                                    caption: "Apagar",
-                                    color: Colors.redAccent,
-                                    icon: Icons.delete_forever_sharp,
-                                    onTap: () => _apagarRecolhimento(index),
-                                  ),
-                                  IconSlideAction(
-                                    caption: "Editar",
-                                    color: Colors.yellow[800],
-                                    icon: Icons.edit,
-                                    onTap: () {
-                                      Navigator.of(context).push(
-                                          MaterialPageRoute(builder: (context) => TelaAgendarRecolhimento(tipoDeManutencao: TipoDeManutencao.alteracao, recolhimentoASerEditado: _listaDeRecolhimentos[index]))
+                                      if(index == store.listaDeRecolhimentos.length){
+                                        if(store.temMaisRegistros)
+                                          return CupertinoActivityIndicator();
+                                        else
+                                          return Divider();
+                                      }
+
+                                      /// Formatar para para dd/MM/yyyy
+                                      final formatoData = new DateFormat('dd/MM/yyyy');
+
+                                      return ListViewItemPesquisa(
+                                        textoPrincipal: formatoData.format(store.listaDeRecolhimentos[index].dataDoRecolhimento.toLocal()),
+                                        textoSecundario: store.listaDeRecolhimentos[index].dataFinalizado != null ? ("Finalizado em ${formatoData.format(store.listaDeRecolhimentos[index].dataFinalizado!)}.") : "Não finalizado",
+                                        iconeEsquerda: Icons.directions_car,
+                                        iconeDireita: Icons.arrow_forward_ios_sharp,
+                                        acaoAoClicar: () async {
+
+                                          // Buscar grupos do recolhimento caso não tenha sido buscado inicialmente
+                                          if(store.listaDeRecolhimentos[index].gruposDoRecolhimento.isEmpty){
+                                            Infraestrutura.mostrarDialogoDeCarregamento(
+                                                context: context,
+                                                titulo: "Buscando grupos do recolhimento..."
+                                            );
+
+                                            store.listaDeRecolhimentos[index].gruposDoRecolhimento = await store.buscarGruposDoRecolhimento(store.listaDeRecolhimentos[index].id!);
+
+                                            // Fechar diálogo de carregamento.
+                                            Navigator.of(context).pop();
+                                          }
+
+                                          Navigator.of(context).push(
+                                              MaterialPageRoute(builder: (context) => TelaInformacoesDoRecolhimento(store.listaDeRecolhimentos[index]))
+                                          );
+                                        },
+                                        acoesDoSlidable:
+                                        store.listaDeRecolhimentos[index].dataFinalizado == null ? [
+                                        IconSlideAction(
+                                          caption: "Apagar",
+                                          color: Colors.redAccent,
+                                          icon: Icons.delete_forever_sharp,
+                                          onTap: () => _apagarRecolhimento(index),
+                                        ),
+                                        IconSlideAction(
+                                          caption: "Editar",
+                                          color: Colors.yellow[800],
+                                          icon: Icons.edit,
+                                          onTap: () {
+                                            Navigator.of(context).push(
+                                                MaterialPageRoute(builder: (context) => TelaAgendarRecolhimento(tipoDeManutencao: TipoDeManutencao.alteracao, recolhimentoASerEditado: store.listaDeRecolhimentos[index]))
+                                            );
+                                          },
+                                        )
+                                        ] : null,
                                       );
-                                    },
-                                  )
-                                ] : null,
-                              );
-                            }
+                                    }
+                                );
+                              },
+                            ),
+                          ),
                         ),
-                      ),
-                    )
+                      );
+                    })
                   ]
               ),
             );
           },
         )
     );
-  }
-
-  /// Método que obtém mais registros após usuário atingir limite de Scroll da ListView.
-  void _obterMaisRegistros(){
-    _obterRegistros(false);
-  }
-
-  /// Método que obtém registros.
-  void _obterRegistros(bool resetaLista) {
-
-    if(resetaLista)
-      setState(() => _carregandoRegistros = true );
-
-    RecolhimentoModel().carregarRecolhimentosPaginados(_ultimoRecolhimentoCarregado, _filtroDataInicial, _filtroDataFinal, _incluirRecolhimentosFinalizados).then((snapshot) {
-
-      // Obter e salvar último recolhimento
-      _ultimoRecolhimentoCarregado = snapshot.docs.isNotEmpty ? snapshot.docs.last : null;
-
-      // Se a quantidade de registros obtidos na nova busca for menor que a quantidade
-      // de registros a se recuperar por vez, então não existem mais documentos a serem carregados.
-      if(snapshot.docs.length < Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
-        _temMaisRegistros = false;
-
-      // Adicionar na lista de redeiros elementos não repetidos
-      snapshot.docs.toList().forEach((element) {
-        if(!_listaDeRecolhimentos.any((redeiro) => redeiro.id == element.id))
-          _listaDeRecolhimentos.add(RecolhimentoDmo.converterSnapshotEmRecolhimento(element));
-      });
-
-      if(resetaLista)
-        setState(() => _carregandoRegistros = false );
-      else
-        setState(() { });
-
-    }).catchError((e){
-      if(resetaLista)
-        setState(() => _carregandoRegistros = false );
-      else
-        setState(() { });
-    });
-
-  }
-
-  /// Reseta os campos de busca para iniciar nova busca.
-  void resetarCamposDeBusca(){
-    _listaDeRecolhimentos = [];
-    _temMaisRegistros = true;
-    _ultimoRecolhimentoCarregado = null;
   }
 
   /// Apagar o recolhimento.
@@ -280,7 +239,7 @@ class _TelaConsultarRecolhimentoState extends State<TelaConsultarRecolhimento> {
           Navigator.of(context).pop();
 
           // Verificar se o recolhimento está em andamento
-          if(_listaDeRecolhimentos[indexRecolhimento].dataIniciado != null && _listaDeRecolhimentos[indexRecolhimento].dataFinalizado == null){
+          if(store.listaDeRecolhimentos[indexRecolhimento].dataIniciado != null && store.listaDeRecolhimentos[indexRecolhimento].dataFinalizado == null){
             Infraestrutura.mostrarAviso(context: context,
                 titulo: "Recolhimento em andamento",
                 mensagem: "Ops... Parece que este recolhimento está em andamento. Por favor finalize o recolhimento para poder apagá-lo!",
@@ -290,25 +249,16 @@ class _TelaConsultarRecolhimentoState extends State<TelaConsultarRecolhimento> {
           else{
             Infraestrutura.mostrarDialogoDeCarregamento(
                 context: context,
-                titulo: "Apagando o recolhimento do dia ${_listaDeRecolhimentos[indexRecolhimento].dataDoRecolhimento}..."
+                titulo: "Apagando o recolhimento do dia ${store.listaDeRecolhimentos[indexRecolhimento].dataDoRecolhimento}..."
             );
 
-            await RecolhimentoModel().apagarRecolhimento(
-                idRecolhimento: _listaDeRecolhimentos[indexRecolhimento].id!,
-                context: context,
-                onSuccess: (){
-                  // Fechar diálogo de carregamento.
-                  Navigator.of(context).pop();
-                  setState(() { _listaDeRecolhimentos.removeAt(indexRecolhimento); });
-                },
-                onFail: (){
-                  // Fechar diálogo de carregamento.
-                  Navigator.of(context).pop();
-                }
-            );
+            await store.apagarRecolhimento(store.listaDeRecolhimentos[indexRecolhimento].id!);
+
+            // Fechar diálogo de carregamento.
+            Navigator.of(context).pop();
           }
         }
     );
   }
-//#endregion Métodos
+  //#endregion Métodos
 }

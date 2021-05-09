@@ -197,6 +197,28 @@ mixin _$LoginStore on _LoginStore, Store {
     });
   }
 
+  final _$erroAtom = Atom(name: '_LoginStore.erro');
+
+  @override
+  String? get erro {
+    _$erroAtom.reportRead();
+    return super.erro;
+  }
+
+  @override
+  set erro(String? value) {
+    _$erroAtom.reportWrite(value, super.erro, () {
+      super.erro = value;
+    });
+  }
+
+  final _$logarUsuarioAsyncAction = AsyncAction('_LoginStore.logarUsuario');
+
+  @override
+  Future<bool> logarUsuario() {
+    return _$logarUsuarioAsyncAction.run(() => super.logarUsuario());
+  }
+
   final _$_LoginStoreActionController = ActionController(name: '_LoginStore');
 
   @override
@@ -299,6 +321,7 @@ estadoDaPagina: ${estadoDaPagina},
 larguraDaTela: ${larguraDaTela},
 alturaDaTela: ${alturaDaTela},
 tecladoVisivel: ${tecladoVisivel},
+erro: ${erro},
 loginDeslocamentoY: ${loginDeslocamentoY},
 loginDeslocamentoX: ${loginDeslocamentoX},
 loginLargura: ${loginLargura},

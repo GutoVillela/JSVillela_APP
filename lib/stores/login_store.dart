@@ -1,19 +1,21 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:jsvillela_app/infra/enums.dart';
+import 'package:jsvillela_app/parse_server/usuario_parse.dart';
 import 'package:mobx/mobx.dart';
 
 part 'login_store.g.dart';
 
 class LoginStore = _LoginStore with _$LoginStore;
 
+/// Classe que contém a Store usada na tela de Login.
 abstract class _LoginStore with Store{
 
   //#region Construtor(es)
 
   _LoginStore(){
     autorun((_){
-      print(alturaDaTela);print(estadoDaPagina);print(loginDeslocamentoY);
+      print(processando);
     });
   }
   //#endregion Construtor(es)
@@ -51,9 +53,13 @@ abstract class _LoginStore with Store{
   @observable
   double alturaDaTela = 600;
 
-  /// Atributo observável que define o teclado está visível na tela.
+  /// Atributo observável que define se o teclado está visível na tela.
   @observable
   bool tecladoVisivel = false;
+
+  /// Atributo observável que define se ocorreu algum erro durante processo de login.
+  @observable
+  String? erro;
   //#endregion Observables
 
   //#region Computed
@@ -151,5 +157,29 @@ abstract class _LoginStore with Store{
   @action
   void setAlturaDaTela(double value) => alturaDaTela = value;
 
+  /// Action que realiza processo de login do usuário.
+  @action
+  Future<bool> logarUsuario() async {
+
+    // Indicar que classe iniciou o processamento.
+    processando = true;
+
+    try{
+      // Realizar login do usuário
+      final usuarioLogado = await UsuarioParse().logarUsuario(usuario, senha);
+
+      // Indicar que classe finalizou o processamento.
+      processando = false;
+
+      // Autenticar somente usuários do tipo Recolhedor
+      return usuarioLogado.tipoDeUsuario == TipoDeUsuario.recolhedor;
+    }
+    catch (e){
+      erro = e.toString();
+      // Indicar que classe finalizou o processamento.
+      processando = false;
+      return false;
+    }
+  }
   //#endregion Actions
 }

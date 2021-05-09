@@ -124,7 +124,7 @@
 //                           setState(() => validandoData = true);
 //
 //                           // Verificar se data é válida
-//                           if(!dataSelecionada!.isAtSameMomentAs(widget.recolhimentoASerEditado.dataDoRecolhimento!) && !await RecolhimentoModel().validarSeExisteRecolhimentoAgendadoParaAData(dataSelecionada)){
+//                           if(!dataSelecionada!.isAtSameMomentAs(widget.recolhimentoASerEditado.dataDoRecolhimento) && !await RecolhimentoModel().validarSeExisteRecolhimentoAgendadoParaAData(dataSelecionada)){
 //                             dataSelecionada = null;
 //                             Infraestrutura.mostrarMensagemDeErro(context, "Já existe um agendamento para a data selecionada. Por favor escolha outra data!");
 //                           }

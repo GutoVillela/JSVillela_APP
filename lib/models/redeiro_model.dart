@@ -180,10 +180,9 @@ class RedeiroModel extends Model {
     // Obter lista de cidades
     List<String> listaDeCidades = [];
     redeiros.forEach((redeiro) {
-      if (redeiro.endereco != null &&
-          redeiro.endereco!.cidade != null &&
-          !listaDeCidades.any((cidade) => cidade == redeiro.endereco!.cidade))
-        listaDeCidades.add(redeiro.endereco!.cidade!);
+      if (redeiro.endereco.cidade != null &&
+          !listaDeCidades.any((cidade) => cidade == redeiro.endereco.cidade))
+        listaDeCidades.add(redeiro.endereco.cidade!);
     });
 
     return listaDeCidades;
