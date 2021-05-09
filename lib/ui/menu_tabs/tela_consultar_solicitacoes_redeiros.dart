@@ -126,9 +126,9 @@ class _TelaConsultarSolicitacoesRedeirosState
                     }
 
                     return ListViewItemPesquisa(
-                      textoPrincipal: _listaDeSolicitacoes[index].materiasPrimasSolicitadas!.first.nomeMateriaPrima! +
-                          (_listaDeSolicitacoes[index].materiasPrimasSolicitadas!.length > 1 ? " e mais ${_listaDeSolicitacoes[index].materiasPrimasSolicitadas!.length - 1}" : ""),
-                      textoSecundario: _listaDeSolicitacoes[index].redeiroSolicitante!.nome!,
+                      textoPrincipal: _listaDeSolicitacoes[index].materiasPrimasSolicitadas.first.nomeMateriaPrima! +
+                          (_listaDeSolicitacoes[index].materiasPrimasSolicitadas.length > 1 ? " e mais ${_listaDeSolicitacoes[index].materiasPrimasSolicitadas.length - 1}" : ""),
+                      textoSecundario: _listaDeSolicitacoes[index].redeiroSolicitante.nome,
                       iconeEsquerda: Icons.dns_rounded,
                       iconeDireita: Icons.search,
                       acaoAoClicar: (){
@@ -146,7 +146,7 @@ class _TelaConsultarSolicitacoesRedeirosState
                               Text("Solicitado por:"),
                               Padding(
                                 padding: const EdgeInsets.symmetric(vertical: 8),
-                                child: Text(_listaDeSolicitacoes[index].redeiroSolicitante!.nome!,
+                                child: Text(_listaDeSolicitacoes[index].redeiroSolicitante.nome,
                                   style: TextStyle(
                                     fontSize: 20,
                                     color: Theme.of(context).primaryColor,
@@ -157,7 +157,7 @@ class _TelaConsultarSolicitacoesRedeirosState
                               Text("Data da solicitação:"),
                               Padding(
                                 padding: const EdgeInsets.symmetric(vertical: 8),
-                                child: Text(formatoData.format(_listaDeSolicitacoes[index].dataDaSolicitacao!.toLocal()),
+                                child: Text(formatoData.format(_listaDeSolicitacoes[index].dataDaSolicitacao.toLocal()),
                                   style: TextStyle(
                                     fontSize: 20,
                                     color: Theme.of(context).primaryColor,
@@ -181,10 +181,10 @@ class _TelaConsultarSolicitacoesRedeirosState
                                 child: Container(
                                   width: double.maxFinite,
                                   child: ListView.builder(
-                                    itemCount: _listaDeSolicitacoes[index].materiasPrimasSolicitadas!.length,
+                                    itemCount: _listaDeSolicitacoes[index].materiasPrimasSolicitadas.length,
                                     itemBuilder: (context, indexMp){
                                       return SlimListViewItemPesquisa(
-                                        textoPrincipal: _listaDeSolicitacoes[index].materiasPrimasSolicitadas![indexMp].nomeMateriaPrima ?? "",
+                                        textoPrincipal: _listaDeSolicitacoes[index].materiasPrimasSolicitadas[indexMp].nomeMateriaPrima ?? "",
                                         iconeEsquerda: Icons.dns_rounded,
                                         acaoAoClicar: null,
                                       );

@@ -35,7 +35,7 @@ class TelaCadernoDoRedeiro extends StatelessWidget {
         appBar: AppBar(
             backgroundColor: Colors.transparent,
             elevation: 0,
-            title: Text(redeiro.nome!),
+            title: Text(redeiro.nome),
             centerTitle: true,
             iconTheme: IconThemeData(color: Theme.of(context).primaryColor),
             actions: [

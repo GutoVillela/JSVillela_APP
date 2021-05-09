@@ -69,12 +69,12 @@ class Infraestrutura {
   }
 
   /// Método que exibe um diálogo de aviso padrão.
-  static void mostrarAviso({required BuildContext context, required String titulo, required String mensagem, required Function acaoAoConfirmar}){
+  static void mostrarAviso({required BuildContext context, required String titulo, required String mensagem, required Function() acaoAoConfirmar}){
 
     // Botão de confirmar
     Widget botaoConfirmar = TextButton(
       child: Text("OK"),
-      onPressed:() => acaoAoConfirmar,
+      onPressed: acaoAoConfirmar,
     );
 
 

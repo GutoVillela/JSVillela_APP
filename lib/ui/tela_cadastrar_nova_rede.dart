@@ -1,4 +1,6 @@
+import 'package:brasil_fields/brasil_fields.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:jsvillela_app/dml/rede_dmo.dart';
 import 'package:jsvillela_app/infra/enums.dart';
 import 'package:jsvillela_app/infra/infraestrutura.dart';
@@ -93,7 +95,11 @@ class _TelaCadastrarNovaRedeState extends State<TelaCadastrarNovaRede> {
                         isDense: true,
                         border: OutlineInputBorder(),
                         hintText: "Valor Unitário"),
-                    keyboardType: TextInputType.phone,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                      RealInputFormatter()
+                    ],
                     validator: (text) {
                       if (text!.isEmpty) return "Valor obrigatório!";
                       return null;

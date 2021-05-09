@@ -19,10 +19,13 @@ class BotaoRedondo extends StatelessWidget {
   /// Cor do icone.
   final Color? corDoIcone;
 
+  /// Define se botão vai exibir ícone de processamento ao invés do ícone padrão.
+  final bool exibirIconeDeProcessamento;
+
   //#endregion Atributos
 
   //#region Construtor(es)
-  BotaoRedondo({required this.icone, this.tamanho, this.acaoAoClicar, this.corDoBotao, this.corDoIcone});
+  BotaoRedondo({required this.icone, this.tamanho, this.acaoAoClicar, this.corDoBotao, this.corDoIcone, this.exibirIconeDeProcessamento = false});
   //#endregion Construtor(es)
 
   @override
@@ -35,10 +38,16 @@ class BotaoRedondo extends StatelessWidget {
           splashColor: Colors.red, // inkwell color
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Icon(
+            child: !exibirIconeDeProcessamento ? Icon(
               icone,
               size: tamanho,
               color: corDoIcone ?? Colors.white,
+            ) :
+            Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(
+                    Theme.of(context).primaryColor),
+              )
             ),
           ),
         ),

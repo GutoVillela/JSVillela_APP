@@ -45,37 +45,32 @@ class _CardRecolhimentoEmAndamentoState extends State<CardRecolhimentoEmAndament
 
   @override
   Widget build(BuildContext context) {
+
     return Expanded(
         child: Column(children: [
-          Expanded(child: CarrouselDeItens(widget.recolhimento, _finalizarRecolhimento)),
-          Padding(
-            padding: const EdgeInsets.all(15.0),
-            child: SizedBox(
-              height: 40,
-              child: ElevatedButton(
-                  style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.resolveWith((Set<MaterialState> states) {
-                        return Theme.of(context).primaryColor;
-                      })
-                  ),
-                  child: Text(
-                    "Terminar recolhimento",
-                    style: TextStyle(
-                        fontSize: 20
-                    ),
-                  ),
-                  onPressed: _finalizarRecolhimento
-              ),
-            ),
-          )
+          Expanded(child: CarrouselDeItens(widget.recolhimento)),
+          // Padding(
+          //   padding: const EdgeInsets.all(15.0),
+          //   child: SizedBox(
+          //     height: 40,
+          //     child: ElevatedButton(
+          //         style: ButtonStyle(
+          //             backgroundColor: MaterialStateProperty.resolveWith((Set<MaterialState> states) {
+          //               return Theme.of(context).primaryColor;
+          //             })
+          //         ),
+          //         child: Text(
+          //           "Terminar recolhimento",
+          //           style: TextStyle(
+          //               fontSize: 20
+          //           ),
+          //         ),
+          //         onPressed: _finalizarRecolhimento
+          //     ),
+          //   ),
+          // )
         ],)
     );
-  }
-
-  /// Callback chamado quando o recolhimento for finalizado.
-  void _finalizarRecolhimento(){
-    DateTime dataFinalizacao = DateTime.now();
-    RecolhimentoModel.of(context).finalizarRecolhimento(idRecolhimento: widget.recolhimento.id!, dataFinalizacao: dataFinalizacao);
   }
 //#endregion Métodos
 }

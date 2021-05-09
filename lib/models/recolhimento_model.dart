@@ -64,7 +64,7 @@ class RecolhimentoModel extends Model {
       CAMPO_DATA_RECOLHIMENTO: dadosDoRecolhimento.dataDoRecolhimento,
       CAMPO_DATA_INICIADO: null,
       CAMPO_DATA_FINALIZADO: null,
-      CAMPO_GRUPOS_DO_RECOLHIMENTO: dadosDoRecolhimento.gruposDoRecolhimento!
+      CAMPO_GRUPOS_DO_RECOLHIMENTO: dadosDoRecolhimento.gruposDoRecolhimento
           .map((e) => e.idGrupo)
           .toList()
     }).then((value) async {
@@ -394,9 +394,9 @@ class RecolhimentoModel extends Model {
       List<GrupoDeRedeirosDmo> listaDeGrupos = [];
 
       // Verificar se o grupo associado ao recolhimento não foi apagado
-      if (this.recolhimentoDoDia != null && this.recolhimentoDoDia!.gruposDoRecolhimento != null &&
-          this.recolhimentoDoDia!.gruposDoRecolhimento!.isNotEmpty) {
-        for (var grupo in this.recolhimentoDoDia!.gruposDoRecolhimento!) {
+      if (this.recolhimentoDoDia != null &&
+          this.recolhimentoDoDia!.gruposDoRecolhimento.isNotEmpty) {
+        for (var grupo in this.recolhimentoDoDia!.gruposDoRecolhimento) {
           try {
             DocumentSnapshot grupoCarregado =
                 await GrupoDeRedeirosModel().carregarGrupoPorId(grupo.idGrupo);
@@ -419,12 +419,12 @@ class RecolhimentoModel extends Model {
       // Carregar redeiros do recolhimento
       if (this
           .recolhimentoDoDia!
-          .gruposDoRecolhimento!
+          .gruposDoRecolhimento
           .isNotEmpty && !recolhimentoEmAndamento) {
         QuerySnapshot redeirosDoRecolhimento = await RedeiroModel()
             .carregarRedeirosPorGrupos(this
                 .recolhimentoDoDia!
-                .gruposDoRecolhimento!
+                .gruposDoRecolhimento
                 .map((e) => e.idGrupo)
                 .toList());
 
@@ -463,7 +463,7 @@ class RecolhimentoModel extends Model {
 
     // Obter os redeiros do recolhimento cadastrados no recolhimento
     snapshotRedeiros.docs.forEach((element) {
-      recolhimentoDoDia!.redeirosDoRecolhimento!.add(
+      recolhimentoDoDia!.redeirosDoRecolhimento.add(
           RedeiroDoRecolhimentoDmo.converterSnapshotEmRedeiroDoRecolhimento(
               element));
     });
@@ -481,7 +481,7 @@ class RecolhimentoModel extends Model {
 
     // Carregar os redeiros do recolhimento caso não existam.
     if (recolhimentoDoDia!.redeirosDoRecolhimento == null ||
-        recolhimentoDoDia!.redeirosDoRecolhimento!.any((element) => true)) {
+        recolhimentoDoDia!.redeirosDoRecolhimento.any((element) => true)) {
       await _carregarRedeirosDoRecolhimentoDoDia();
     }
     recolhimentoEmAndamento = true;

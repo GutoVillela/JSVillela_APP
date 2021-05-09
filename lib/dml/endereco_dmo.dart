@@ -3,6 +3,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:jsvillela_app/dml/base_dmo.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:jsvillela_app/models/redeiro_model.dart';
+import 'package:jsvillela_app/parse_server/redeiro_parse.dart';
+import 'package:parse_server_sdk/parse_server_sdk.dart';
 
 /// Classe modelo para endereços.
 class EnderecoDmo implements BaseDmo{
@@ -34,6 +36,17 @@ class EnderecoDmo implements BaseDmo{
 
   //#region Construtor(es)
   EnderecoDmo({this.logradouro, this.numero, this.bairro, this.cidade, this.cep, this.complemento, this.posicao});
+
+  /// Construtor que inicializa objetos de acordo com um objeto do Parse Server.
+  EnderecoDmo.fromParse(ParseObject parseObject) :
+    logradouro = parseObject.get(RedeiroParse.CAMPO_ENDERECO_LOGRADOURO) ?? "",
+    numero = parseObject.get(RedeiroParse.CAMPO_ENDERECO_NUMERO) ?? "",
+    bairro = parseObject.get(RedeiroParse.CAMPO_ENDERECO_BAIRRO) ?? "",
+    cidade = parseObject.get(RedeiroParse.CAMPO_ENDERECO_CIDADE) ?? "",
+    cep = parseObject.get(RedeiroParse.CAMPO_ENDERECO_CEP) ?? "",
+    complemento = parseObject.get(RedeiroParse.CAMPO_ENDERECO_COMPLEMENTO) ?? "",
+    posicao = parseObject.get<ParseGeoPoint>(RedeiroParse.CAMPO_ENDERECO_POSICAO) == null ? null : Position(longitude: parseObject.get<ParseGeoPoint>(RedeiroParse.CAMPO_ENDERECO_POSICAO)!.longitude, latitude: parseObject.get<ParseGeoPoint>(RedeiroParse.CAMPO_ENDERECO_POSICAO)!.latitude, timestamp: null, accuracy: 0, altitude: 0, heading: 0, speed: 0, speedAccuracy: 0)
+  ;
   //#endregion Construtor(es)
 
   //#region Métodos

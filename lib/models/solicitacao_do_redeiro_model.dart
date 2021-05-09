@@ -74,12 +74,12 @@ class SolicitacaoDoRedeiroModel extends Model{
 
     //Buscar informações dos redeiros solicitantes e das matérias primas solicitadas
     for(int i = 0; i < this.solicitacoes.length; i++){
-      DocumentSnapshot redeiroCarregado = await RedeiroModel().carregarRedeiroPorId(this.solicitacoes[i].redeiroSolicitante!.id ?? "");
+      DocumentSnapshot redeiroCarregado = await RedeiroModel().carregarRedeiroPorId(this.solicitacoes[i].redeiroSolicitante.id ?? "");
       this.solicitacoes[i].redeiroSolicitante = RedeiroDmo.converterSnapshotEmRedeiro(redeiroCarregado);
 
-      for(int j = 0; j < this.solicitacoes[i].materiasPrimasSolicitadas!.length; j++){
-        DocumentSnapshot materiaPrimaCarregada = await MateriaPrimaModel().carregarMateriaPrimaPorId(this.solicitacoes[i].materiasPrimasSolicitadas![j].id ?? "");
-        this.solicitacoes[i].materiasPrimasSolicitadas![j] = MateriaPrimaDmo.converterSnapshotEmDmo(materiaPrimaCarregada);
+      for(int j = 0; j < this.solicitacoes[i].materiasPrimasSolicitadas.length; j++){
+        DocumentSnapshot materiaPrimaCarregada = await MateriaPrimaModel().carregarMateriaPrimaPorId(this.solicitacoes[i].materiasPrimasSolicitadas[j].id ?? "");
+        this.solicitacoes[i].materiasPrimasSolicitadas[j] = MateriaPrimaDmo.converterSnapshotEmDmo(materiaPrimaCarregada);
       }
     }
 
@@ -169,17 +169,17 @@ class SolicitacaoDoRedeiroModel extends Model{
   Future<SolicitacaoDoRedeiroDmo> carregarDetalhesDaSolicitacao(SolicitacaoDoRedeiroDmo solicitacao) async{
 
     // Carregar detalhes do redeiro.
-    if(solicitacao.redeiroSolicitante != null && solicitacao.redeiroSolicitante!.id != null){
-      DocumentSnapshot redeiroCarregado = await RedeiroModel().carregarRedeiroPorId(solicitacao.redeiroSolicitante!.id ?? "");
+    if(solicitacao.redeiroSolicitante != null && solicitacao.redeiroSolicitante.id != null){
+      DocumentSnapshot redeiroCarregado = await RedeiroModel().carregarRedeiroPorId(solicitacao.redeiroSolicitante.id ?? "");
       solicitacao.redeiroSolicitante = RedeiroDmo.converterSnapshotEmRedeiro(redeiroCarregado);
     }
 
     // Carregar detalhes da solicitação.
-    if(solicitacao.materiasPrimasSolicitadas != null && solicitacao.materiasPrimasSolicitadas!.isNotEmpty){
-      for(int i = 0; i < solicitacao.materiasPrimasSolicitadas!.length; i++){
-        if(solicitacao.materiasPrimasSolicitadas![i].id != null){
-          DocumentSnapshot materiaPrimaCarregada = await MateriaPrimaModel().carregarMateriaPrimaPorId(solicitacao.materiasPrimasSolicitadas![i].id ?? "");
-          solicitacao.materiasPrimasSolicitadas![i] = MateriaPrimaDmo.converterSnapshotEmDmo(materiaPrimaCarregada);
+    if(solicitacao.materiasPrimasSolicitadas != null && solicitacao.materiasPrimasSolicitadas.isNotEmpty){
+      for(int i = 0; i < solicitacao.materiasPrimasSolicitadas.length; i++){
+        if(solicitacao.materiasPrimasSolicitadas[i].id != null){
+          DocumentSnapshot materiaPrimaCarregada = await MateriaPrimaModel().carregarMateriaPrimaPorId(solicitacao.materiasPrimasSolicitadas[i].id ?? "");
+          solicitacao.materiasPrimasSolicitadas[i] = MateriaPrimaDmo.converterSnapshotEmDmo(materiaPrimaCarregada);
         }
       }
     }

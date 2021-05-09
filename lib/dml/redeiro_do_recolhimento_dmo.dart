@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:jsvillela_app/dml/base_dmo.dart';
+import 'package:jsvillela_app/dml/endereco_dmo.dart';
 import 'package:jsvillela_app/dml/redeiro_dmo.dart';
 import 'package:jsvillela_app/models/redeiro_do_recolhimento_model.dart';
+import 'package:parse_server_sdk/parse_server_sdk.dart';
 
 // TODO: Finalizar implementação da Classe RedeiroDoRecolhimentoDmo
 /// Classe modelo para redeiros do recolhimento.
@@ -23,6 +25,10 @@ class RedeiroDoRecolhimentoDmo implements BaseDmo{
   //#region Construtor(es)
   RedeiroDoRecolhimentoDmo({this.id, this.redeiro, this.dataFinalizacao});
 
+  /// Construtor que inicializa objetos de acordo com um objeto do Parse Server.
+  RedeiroDoRecolhimentoDmo.fromParse(ParseObject parseObject) :
+        id = parseObject.objectId ?? "";
+
   @override
   Map<String, dynamic> converterParaMapa() {
     return {
@@ -40,7 +46,7 @@ class RedeiroDoRecolhimentoDmo implements BaseDmo{
         dataFinalizacao:  redeiroDoRecolhimento[RedeiroDoRecolhimentoModel.CAMPO_DATA_FINALIZACAO] != null ?
           new DateTime.fromMillisecondsSinceEpoch((redeiroDoRecolhimento[RedeiroDoRecolhimentoModel.CAMPO_DATA_FINALIZACAO] as Timestamp).millisecondsSinceEpoch).toLocal() :
           null,// Obter data e converter para o fuso horário local
-        redeiro: RedeiroDmo(id: redeiroDoRecolhimento[RedeiroDoRecolhimentoModel.CAMPO_REDEIRO])
+        redeiro: RedeiroDmo(id: redeiroDoRecolhimento[RedeiroDoRecolhimentoModel.CAMPO_REDEIRO], nome: "", endereco: EnderecoDmo(), gruposDoRedeiro: [])
     );
   }
 

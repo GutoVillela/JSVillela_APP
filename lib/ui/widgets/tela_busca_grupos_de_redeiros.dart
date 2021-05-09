@@ -1,19 +1,15 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:jsvillela_app/dml/grupo_de_redeiros_dmo.dart';
-import 'package:jsvillela_app/models/checklist_item_model.dart';
-import 'package:jsvillela_app/models/grupo_de_redeiros_model.dart';
+import 'package:jsvillela_app/stores/widget_busca_grupos_store.dart';
 import 'package:jsvillela_app/ui/widgets/checklist_item.dart';
-import 'campo_de_texto_com_icone.dart';
-import 'list_view_item_pesquisa.dart';
 
 class TelaBuscaGruposDeRedeiros extends StatefulWidget {
   //#region Atributos
 
   /// Define quais são os grupos que já serão marcados por padrão.
-  List<GrupoDeRedeirosDmo> gruposJaSelecionados = [];
+  final List<GrupoDeRedeirosDmo> gruposJaSelecionados;
   //#endregion Atributos
 
   //#region Contrutor(es)
@@ -26,14 +22,37 @@ class TelaBuscaGruposDeRedeiros extends StatefulWidget {
 }
 
 class _TelaBuscaGruposDeRedeirosState extends State<TelaBuscaGruposDeRedeiros> {
+
   //#region Atributos
 
-  /// Controller utilizado no campo de texto de Busca.
-  final _buscaController = TextEditingController();
+  /// Store usado para manupilar estados do Widget de busca de grupos de redeiros.
+  late WidgetBuscaGruposStore widgetBuscaGruposStore;
 
-  /// Model de CheckListItem usado para demarcar os grupos de redeiros selecionados.
-  List<CheckListItemModel> gruposDeRedeiros = [];
+  /// ScrollController usado para saber se usuário scrollou a lista até o final.
+  ScrollController _scrollController = ScrollController();
+
   //#endregion Atributos
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Inicializar store
+    widgetBuscaGruposStore = WidgetBuscaGruposStore(gruposJaSelecionados: widget.gruposJaSelecionados);
+
+    // Adicionando evento de Scroll ao ScrollController
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels ==
+          _scrollController.position.maxScrollExtent) {
+        // Quando usuário chegar ao final da lista, obter mais registros
+        if (widgetBuscaGruposStore.temMaisRegistros && widgetBuscaGruposStore.listaDeGruposDeRedeiros.isNotEmpty){
+          widgetBuscaGruposStore.obterListaDeGruposPaginados(false);
+        }
+      }
+    });
+
+    widgetBuscaGruposStore.obterListaDeGruposPaginados(true);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,79 +83,55 @@ class _TelaBuscaGruposDeRedeirosState extends State<TelaBuscaGruposDeRedeiros> {
                     style: TextStyle(
                         color: Theme.of(context).primaryColor, fontSize: 26),
                   ),
-                  // Container(
-                  //   child: CampoDeTextoComIcone(
-                  //     texto: "Nome do redeiro",
-                  //     icone: Icon(
-                  //         Icons.search,
-                  //         color: Theme.of(context).primaryColor
-                  //     ),
-                  //     cor: Theme.of(context).primaryColor,
-                  //     campoDeSenha: false,
-                  //     controller: _buscaController,
-                  //     regraDeValidacao: (texto){
-                  //       return null;
-                  //     },
-                  //   ),
-                  // ),
-                  FutureBuilder<QuerySnapshot>(
-                    future: FirebaseFirestore.instance
-                        .collection(GrupoDeRedeirosModel.NOME_COLECAO)
-                        .orderBy(GrupoDeRedeirosModel.CAMPO_NOME)
-                        .get(),
-                    builder: (context, snapshot) {
-                      if (!snapshot.hasData)
-                        return Container(
-                          height: 200,
-                          alignment: Alignment.center,
-                          child: Center(
+                  Observer(
+                    builder: (_){
+                      if(widgetBuscaGruposStore.processando)
+                          return Center(
                             child: CircularProgressIndicator(
                               valueColor: AlwaysStoppedAnimation<Color>(
-                                  Theme.of(context).primaryColor),
-                            ),
-                          ),
-                        );
-                      else {
-                        // Limpar e popular lista de Grupos de Redeiros
-                        gruposDeRedeiros = [];
-                        snapshot.data!.docs.forEach((grupo) {
-                          bool checarGrupo =
-                              widget.gruposJaSelecionados.isNotEmpty &&
-                              widget.gruposJaSelecionados.any(
-                                  (elemento) => elemento.idGrupo == grupo.id);
-
-                          gruposDeRedeiros.add(CheckListItemModel(
-                              texto: grupo[GrupoDeRedeirosModel.CAMPO_NOME],
-                              checado: checarGrupo,
-                              id: grupo.id));
-                        });
-
+                              Theme.of(context).primaryColor
+                              ),
+                            )
+                          );
+                      else
                         return Expanded(
                           child: Container(
                             padding: EdgeInsets.all(10),
-                            child: ListView(
-                              scrollDirection: Axis.vertical,
-                              shrinkWrap: true,
-                              padding: EdgeInsets.only(top: 10),
-                              children: [
-                                ...gruposDeRedeiros
-                                    .map((item) => ChecklistItem(
-                                          checkListItemModel: item,
-                                          iconeDoCheckBox:
-                                              Icon(Icons.people_alt),
-                                        ))
-                                    .toList()
-                              ],
-                            ),
+                             child: ListView.separated(
+                                 controller: _scrollController,
+                                 scrollDirection: Axis.vertical,
+                                 shrinkWrap: true,
+                                 padding: EdgeInsets.only(top: 10),
+                                 itemCount: widgetBuscaGruposStore.listaDeGruposDeRedeiros.length +
+                                     1, // É somado um pois o último widget será um item de carregamento
+                                 separatorBuilder: (_, __){
+                                   return Divider();
+                                 },
+                                 itemBuilder: (_, index) {
+                                   if (index == widgetBuscaGruposStore.listaDeGruposDeRedeiros.length) {
+                                     if (widgetBuscaGruposStore.temMaisRegistros)
+                                       return CupertinoActivityIndicator();
+                                     else
+                                       return Divider();
+                                   }
+
+                                   final grupo = widgetBuscaGruposStore.listaDeGruposDeRedeiros[index];
+
+                                   return  ChecklistItem(
+                                             checkListItemModel: grupo,
+                                             iconeDoCheckBox:
+                                             Icon(Icons.people_alt),
+                                           );
+                                 }
+                             )
                           ),
                         );
-                      }
-                    },
+                    }
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      FlatButton(
+                      TextButton(
                         onPressed: () {
                           Navigator.of(context).pop();
                         },
@@ -145,14 +140,18 @@ class _TelaBuscaGruposDeRedeirosState extends State<TelaBuscaGruposDeRedeiros> {
                           style: TextStyle(
                               color: Colors.white, fontWeight: FontWeight.bold),
                         ),
-                        color: Colors.red,
+                        style: TextButton.styleFrom(
+                          backgroundColor: Colors.red
+                        ),
                       ),
                       SizedBox(width: 10),
-                      FlatButton(
-                          color: Theme.of(context).primaryColor,
+                      TextButton(
+                          style: TextButton.styleFrom(
+                            backgroundColor: Theme.of(context).primaryColor,
+                          ),
                           onPressed: () {
                             List<GrupoDeRedeirosDmo> gruposChecados = [];
-                            gruposDeRedeiros.forEach((grupo) {
+                            widgetBuscaGruposStore.listaDeGruposDeRedeiros.forEach((grupo) {
                               if (grupo.checado) {
                                 GrupoDeRedeirosDmo novoItem =
                                     new GrupoDeRedeirosDmo(

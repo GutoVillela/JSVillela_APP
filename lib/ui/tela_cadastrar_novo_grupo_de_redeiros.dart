@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:jsvillela_app/dml/grupo_de_redeiros_dmo.dart';
 import 'package:jsvillela_app/infra/enums.dart';
 import 'package:jsvillela_app/infra/infraestrutura.dart';
 import 'package:jsvillela_app/models/grupo_de_redeiros_model.dart';
+import 'package:jsvillela_app/stores/cadastrar_grupo_de_redeiros_store.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class TelaCadastrarNovoGrupoDeRedeiros extends StatefulWidget {
@@ -14,11 +16,15 @@ class TelaCadastrarNovoGrupoDeRedeiros extends StatefulWidget {
   /// Grupo de Redeiros a ser editado.
   final GrupoDeRedeirosDmo? grupoASerEditado;
 
+  /// Store utilizado para manipular a tela.
+  late CadastrarGrupoDeRedeirosStore grupoDeRedeirosStore;
   //#endregion Atributos
 
   //#region Construtor(es)
   TelaCadastrarNovoGrupoDeRedeiros(
-      {required this.tipoDeManutencao, this.grupoASerEditado});
+      {required this.tipoDeManutencao, this.grupoASerEditado}){
+    grupoDeRedeirosStore = CadastrarGrupoDeRedeirosStore(tipoDeManutencao: tipoDeManutencao);
+  }
   //#endregion Construtor(es)
 
   @override
@@ -28,11 +34,9 @@ class TelaCadastrarNovoGrupoDeRedeiros extends StatefulWidget {
 
 class _TelaCadastrarNovoGrupoDeRedeirosState
     extends State<TelaCadastrarNovoGrupoDeRedeiros> {
+
   /// Chave global para o formulário de cadastro.
   final _formKey = GlobalKey<FormState>();
-
-  /// Chave de Scaffold.
-  final _chaveScaffold = GlobalKey<ScaffoldState>();
 
   ///Controller utilizado no campo de texto "Nome do Grupo".
   final _nomeGrupoDeRedeirosController = TextEditingController();
@@ -48,79 +52,101 @@ class _TelaCadastrarNovoGrupoDeRedeirosState
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
-        key: _chaveScaffold,
         appBar: AppBar(
-            title: Text(
-                widget.tipoDeManutencao ==
+            title: Observer(
+              builder: (_){
+                return Text(
+                    widget.grupoDeRedeirosStore.tipoDeManutencao ==
                         TipoDeManutencao.cadastro
-                    ? "CADASTRAR GRUPO"
-                    : "EDITAR GRUPO"),
+                        ? "CADASTRAR GRUPO"
+                        : "EDITAR GRUPO"
+                );
+              },
+            ),
             centerTitle: true),
-        body: ScopedModel<GrupoDeRedeirosModel>(
-          model: GrupoDeRedeirosModel(),
-          child: ScopedModelDescendant<GrupoDeRedeirosModel>(
-              builder: (context, child, model) {
-            return Form(
-              key: _formKey,
-              child: ListView(
-                padding: EdgeInsets.all(20),
-                children: [
-                  TextFormField(
-                    controller: _nomeGrupoDeRedeirosController,
-                    decoration: InputDecoration(
-                        prefixIcon: Icon(Icons.grid_on),
-                        contentPadding: EdgeInsets.symmetric(vertical: 20),
-                        isDense: true,
-                        border: OutlineInputBorder(),
-                        hintText: "Nome do Grupo"),
-                    validator: (text) {
-                      if (text!.isEmpty) return "Nome obrigatório!";
-                      return null;
-                    },
-                  ),
-                  SizedBox(height: 20),
-                  SizedBox(
-                    height: 60,
-                    child: RaisedButton(
-                        child: Text(
-                          widget.tipoDeManutencao ==
-                                  TipoDeManutencao.cadastro
+        body: Form(
+          key: _formKey,
+          child: ListView(
+            padding: EdgeInsets.all(20),
+            children: [
+              TextFormField(
+                controller: _nomeGrupoDeRedeirosController,
+                onChanged: widget.grupoDeRedeirosStore.setNomeGrupo,
+                decoration: InputDecoration(
+                    prefixIcon: Icon(Icons.grid_on),
+                    contentPadding: EdgeInsets.symmetric(vertical: 20),
+                    isDense: true,
+                    border: OutlineInputBorder(),
+                    hintText: "Nome do Grupo"
+                ),
+                validator: (text) {
+                  if (text!.isEmpty) return "Nome obrigatório!";
+                  return null;
+                },
+              ),
+              SizedBox(height: 20),
+              SizedBox(
+                height: 60,
+                child: Observer(
+                  builder: (_){
+                    return ElevatedButton(
+                        child: !widget.grupoDeRedeirosStore.processando ?
+                        Text(
+                          widget.grupoDeRedeirosStore.tipoDeManutencao ==
+                              TipoDeManutencao.cadastro
                               ? "Cadastrar Grupo"
                               : "Editar grupo",
                           style: TextStyle(fontSize: 20),
+                        ) :
+                        CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                              Theme.of(context).primaryColor),
                         ),
-                        textColor: Colors.white,
-                        color: Theme.of(context).primaryColor,
-                        onPressed: () {
-                          if (_formKey.currentState!.validate()) {
-                            GrupoDeRedeirosDmo grupo = GrupoDeRedeirosDmo(
-                                nomeGrupo: _nomeGrupoDeRedeirosController.text,
-                                idGrupo: widget.grupoASerEditado == null
-                                    ? ""
-                                    : widget.grupoASerEditado!.idGrupo);
+                        style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.resolveWith((Set<MaterialState> states) {
+                              return Theme.of(context).primaryColor;
+                            })
+                        ),
+                        onPressed: !widget.grupoDeRedeirosStore.habilitaBotaoDeCadastro ? null : () async {
 
-                            if (widget.tipoDeManutencao  ==
-                                TipoDeManutencao.cadastro)
-                              model.cadastrarGrupoDeRedeiros(
-                                  dadosDoGrupo: grupo,
-                                  onSuccess:
-                                      _finalizarCadastroDoGrupoDeRedeiros,
-                                  onFail: _informarErroDeCadastro);
-                            else
-                              model.atualizarGrupo(
-                                  dadosDoGrupo: grupo,
-                                  onSuccess:
-                                      _finalizarCadastroDoGrupoDeRedeiros,
-                                  onFail: _informarErroDeCadastro);
+                          if (_formKey.currentState!.validate()) {
+
+                            if (widget.grupoDeRedeirosStore.tipoDeManutencao  ==
+                                TipoDeManutencao.cadastro){
+                              // CADASTRO DO GRUPO
+                              if(await widget.grupoDeRedeirosStore.cadastrarGrupoDeRedeiros() != null){
+                                _finalizarCadastroDoGrupoDeRedeiros();
+                              }
+                              else{
+                                _informarErroDeCadastro();
+                              }
+                            }
+                            else{
+                              // EDIÇÃO DO GRUPO
+                              GrupoDeRedeirosDmo grupo = GrupoDeRedeirosDmo(
+                                  nomeGrupo: _nomeGrupoDeRedeirosController.text,
+                                  idGrupo: widget.grupoASerEditado == null
+                                      ? ""
+                                      : widget.grupoASerEditado!.idGrupo);
+                              if(await widget.grupoDeRedeirosStore.editarGrupoDeRedeiros(grupo) != null){
+                                _finalizarCadastroDoGrupoDeRedeiros();
+                              }
+                              else{
+                                _informarErroDeCadastro();
+                              }
+                            }
                           }
-                        }),
-                  )
-                ],
-              ),
-            );
-          }),
-        ));
+                        }
+                      );
+                  },
+                ),
+              )
+            ],
+          ),
+        )
+    );
   }
 
   /// Callback chamado quando o cadastro ou edição for realizado com sucesso.
@@ -140,8 +166,8 @@ class _TelaCadastrarNovoGrupoDeRedeirosState
     Infraestrutura.mostrarMensagemDeErro(
         context,
         widget.tipoDeManutencao ==
-                TipoDeManutencao.cadastro
-            ? "Falha ao cadastrar grupo!"
-            : "Falha ao editar grupo!");
+            TipoDeManutencao.cadastro
+            ? (widget.grupoDeRedeirosStore.erro ?? "Falha ao cadastrar grupo!")
+            : (widget.grupoDeRedeirosStore.erro ?? "Falha ao editar grupo!"));
   }
 }

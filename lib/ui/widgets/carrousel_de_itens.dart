@@ -12,13 +12,10 @@ class CarrouselDeItens extends StatefulWidget {
   /// Recolhimento com redeiros associados aos Cards.
   final RecolhimentoDmo recolhimento;
 
-  /// Callback a ser executado quando o recolhimento for finalizado.
-  final VoidCallback callbackFinalizarRecolhimento;
-
   //#endregion Propriedades
 
   //#region Construtor(es)
-  CarrouselDeItens(this.recolhimento, this.callbackFinalizarRecolhimento);
+  CarrouselDeItens(this.recolhimento);
   //#endregion Construtor(es)
 
   @override
@@ -39,6 +36,10 @@ class _CarrouselDeItensState extends State<CarrouselDeItens> {
 
   @override
   Widget build(BuildContext context) {
+
+    print("############################# widget.recolhimento: ${widget.recolhimento}");
+    print("############################# widget.recolhimento.redeirosDoRecolhimento: ${widget.recolhimento.redeirosDoRecolhimento}");
+
     return Center(
       child: Container(
         child: finalizouRecolhimento ?
@@ -56,31 +57,17 @@ class _CarrouselDeItensState extends State<CarrouselDeItens> {
         ) :
         PageView.builder(
 
-            itemCount: widget.recolhimento.redeirosDoRecolhimento!.length,
+            itemCount: widget.recolhimento.redeirosDoRecolhimento.length,
             controller: PageController(viewportFraction: 0.8, keepPage: true),
             onPageChanged: (int index) => setState(() => _cardAtual = index),
             itemBuilder: (_, index){
               return Transform.scale(
                 scale: index == _cardAtual ? 1 : 0.9,
-                child: ItemDoCarrousel(widget.recolhimento.redeirosDoRecolhimento![index], widget.recolhimento.id!, _callBackFinalizarRecolhimento),
+                child: ItemDoCarrousel(redeiroDoRecolhimento: widget.recolhimento.redeirosDoRecolhimento[index]),
               );
             }
         ),
       ),
     );
-  }
-
-  /// Callback executado quando o recolhimento é finalizado.
-  void _callBackFinalizarRecolhimento(String idRedeiroDoRecolhimento, DateTime dataFinalizacao){
-    widget.recolhimento.redeirosDoRecolhimento!.firstWhere((element) => element.id == idRedeiroDoRecolhimento).dataFinalizacao = dataFinalizacao;
-
-    setState(() {
-      // Finalizar recolhimento caso todos os redeiros do recolhimentos estejam finalizados.
-      finalizouRecolhimento = !widget.recolhimento.redeirosDoRecolhimento!.any((element) => element.dataFinalizacao == null);
-    });
-
-    // Iniciar callback de finalizar recolhimento quando for identificado que todos os redeiros foram finalizados.
-    if(finalizouRecolhimento)
-      widget.callbackFinalizarRecolhimento();
   }
 }
