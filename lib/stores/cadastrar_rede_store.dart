@@ -27,7 +27,7 @@ abstract class _CadastrarRedeStore with Store{
   /// Rede a ser editado (caso haja algum).
   final RedeDmo? redeASerEditada;
 
-  /// Store que controla tela de consulta de redeiros (usado para atualizar informações da tela após cadastro/alteração).
+  /// Store que controla tela de consulta de rede (usado para atualizar informações da tela após cadastro/alteração).
   final ConsultarRedeStore storeConsulta = GetIt.I<ConsultarRedeStore>();
 
   //#endregion Atributos
@@ -38,11 +38,11 @@ abstract class _CadastrarRedeStore with Store{
   @observable
   bool processando = false;
 
-  ///Atributo observável que define o nome do redeiro definido em tela.
+  ///Atributo observável que define o nome do rede definido em tela.
   @observable
   String nomeRede = "";
 
-  ///Atributo observável que define o email do redeiro definido em tela.
+  ///Atributo observável que define o email do rede definido em tela.
   @observable
   double valorUnitarioRede = 0;
 
@@ -57,15 +57,15 @@ abstract class _CadastrarRedeStore with Store{
 
   //#region Actions
 
-  /// Action que define valor do atributo observável que define o nome do redeiro definido em tela.
+  /// Action que define valor do atributo observável que define o nome do rede definido em tela.
   @action
   void setNomeRede (String value) => nomeRede = value;
 
-  ///Action que define valor do atributo observável que define o email do redeiro definido em tela.
+  ///Action que define valor do atributo observável que define o email do rede definido em tela.
   @action
   void setValorUnitarioRede (double value) => valorUnitarioRede = value;
 
-  /// Action que realiza processo cadastro ou edição do redeiro.
+  /// Action que realiza processo cadastro ou edição do rede.
   @action
   Future<RedeDmo?> cadastrarOuEditarRede() async {
 
