@@ -5,7 +5,6 @@ import 'package:jsvillela_app/dml/redeiro_dmo.dart';
 import 'package:jsvillela_app/infra/enums.dart';
 import 'package:jsvillela_app/parse_server/redeiro_parse.dart';
 import 'package:mobx/mobx.dart';
-
 import 'consultar_redeiros_store.dart';
 
 part 'cadastrar_redeiro_store.g.dart';
