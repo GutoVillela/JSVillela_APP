@@ -118,32 +118,32 @@ class _TelaCadastrarNovaRedeState extends State<TelaCadastrarNovaRede> {
                         ),
                         textColor: Colors.white,
                         color: Theme.of(context).primaryColor,
-                        onPressed: () {
-                          if (_formKey.currentState!.validate()) {
-                                _finalizarCadastroDaRede();
-                                }
+                        onPressed: !widget.store.habilitaBotaoDeCadastro ? null : () async {
+                            if(await widget.store.cadastrarOuEditarRede() != null){
+                              _finalizarCadastroDaRede();
+                            }
                             else{
-                              _informarErroDeCadastro();
+                            _informarErroDeCadastro();
                             }
                           }
-                        //}
                         ),
-    )
-    ],
-    ),
+                  )
+              ],
+          ),
     ));
 }
 
   /// Callback chamado quando o cadastro ou edição for realizado com sucesso.
   void _finalizarCadastroDaRede() {
     Infraestrutura.mostrarMensagemDeSucesso(
+
         context,
         widget.tipoDeManutencao  ==
                 TipoDeManutencao.cadastro
             ? "Rede Cadastrada com sucesso!"
             : "Rede editada com sucesso!");
 
-    Navigator.of(context).pop();
+    //Navigator.of(context).pop();
   }
 
   /// Callback chamado quando ocorer um erro no cadastro ou edição.
