@@ -98,9 +98,9 @@ class _TelaCadastroDeRedesState extends State<TelaCadastroDeRedes> {
                             return ListViewItemPesquisa(
                                 acaoAoClicar: null,
                                 textoPrincipal: store.listaDeRede[index]
-                                    .nome_rede!,
+                                    .nomeRede,
                                 textoSecundario: "R\$ " +
-                                    store.listaDeRede[index].valor_unitario_rede
+                                    store.listaDeRede[index].valorUnitarioRede
                                         .toString(),
                                 iconeEsquerda: Icons.person,
                                 iconeDireita: Icons.search,
@@ -156,7 +156,7 @@ class _TelaCadastroDeRedesState extends State<TelaCadastroDeRedes> {
 
           Infraestrutura.mostrarDialogoDeCarregamento(
               context: context,
-              titulo: "Apagando o grupo do dia ${store.listaDeRede[indexRede].nome_rede}..."
+              titulo: "Apagando o grupo do dia ${store.listaDeRede[indexRede].nomeRede}..."
           );
 
           await store.apagarRede(rede.id!);

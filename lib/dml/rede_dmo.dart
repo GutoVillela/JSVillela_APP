@@ -10,26 +10,26 @@ class RedeDmo implements BaseDmo{
   String? id;
 
   /// Nome da Rede
-  String? nome_rede;
+  String nomeRede;
 
   /// Valor da Rede
-  double? valor_unitario_rede;
+  double valorUnitarioRede;
 
-  RedeDmo({required this.id, required this.nome_rede, required this.valor_unitario_rede});
+  RedeDmo({required this.id, required this.nomeRede, required this.valorUnitarioRede});
 
   /// Construtor que inicializa objetos de acordo com um objeto do Parse Server.
   RedeDmo.fromParse(ParseObject parseObject) :
         id = parseObject.objectId ?? "",
-        nome_rede = parseObject.get(RedeParse.CAMPO_NOME_REDE) ?? "Falha ao obter o nome da rede",
-        valor_unitario_rede = parseObject.get(RedeParse.CAMPO_VLR_UNITARIO);
+        nomeRede = parseObject.get(RedeParse.CAMPO_NOME_REDE) ?? "Falha ao obter o nome da rede",
+        valorUnitarioRede = parseObject.get(RedeParse.CAMPO_VLR_UNITARIO);
 
   /// Converte um snapshot em um objeto RedeDmo.
   static RedeDmo converterSnapshotEmRede(DocumentSnapshot rede){
 
     return RedeDmo(
         id: rede.id,
-        nome_rede: rede[RedeModel.CAMPO_REDE],
-        valor_unitario_rede: rede[RedeModel.CAMPO_VALOR_UNITARIO]
+        nomeRede: rede[RedeModel.CAMPO_REDE],
+        valorUnitarioRede: rede[RedeModel.CAMPO_VALOR_UNITARIO]
     );
   }
 
@@ -37,15 +37,15 @@ class RedeDmo implements BaseDmo{
   String toString() {
     return
         'id: $id, '
-        'nome_rede: $nome_rede, '
-        'valor_unitário_rede: $valor_unitario_rede';
+        'nome_rede: $nomeRede, '
+        'valor_unitário_rede: $valorUnitarioRede';
   }
 
   @override
   Map<String, dynamic> converterParaMapa() {
     return {
-      RedeModel.CAMPO_REDE : nome_rede,
-      RedeModel.CAMPO_VALOR_UNITARIO : valor_unitario_rede
+      RedeModel.CAMPO_REDE : nomeRede,
+      RedeModel.CAMPO_VALOR_UNITARIO : valorUnitarioRede
     };
   }
 }

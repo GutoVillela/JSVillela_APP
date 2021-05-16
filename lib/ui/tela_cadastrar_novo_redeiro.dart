@@ -35,8 +35,7 @@ class TelaCadastrarNovoRedeiro extends StatefulWidget {
       store.emailRedeiro = redeiroASerEditado.email ?? "";
       store.celularRedeiro = redeiroASerEditado.celular ?? "";
       store.whatsapp = redeiroASerEditado.whatsApp;
-      store.endereco =
-          redeiroASerEditado.endereco;
+      store.endereco = redeiroASerEditado.endereco;
       store.gruposDeRedeiros = ObservableList.of(redeiroASerEditado.gruposDoRedeiro);
     }
   }

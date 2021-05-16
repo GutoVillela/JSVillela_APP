@@ -28,8 +28,8 @@ class RedeParse{
 
     // Definir informações da rede a ser salva
     final dadosASalvar = ParseObject(NOME_CLASSE)
-      ..set<String?>(CAMPO_NOME_REDE, rede.nome_rede)
-      ..set<double?>(CAMPO_VLR_UNITARIO, rede.valor_unitario_rede);
+      ..set<String?>(CAMPO_NOME_REDE, rede.nomeRede)
+      ..set<double?>(CAMPO_VLR_UNITARIO, rede.valorUnitarioRede);
 
     print("Dados a sakvar da rede: " + dadosASalvar.toString());
 
