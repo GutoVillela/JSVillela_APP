@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:jsvillela_app/infra/enums.dart';
-import 'package:jsvillela_app/infra/paleta_de_cores.dart';
 import 'package:jsvillela_app/stores/navegacao_store.dart';
 import 'package:jsvillela_app/ui/menu_tabs/home_tab.dart';
 import 'package:jsvillela_app/ui/menu_tabs/tela_agendar_recolhimento.dart';

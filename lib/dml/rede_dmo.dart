@@ -15,7 +15,7 @@ class RedeDmo implements BaseDmo{
   /// Valor da Rede
   double? valor_unitario_rede;
 
-  RedeDmo({this.id, required this.nome_rede, required this.valor_unitario_rede});
+  RedeDmo({required this.id, required this.nome_rede, required this.valor_unitario_rede});
 
   /// Construtor que inicializa objetos de acordo com um objeto do Parse Server.
   RedeDmo.fromParse(ParseObject parseObject) :

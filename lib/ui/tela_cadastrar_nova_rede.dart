@@ -6,9 +6,13 @@ import 'package:jsvillela_app/infra/enums.dart';
 import 'package:jsvillela_app/infra/infraestrutura.dart';
 import 'package:jsvillela_app/models/rede_model.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:jsvillela_app/stores/cadastrar_rede_store.dart';
 
 class TelaCadastrarNovaRede extends StatefulWidget {
   //#region Atributos
+
+  late final CadastrarRedeStore store;
 
   /// Tipo de manutenção desta tela (inclusão ou alteração)
   final TipoDeManutencao tipoDeManutencao;
@@ -62,11 +66,7 @@ class _TelaCadastrarNovaRedeState extends State<TelaCadastrarNovaRede> {
                     ? "CADASTRAR REDE"
                     : "EDITAR REDE"),
             centerTitle: true),
-        body: ScopedModel<RedeModel>(
-          model: RedeModel(),
-          child: ScopedModelDescendant<RedeModel>(
-              builder: (context, child, model) {
-            return Form(
+        body: Form(
               key: _formKey,
               child: ListView(
                 padding: EdgeInsets.all(20),
@@ -120,35 +120,19 @@ class _TelaCadastrarNovaRedeState extends State<TelaCadastrarNovaRede> {
                         color: Theme.of(context).primaryColor,
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {
-                            RedeDmo dadosDaRede = RedeDmo(
-                                id: widget.redeASerEditada != null
-                                    ? widget.redeASerEditada!.id
-                                    : null,
-                                nome_rede: _nomeRedeController.text,
-                                valor_unitario_rede: double.parse(
-                                    _vlrUnitarioController.text
-                                        .replaceAll(RegExp(r','), '.')));
-
-                            if (widget.tipoDeManutencao ==
-                                TipoDeManutencao.cadastro)
-                              model.cadastrarRede(
-                                  dadosDaRede: dadosDaRede,
-                                  onSuccess: _finalizarCadastroDaRede,
-                                  onFail: _informarErroDeCadastro);
-                            else
-                              model.atualizarRede(
-                                  dadosDaRede: dadosDaRede,
-                                  onSuccess: _finalizarCadastroDaRede,
-                                  onFail: _informarErroDeCadastro);
+                                _finalizarCadastroDaRede();
+                                }
+                            else{
+                              _informarErroDeCadastro();
+                            }
                           }
-                        }),
-                  )
-                ],
-              ),
-            );
-          }),
-        ));
-  }
+                        //}
+                        ),
+    )
+    ],
+    ),
+    ));
+}
 
   /// Callback chamado quando o cadastro ou edição for realizado com sucesso.
   void _finalizarCadastroDaRede() {

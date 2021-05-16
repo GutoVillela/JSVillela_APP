@@ -85,7 +85,7 @@ abstract class _CadastrarRedeStore with Store{
 
       if(tipoDeManutencao == TipoDeManutencao.cadastro){
         // Realizar cadastro do redeiro.
-        rede = await RedeParse().cadastrarRedeiro(dadosDaRede);
+        rede = await RedeParse().cadastrarRede(dadosDaRede);
       }
       else{
         // Realizar edição do grupo.

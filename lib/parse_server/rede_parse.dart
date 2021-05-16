@@ -24,18 +24,20 @@ class RedeParse{
 
   //#region Métodos
   /// Método responsável por cadastrar uma nova rede no Parse Server.
-  Future<RedeDmo> cadastrarRedeiro(RedeDmo rede) async {
+  Future<RedeDmo> cadastrarRede(RedeDmo rede) async {
 
     // Definir informações da rede a ser salva
     final dadosASalvar = ParseObject(NOME_CLASSE)
-      ..set<String?>(CAMPO_ID_REDE, rede.id)
       ..set<String?>(CAMPO_NOME_REDE, rede.nome_rede)
       ..set<double?>(CAMPO_VLR_UNITARIO, rede.valor_unitario_rede);
+
+    print("Dados a sakvar da rede: " + dadosASalvar.toString());
+
     // Gravar dados no Parse Server
     final response = await dadosASalvar.save();
 
     if(response.success){
-      // Em caso de sucesso recuperar id do Redeiro cadastrado.
+      // Em caso de sucesso recuperar id da Rede cadastrada.
       rede.id = (response.result as ParseObject).objectId;
 
       // Retornar redeiro com ID preenchido.
@@ -69,6 +71,9 @@ class RedeParse{
 
       // Em caso de sucesso retornar objeto de redeiros preenchido.
       if(response.results != null){
+
+        print(response.result);
+
         //Montar lista com objetos de retorno
         List<RedeDmo> lista = [];
 
@@ -77,8 +82,10 @@ class RedeParse{
 
         return lista;
       }
-      else
+      else {
+        print("rede_parse.dart -> vazio");
         return [];
+      }
     }
     else{
       if(response.error != null)
@@ -88,6 +95,23 @@ class RedeParse{
     }
   }
 
+  /// Método responsável por apagar uma Rede do Parse Server.
+  Future<void> apagarRede(String idRede) async {
+
+    // Alterar informações da Rede
+    final registroAApagar = ParseObject(NOME_CLASSE)
+      ..objectId = idRede;
+
+    // Gravar dados no Parse Server
+    final response = await registroAApagar.delete();
+
+    if(!response.success){
+      if(response.error != null)
+        return Future.error(ErrosParse.obterDescricao(response.error!.code));
+      else
+        return Future.error("Aconteceu um erro inesperado!");
+    }
+  }
 //#endregion Métodos
 
 }
