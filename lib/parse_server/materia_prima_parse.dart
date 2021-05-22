@@ -28,9 +28,9 @@ class MateriaPrimaParse{
 
     // Definir informações da materia prima a ser salva
     final dadosASalvar = ParseObject(NOME_CLASSE)
-      ..set<String?>(CAMPO_ID_MP, materia_prima.id)
       ..set<String?>(CAMPO_NOME_MATERIA_PRIMA, materia_prima.nomeMateriaPrima)
       ..set<String?>(CAMPO_ICONE_MATERIA_PRIMA, materia_prima.iconeMateriaPrima);
+    print("Dados a sakvar da rede: " + dadosASalvar.toString());
     // Gravar dados no Parse Server
     final response = await dadosASalvar.save();
 
@@ -88,6 +88,23 @@ class MateriaPrimaParse{
     }
   }
 
-//#endregion Métodos
+  /// Método responsável por apagar uma Materia Prima do Parse Server.
+  Future<void> apagarMateriaPrima(String idMatPrima) async {
 
+    // Alterar informações da Materia Prima
+    final registroAApagar = ParseObject(NOME_CLASSE)
+      ..objectId = idMatPrima;
+
+    // Gravar dados no Parse Server
+    final response = await registroAApagar.delete();
+
+    if(!response.success){
+      if(response.error != null)
+        return Future.error(ErrosParse.obterDescricao(response.error!.code));
+      else
+        return Future.error("Aconteceu um erro inesperado!");
+    }
+  }
+
+//#endregion Métodos
 }
