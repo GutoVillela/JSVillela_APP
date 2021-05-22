@@ -91,6 +91,15 @@ mixin _$ConsultarMateriaPrimaStore on _ConsultarMateriaPrimaStore, Store {
         .run(() => super.obterListaDeRedePaginadaComFiltro(filtroNome));
   }
 
+  final _$apagarMateriaPrimaAsyncAction =
+      AsyncAction('_ConsultarMateriaPrimaStore.apagarMateriaPrima');
+
+  @override
+  Future<void> apagarMateriaPrima(String idMatPrima) {
+    return _$apagarMateriaPrimaAsyncAction
+        .run(() => super.apagarMateriaPrima(idMatPrima));
+  }
+
   final _$_ConsultarMateriaPrimaStoreActionController =
       ActionController(name: '_ConsultarMateriaPrimaStore');
 

@@ -91,8 +91,8 @@ class _TelaCadastroDeMateriaPrimaState extends State<TelaCadastroDeMateriaPrima>
 
                           return ListViewItemPesquisa(
                             acaoAoClicar: null,
-                              textoPrincipal: store.listaDeMateriaPrima[index].nomeMateriaPrima!,
-                              textoSecundario: store.listaDeMateriaPrima[index].iconeMateriaPrima!,
+                              textoPrincipal: store.listaDeMateriaPrima[index].nomeMateriaPrima,
+                              textoSecundario: store.listaDeMateriaPrima[index].iconeMateriaPrima,
                               iconeEsquerda: Icons.person,
                               iconeDireita: Icons.search,
                               acoesDoSlidable:[
@@ -139,7 +139,7 @@ class _TelaCadastroDeMateriaPrimaState extends State<TelaCadastroDeMateriaPrima>
 
           final mp = store.listaDeMateriaPrima[indexGrupo];
           // Fechar diálogo de confirmação
-          Navigator.of(context).pop();
+          //Navigator.of(context).pop();
 
           Infraestrutura.mostrarDialogoDeCarregamento(
               context: context,

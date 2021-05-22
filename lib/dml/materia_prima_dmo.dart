@@ -42,7 +42,9 @@ class MateriaPrimaDmo implements BaseDmo{
 
   @override
   String toString() {
-    return 'MateriaPrimaDmo(id : ${id ?? "null"}, nomeMateriaPrima : ${nomeMateriaPrima ?? "null"}, iconeMateriaPrima : ${iconeMateriaPrima ?? "null"})';
+    return  'id : $id,'
+            'nomeMateriaPrima : $nomeMateriaPrima,'
+            'iconeMateriaPrima : $iconeMateriaPrima';
   }
   //#endregion Métodos
 

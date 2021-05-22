@@ -1,17 +1,18 @@
 import 'package:get_it/get_it.dart';
+import 'package:flutter/material.dart';
 import 'package:jsvillela_app/infra/paleta_de_cores.dart';
 import 'package:jsvillela_app/models/grupo_de_redeiros_model.dart';
 import 'package:jsvillela_app/models/recolhimento_model.dart';
 import 'package:jsvillela_app/models/redeiro_do_recolhimento_model.dart';
 import 'package:jsvillela_app/models/solicitacao_do_redeiro_model.dart';
 import 'package:jsvillela_app/models/usuario_model.dart';
-import 'package:flutter/material.dart';
 import 'package:jsvillela_app/stores/consultar_recolhimentos_store.dart';
 import 'package:jsvillela_app/stores/consultar_redeiros_store.dart';
+import 'package:jsvillela_app/stores/consultar_rede_store.dart';
+import 'package:jsvillela_app/stores/consultar_materia_prima_store.dart';
 import 'package:jsvillela_app/stores/inicio_store.dart';
 import 'package:jsvillela_app/stores/login_store.dart';
 import 'package:jsvillela_app/stores/navegacao_store.dart';
-import 'package:jsvillela_app/stores/consultar_rede_store.dart';
 import 'package:jsvillela_app/ui/tela_de_login.dart';
 import 'package:jsvillela_app/ui/tela_principal.dart';
 import 'package:parse_server_sdk/parse_server_sdk.dart';
@@ -47,6 +48,7 @@ void setupLocators(){
   GetIt.I.registerSingleton(ConsultarRedeirosStore());
   GetIt.I.registerSingleton(ConsultarRecolhimentosStore());
   GetIt.I.registerSingleton(ConsultarRedeStore());
+  GetIt.I.registerSingleton(ConsultarMateriaPrimaStore());
 }
 
 /// Inicializa o Parse Server
