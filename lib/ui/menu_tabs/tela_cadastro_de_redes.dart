@@ -8,7 +8,6 @@ import 'package:jsvillela_app/infra/paleta_de_cores.dart';
 import 'package:jsvillela_app/ui/tela_cadastrar_nova_rede.dart';
 import 'package:jsvillela_app/ui/widgets/campo_de_texto_com_icone.dart';
 import 'package:jsvillela_app/ui/widgets/list_view_item_pesquisa.dart';
-import 'package:jsvillela_app/infra/preferencias.dart';
 import 'package:jsvillela_app/stores/consultar_rede_store.dart';
 
 class TelaCadastroDeRedes extends StatefulWidget {
@@ -97,11 +96,8 @@ class _TelaCadastroDeRedesState extends State<TelaCadastroDeRedes> {
 
                             return ListViewItemPesquisa(
                                 acaoAoClicar: null,
-                                textoPrincipal: store.listaDeRede[index]
-                                    .nomeRede,
-                                textoSecundario: "R\$ " +
-                                    store.listaDeRede[index].valorUnitarioRede
-                                        .toString(),
+                                textoPrincipal: store.listaDeRede[index].nomeRede,
+                                textoSecundario: "R\$ " +store.listaDeRede[index].valorUnitarioRede.toString(),
                                 iconeEsquerda: Icons.person,
                                 iconeDireita: Icons.search,
                                 acoesDoSlidable: [

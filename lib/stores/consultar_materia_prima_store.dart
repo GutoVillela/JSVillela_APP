@@ -10,7 +10,6 @@ class ConsultarMateriaPrimaStore = _ConsultarMateriaPrimaStore with _$ConsultarM
 abstract class _ConsultarMateriaPrimaStore with Store{
 
   //#region Construtor(es)
-
   //#endregion Construtor(es)
 
   //#region Observables
@@ -22,7 +21,7 @@ abstract class _ConsultarMateriaPrimaStore with Store{
   @observable
   String termoDeBusca = "";
 
-  ///Atributo observável que define a lista de redeiros a ser exibida em tela.
+  ///Atributo observável que define a lista de MP a ser exibida em tela.
   ObservableList<MateriaPrimaDmo> listaDeMateriaPrima = ObservableList<MateriaPrimaDmo>();
 
   ///Atributo observável que define se existem mais registros a serem buscados.
@@ -35,7 +34,6 @@ abstract class _ConsultarMateriaPrimaStore with Store{
   //#endregion Observables
 
   //#region Computed
-
   //#endregion Computed
 
   //#region Actions
@@ -51,7 +49,7 @@ abstract class _ConsultarMateriaPrimaStore with Store{
     listaDeMateriaPrima.addAll(value);
   }
 
-  /// Action responsável por obter a lista de mp do Parse Server de forma paginada.
+  /// Action responsável por obter a lista de MP do Parse Server de forma paginada.
   @action
   Future<void> obterListaDeMateriaPrimaPaginada(bool limpaLista, String? filtroPorNome) async{
 
@@ -85,10 +83,25 @@ abstract class _ConsultarMateriaPrimaStore with Store{
     }
   }
 
-  /// Action responsável por obter a lista de mp do Parse Server de forma paginada aplicando filtro de nome.
+  /// Action responsável por obter a lista de MP do Parse Server de forma paginada aplicando filtro de nome.
   @action
   Future<void> obterListaDeRedePaginadaComFiltro(String filtroNome) async{
     await obterListaDeMateriaPrimaPaginada(true, filtroNome);
+  }
+
+  @action
+  Future<void> apagarMateriaPrima(String idMatPrima) async{
+    try{
+
+      // Apagar MP no Parse Server
+      await MateriaPrimaParse().apagarMateriaPrima(idMatPrima);
+
+      // Remover MP apagada da lista
+      listaDeMateriaPrima.removeWhere((e) => e.id == idMatPrima);
+    }
+    catch (e){
+      erro = e.toString();
+    }
   }
 
 //#endregion Actions

@@ -57,7 +57,7 @@ abstract class _CadastrarRedeStore with Store{
 
   //#region Actions
 
-  /// Action que define valor do atributo observável que define o nome da rede definido em tela.
+  /// Action que define valor do atributo observável que define o nome da rede definid em tela.
   @action
   void setNomeRede (String value) => nomeRede = value;
 
@@ -65,7 +65,7 @@ abstract class _CadastrarRedeStore with Store{
   @action
   void setValorUnitarioRede (double value) => valorUnitarioRede = value;
 
-  /// Action que realiza processo cadastro ou edição do rede.
+  /// Action que realiza processo cadastro ou edição da rede.
   @action
   Future<RedeDmo?> cadastrarOuEditarRede() async {
 

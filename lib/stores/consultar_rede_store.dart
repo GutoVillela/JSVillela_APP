@@ -10,7 +10,6 @@ class ConsultarRedeStore = _ConsultarRedeStore with _$ConsultarRedeStore;
 abstract class _ConsultarRedeStore with Store{
 
   //#region Construtor(es)
-
   //#endregion Construtor(es)
 
   //#region Observables
@@ -35,7 +34,6 @@ abstract class _ConsultarRedeStore with Store{
   //#endregion Observables
 
   //#region Computed
-
   //#endregion Computed
 
   //#region Actions

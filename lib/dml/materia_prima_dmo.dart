@@ -13,15 +13,15 @@ class MateriaPrimaDmo implements BaseDmo{
   String? id;
 
   /// Nome da matéria-prima.
-  String? nomeMateriaPrima;
+  String nomeMateriaPrima;
 
   /// Ícone da matéria-prima.
-  String? iconeMateriaPrima;
+  String iconeMateriaPrima;
 
   //#endregion Atributos
 
   //#region Construtor(es)
-  MateriaPrimaDmo({this.id, this.nomeMateriaPrima, this.iconeMateriaPrima});
+  MateriaPrimaDmo({this.id, required this.nomeMateriaPrima, required this.iconeMateriaPrima});
   //#endregion Construtor(es)
 
   /// Construtor que inicializa objetos de acordo com um objeto do Parse Server.

@@ -14,7 +14,8 @@ class TelaCadastrarNovaRede extends StatefulWidget {
   //#endregion Atributos
 
   //#region Construtor(es)
-  TelaCadastrarNovaRede({required TipoDeManutencao tipoDeManutencao , RedeDmo? redeASerEditada}){
+  TelaCadastrarNovaRede({required TipoDeManutencao tipoDeManutencao , RedeDmo? redeASerEditada})
+  {
     store =  CadastrarRedeStore(tipoDeManutencao: tipoDeManutencao, redeASerEditada: redeASerEditada);
     // Em caso de edição, iniciar valores
     if(tipoDeManutencao == TipoDeManutencao.alteracao && redeASerEditada != null){
@@ -30,6 +31,7 @@ class TelaCadastrarNovaRede extends StatefulWidget {
 }
 
 class _TelaCadastrarNovaRedeState extends State<TelaCadastrarNovaRede> {
+  //#region Atributos
   /// Chave global para o formulário de cadastro.
   final _formKey = GlobalKey<FormState>();
 
@@ -41,7 +43,9 @@ class _TelaCadastrarNovaRedeState extends State<TelaCadastrarNovaRede> {
 
   ///Controller utilizado no campo numerico "Valor Unitario".
   final _vlrUnitarioController = TextEditingController();
+  //#endregion Atributos
 
+  //#region Métodos
   @override
   void initState() {
     super.initState();
@@ -51,6 +55,7 @@ class _TelaCadastrarNovaRedeState extends State<TelaCadastrarNovaRede> {
       _vlrUnitarioController.text = widget.store.valorUnitarioRede.toStringAsFixed(2);
     }
   }
+  //#endregion Métodos
 
   @override
   Widget build(BuildContext context) {
@@ -138,20 +143,18 @@ class _TelaCadastrarNovaRedeState extends State<TelaCadastrarNovaRede> {
     Infraestrutura.mostrarMensagemDeSucesso(
 
         context,
-        widget.store.tipoDeManutencao  ==
-                TipoDeManutencao.cadastro
+        widget.store.tipoDeManutencao  == TipoDeManutencao.cadastro
             ? "Rede Cadastrada com sucesso!"
             : "Rede editada com sucesso!");
 
-    //Navigator.of(context).pop();
+    Navigator.of(context).pop();
   }
 
   /// Callback chamado quando ocorer um erro no cadastro ou edição.
   void _informarErroDeCadastro() {
     Infraestrutura.mostrarMensagemDeErro(
         context,
-        widget.store.tipoDeManutencao  ==
-                TipoDeManutencao.cadastro
+        widget.store.tipoDeManutencao  == TipoDeManutencao.cadastro
             ? "Falha ao cadastrar rede!"
             : "Falha ao editar rede!");
   }

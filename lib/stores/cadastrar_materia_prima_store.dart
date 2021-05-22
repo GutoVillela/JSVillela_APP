@@ -24,10 +24,10 @@ abstract class _CadastrarMateriaPrimaStore with Store{
   /// Atributo que define o tipo de manutenção da tela (inclusão ou alteração)
   final TipoDeManutencao tipoDeManutencao;
 
-  /// Rede a ser editado (caso haja algum).
+  /// Materia Prima a ser editada (caso haja alguma).
   final MateriaPrimaDmo? materiaPrimaASerEditada;
 
-  /// Store que controla tela de consulta de redeiros (usado para atualizar informações da tela após cadastro/alteração).
+  /// Store que controla tela de consulta de MP (usado para atualizar informações da tela após cadastro/alteração).
   final ConsultarMateriaPrimaStore storeConsulta = GetIt.I<ConsultarMateriaPrimaStore>();
 
   //#endregion Atributos
@@ -42,7 +42,7 @@ abstract class _CadastrarMateriaPrimaStore with Store{
   @observable
   String nomeMateriaPrima = "";
 
-  ///Atributo observável que define icone da mp definida em tela.
+  ///Atributo observável que define icone da MP definida em tela.
   @observable
   String iconeMateriaPrima = "";
 
@@ -57,11 +57,11 @@ abstract class _CadastrarMateriaPrimaStore with Store{
 
   //#region Actions
 
-  /// Action que define valor do atributo observável que define o nome da mp em tela.
+  /// Action que define valor do atributo observável que define o nome da MP em tela.
   @action
   void setNomeMateriaPrima (String value) => nomeMateriaPrima = value;
 
-  ///Action que define valor do atributo observável que define o icone da mp em tela.
+  ///Action que define valor do atributo observável que define o icone da MP em tela.
   @action
   void setIconeMateriaPrima (String value) => iconeMateriaPrima = value;
 
@@ -84,29 +84,28 @@ abstract class _CadastrarMateriaPrimaStore with Store{
       late MateriaPrimaDmo materiaPrima;
 
       if(tipoDeManutencao == TipoDeManutencao.cadastro){
-        // Realizar cadastro do redeiro.
+        // Realizar cadastro da MP.
         materiaPrima = await MateriaPrimaParse().cadastrarMateriaPrima(dadosDaRede);
       }
       else{
-        // Realizar edição do grupo.
-        //rede = await RedeParse().editarRede(dadosDaRede);
+        // Realizar edição da MP.
+        //materiaPrima = await MateriaPrimaParse().editarRede(dadosDaRede);
       }
 
       // Atualizar registro na tela de consulta após edição
       if(storeConsulta.listaDeMateriaPrima.any((element) => element.id == materiaPrima.id))
         storeConsulta.listaDeMateriaPrima[storeConsulta.listaDeMateriaPrima.indexWhere((element) => element.id == materiaPrima.id)] = materiaPrima;
       else
-        // Caso não exista, adicioná-lo
+        // Caso não exista, adicioná-la
         storeConsulta.listaDeMateriaPrima.add(materiaPrima);
 
       // Indicar que classe finalizou o processamento.
       processando = false;
 
-      // Retornar nova rede
+      // Retornar nova MP
       return materiaPrima;
     }
     catch (e){
-      //erro = e.toString();
       print("ERRO: ${e.toString()}");
       // Indicar que classe finalizou o processamento.
       processando = false;
