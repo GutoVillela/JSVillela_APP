@@ -19,7 +19,8 @@ class TelaCadastrarNovaRede extends StatefulWidget {
     // Em caso de edição, iniciar valores
     if(tipoDeManutencao == TipoDeManutencao.alteracao && redeASerEditada != null){
       store.nomeRede = redeASerEditada.nomeRede;
-      store.valorUnitarioRede = redeASerEditada.valorUnitarioRede;
+      store.valorUnitarioRede = redeASerEditada.valorUnitarioRede!.toDouble();
+      print("Na store: " + store.valorUnitarioRede.toString());
     }
   }
   //#endregion Construtor(es)

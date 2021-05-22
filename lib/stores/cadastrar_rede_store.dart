@@ -78,7 +78,8 @@ abstract class _CadastrarRedeStore with Store{
       RedeDmo dadosDaRede = RedeDmo(
           id: redeASerEditada?.id,
           nomeRede: nomeRede,
-          valorUnitarioRede: valorUnitarioRede);
+          valorUnitarioRede: valorUnitarioRede + 0.00
+          );
 
 
       late RedeDmo rede;

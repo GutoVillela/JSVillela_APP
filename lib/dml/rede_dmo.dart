@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:jsvillela_app/dml/base_dmo.dart';
 import 'package:jsvillela_app/models/rede_model.dart';
@@ -13,7 +15,7 @@ class RedeDmo implements BaseDmo{
   String nomeRede;
 
   /// Valor da Rede
-  double valorUnitarioRede;
+  double? valorUnitarioRede;
 
   RedeDmo({required this.id, required this.nomeRede, required this.valorUnitarioRede});
 
