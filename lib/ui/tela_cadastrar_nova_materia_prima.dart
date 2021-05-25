@@ -2,23 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:jsvillela_app/dml/materia_prima_dmo.dart';
 import 'package:jsvillela_app/infra/enums.dart';
 import 'package:jsvillela_app/infra/infraestrutura.dart';
-import 'package:jsvillela_app/models/materia_prima_model.dart';
-import 'package:scoped_model/scoped_model.dart';
+import 'package:jsvillela_app/stores/cadastrar_materia_prima_store.dart';
 
 class TelaCadastrarMateriaPrima extends StatefulWidget {
   //#region Atributos
 
-  /// Tipo de manutenção desta tela (inclusão ou alteração)
-  final TipoDeManutencao tipoDeManutencao;
-
-  /// Matéria-prima a ser editado.
-  final MateriaPrimaDmo? mpASerEditada;
+  late final CadastrarMateriaPrimaStore store;
 
   //#endregion Atributos
 
   //#region Construtor(es)
   TelaCadastrarMateriaPrima(
-      {required this.tipoDeManutencao, this.mpASerEditada});
+      {required TipoDeManutencao tipoDeManutencao,
+      MateriaPrimaDmo? mpASerEditada}) {
+    store = CadastrarMateriaPrimaStore(
+        tipoDeManutencao: tipoDeManutencao,
+        materiaPrimaASerEditada: mpASerEditada);
+    // Em caso de edição, iniciar valores
+    if (tipoDeManutencao == TipoDeManutencao.alteracao &&
+        mpASerEditada != null) {
+      store.nomeMateriaPrima = mpASerEditada.nomeMateriaPrima;
+      store.iconeMateriaPrima = mpASerEditada.iconeMateriaPrima;
+    }
+  }
   //#endregion Construtor(es)
 
   @override
@@ -46,10 +52,9 @@ class _TelaCadastrarMateriaPrimaState extends State<TelaCadastrarMateriaPrima> {
   void initState() {
     super.initState();
 
-    if (widget.tipoDeManutencao ==
-        TipoDeManutencao.alteracao) {
-      _nomeMateriaPrimaController.text = widget.mpASerEditada!.nomeMateriaPrima!;
-      _iconeController.text = widget.mpASerEditada!.iconeMateriaPrima!;
+    if (widget.store.tipoDeManutencao == TipoDeManutencao.alteracao) {
+      _nomeMateriaPrimaController.text = widget.store.nomeMateriaPrima;
+      _iconeController.text = widget.store.iconeMateriaPrima;
     }
   }
 
@@ -60,92 +65,68 @@ class _TelaCadastrarMateriaPrimaState extends State<TelaCadastrarMateriaPrima> {
         key: _chaveScaffold,
         appBar: AppBar(
             title: Text(
-                widget.tipoDeManutencao ==
-                        TipoDeManutencao.cadastro
+                widget.store.tipoDeManutencao == TipoDeManutencao.cadastro
                     ? "CADASTRAR MATÉRIA-PRIMA"
                     : "EDITAR MATÉRIA-PRIMA"),
             centerTitle: true),
-        body: ScopedModel<MateriaPrimaModel>(
-          model: MateriaPrimaModel(),
-          child: ScopedModelDescendant<MateriaPrimaModel>(
-              builder: (context, child, model) {
-            return Form(
-              key: _formKey,
-              child: ListView(
-                padding: EdgeInsets.all(20),
-                children: [
-                  TextFormField(
-                    controller: _nomeMateriaPrimaController,
-                    decoration: InputDecoration(
-                        prefixIcon: Icon(Icons.grid_on),
-                        contentPadding: EdgeInsets.symmetric(vertical: 20),
-                        isDense: true,
-                        border: OutlineInputBorder(),
-                        hintText: "Matéria Prima"),
-                    validator: (text) {
-                      if (text!.isEmpty) return "Nome obrigatório!";
-                      return null;
-                    },
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  //TODO: Criar uma maneira de selecionar um ícone a partir de uma lista
-                  TextFormField(
-                    controller: _iconeController,
-                    decoration: InputDecoration(
-                        prefixIcon: Icon(Icons.add_circle_outline),
-                        contentPadding: EdgeInsets.symmetric(vertical: 20),
-                        isDense: true,
-                        border: OutlineInputBorder(),
-                        hintText: "Ícone"),
-                    validator: (text) {
-                      if (text!.isEmpty) return "Selecione um ícone!";
-                      return null;
-                    },
-                  ),
-                  SizedBox(height: 20),
-                  SizedBox(
-                    height: 60,
-                    child: RaisedButton(
-                        child: Text(
-                          widget.tipoDeManutencao ==
-                                  TipoDeManutencao.cadastro
-                              ? "Cadastrar matéria-prima"
-                              : "Editar matéria-prima",
-                          style: TextStyle(fontSize: 20),
-                        ),
-                        textColor: Colors.white,
-                        color: Theme.of(context).primaryColor,
-                        onPressed: () {
-                          if (_formKey.currentState!.validate()) {
-                            MateriaPrimaDmo dadosDaMateriaPrima =
-                                MateriaPrimaDmo(
-                                    id: widget.mpASerEditada == null
-                                        ? null
-                                        : widget.mpASerEditada!.id,
-                                    nomeMateriaPrima:
-                                        _nomeMateriaPrimaController.text,
-                                    iconeMateriaPrima: _iconeController.text);
-
-                            if (widget.tipoDeManutencao  ==
-                                TipoDeManutencao.cadastro)
-                              model.cadastrarMateriaPrima(
-                                  dadosDaMateriaPrima: dadosDaMateriaPrima,
-                                  onSuccess: _finalizarCadastroDaMateriaPrima,
-                                  onFail: _informarErroDeCadastro);
-                            else
-                              model.atualizarMateriaPrima(
-                                  dadosDaMateriaPrima: dadosDaMateriaPrima,
-                                  onSuccess: _finalizarCadastroDaMateriaPrima,
-                                  onFail: _informarErroDeCadastro);
-                          }
-                        }),
-                  )
-                ],
+        body: Form(
+          key: _formKey,
+          child: ListView(
+            padding: EdgeInsets.all(20),
+            children: [
+              TextFormField(
+                  controller: _nomeMateriaPrimaController,
+                  decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.grid_on),
+                      contentPadding: EdgeInsets.symmetric(vertical: 20),
+                      isDense: true,
+                      border: OutlineInputBorder(),
+                      hintText: "Matéria Prima"),
+                  validator: (text) {
+                    if (text!.isEmpty) return "Nome obrigatório!";
+                    return null;
+                  },
+                  onChanged: widget.store.setNomeMateriaPrima),
+              SizedBox(
+                height: 20,
               ),
-            );
-          }),
+              //TODO: Criar uma maneira de selecionar um ícone a partir de uma lista
+              TextFormField(
+                controller: _iconeController,
+                decoration: InputDecoration(
+                    prefixIcon: Icon(Icons.add_circle_outline),
+                    contentPadding: EdgeInsets.symmetric(vertical: 20),
+                    isDense: true,
+                    border: OutlineInputBorder(),
+                    hintText: "Ícone"),
+                validator: (text) {
+                  if (text!.isEmpty) return "Selecione um ícone!";
+                  return null;
+                },
+                onChanged: widget.store.setIconeMateriaPrima,
+              ),
+              SizedBox(height: 20),
+              SizedBox(
+                height: 60,
+                child: RaisedButton(
+                    child: Text(
+                      widget.store.tipoDeManutencao == TipoDeManutencao.cadastro
+                          ? "Cadastrar matéria-prima"
+                          : "Editar matéria-prima",
+                      style: TextStyle(fontSize: 20),
+                    ),
+                    textColor: Colors.white,
+                    color: Theme.of(context).primaryColor,
+                    onPressed: !widget.store.habilitaBotaoDeCadastro ? null  : () async {
+                            if (await widget.store.cadastrarOuEditarMateriaPrima() != null) {
+                              _finalizarCadastroDaMateriaPrima();
+                            } else {
+                              _informarErroDeCadastro();
+                            }
+                          }),
+              )
+            ],
+          ),
         ));
   }
 
@@ -153,8 +134,7 @@ class _TelaCadastrarMateriaPrimaState extends State<TelaCadastrarMateriaPrima> {
   void _finalizarCadastroDaMateriaPrima() {
     Infraestrutura.mostrarMensagemDeSucesso(
         context,
-        widget.tipoDeManutencao  ==
-                TipoDeManutencao.cadastro
+        widget.store.tipoDeManutencao == TipoDeManutencao.cadastro
             ? "Matéria-prima cadastrada com sucesso!"
             : "Matéria-prima editada com sucesso!");
 
@@ -165,8 +145,7 @@ class _TelaCadastrarMateriaPrimaState extends State<TelaCadastrarMateriaPrima> {
   void _informarErroDeCadastro() {
     Infraestrutura.mostrarMensagemDeErro(
         context,
-        widget.tipoDeManutencao  ==
-                TipoDeManutencao.cadastro
+        widget.store.tipoDeManutencao == TipoDeManutencao.cadastro
             ? "Falha ao cadastrar matéria-prima!"
             : "Falha ao editar matéria-prima!");
   }

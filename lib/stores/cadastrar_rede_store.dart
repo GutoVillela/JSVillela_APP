@@ -57,15 +57,15 @@ abstract class _CadastrarRedeStore with Store{
 
   //#region Actions
 
-  /// Action que define valor do atributo observável que define o nome do rede definido em tela.
+  /// Action que define valor do atributo observável que define o nome da rede definid em tela.
   @action
   void setNomeRede (String value) => nomeRede = value;
 
-  ///Action que define valor do atributo observável que define o email do rede definido em tela.
+  ///Action que define valor do atributo observável que define o valor unit do rede definido em tela.
   @action
   void setValorUnitarioRede (double value) => valorUnitarioRede = value;
 
-  /// Action que realiza processo cadastro ou edição do rede.
+  /// Action que realiza processo cadastro ou edição da rede.
   @action
   Future<RedeDmo?> cadastrarOuEditarRede() async {
 
@@ -77,15 +77,18 @@ abstract class _CadastrarRedeStore with Store{
       // Montando objeto para cadastro
       RedeDmo dadosDaRede = RedeDmo(
           id: redeASerEditada?.id,
-          nome_rede: nomeRede,
-          valor_unitario_rede: valorUnitarioRede);
+          nomeRede: nomeRede,
+          valorUnitarioRede: valorUnitarioRede + 0.00
+          );
 
 
       late RedeDmo rede;
 
       if(tipoDeManutencao == TipoDeManutencao.cadastro){
+        print("... -> ");
+        print(dadosDaRede);
         // Realizar cadastro do redeiro.
-        rede = await RedeParse().cadastrarRedeiro(dadosDaRede);
+        rede = await RedeParse().cadastrarRede(dadosDaRede);
       }
       else{
         // Realizar edição do grupo.

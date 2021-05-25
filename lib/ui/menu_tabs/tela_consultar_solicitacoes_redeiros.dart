@@ -126,7 +126,7 @@ class _TelaConsultarSolicitacoesRedeirosState
                     }
 
                     return ListViewItemPesquisa(
-                      textoPrincipal: _listaDeSolicitacoes[index].materiasPrimasSolicitadas.first.nomeMateriaPrima! +
+                      textoPrincipal: _listaDeSolicitacoes[index].materiasPrimasSolicitadas.first.nomeMateriaPrima +
                           (_listaDeSolicitacoes[index].materiasPrimasSolicitadas.length > 1 ? " e mais ${_listaDeSolicitacoes[index].materiasPrimasSolicitadas.length - 1}" : ""),
                       textoSecundario: _listaDeSolicitacoes[index].redeiroSolicitante.nome,
                       iconeEsquerda: Icons.dns_rounded,
@@ -184,7 +184,7 @@ class _TelaConsultarSolicitacoesRedeirosState
                                     itemCount: _listaDeSolicitacoes[index].materiasPrimasSolicitadas.length,
                                     itemBuilder: (context, indexMp){
                                       return SlimListViewItemPesquisa(
-                                        textoPrincipal: _listaDeSolicitacoes[index].materiasPrimasSolicitadas[indexMp].nomeMateriaPrima ?? "",
+                                        textoPrincipal: _listaDeSolicitacoes[index].materiasPrimasSolicitadas[indexMp].nomeMateriaPrima,
                                         iconeEsquerda: Icons.dns_rounded,
                                         acaoAoClicar: null,
                                       );

@@ -118,8 +118,8 @@ class RedeModel extends Model {
   RedeDmo converterSnapshotEmRede(DocumentSnapshot rede) {
     return RedeDmo(
         id: rede.id,
-        nome_rede: rede[CAMPO_REDE],
-        valor_unitario_rede: rede[CAMPO_VALOR_UNITARIO]);
+        nomeRede: rede[CAMPO_REDE],
+        valorUnitarioRede: rede[CAMPO_VALOR_UNITARIO]);
   }
 //#endregion Métodos
 }

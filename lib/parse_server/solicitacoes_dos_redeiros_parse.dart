@@ -1,4 +1,3 @@
-import 'package:jsvillela_app/dml/grupo_de_redeiros_dmo.dart';
 import 'package:jsvillela_app/dml/solicitacao_do_redeiro_dmo.dart';
 import 'package:jsvillela_app/infra/preferencias.dart';
 import 'package:parse_server_sdk/parse_server_sdk.dart';

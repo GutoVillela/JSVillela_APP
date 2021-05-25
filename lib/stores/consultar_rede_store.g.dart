@@ -89,6 +89,13 @@ mixin _$ConsultarRedeStore on _ConsultarRedeStore, Store {
         .run(() => super.obterListaDeRedePaginadaComFiltro(filtroNome));
   }
 
+  final _$apagarRedeAsyncAction = AsyncAction('_ConsultarRedeStore.apagarRede');
+
+  @override
+  Future<void> apagarRede(String idRede) {
+    return _$apagarRedeAsyncAction.run(() => super.apagarRede(idRede));
+  }
+
   final _$_ConsultarRedeStoreActionController =
       ActionController(name: '_ConsultarRedeStore');
 

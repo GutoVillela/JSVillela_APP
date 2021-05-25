@@ -1,17 +1,13 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:jsvillela_app/infra/enums.dart';
 import 'package:jsvillela_app/infra/infraestrutura.dart';
 import 'package:jsvillela_app/infra/paleta_de_cores.dart';
-import 'package:jsvillela_app/models/materia_prima_model.dart';
 import 'package:jsvillela_app/ui/widgets/campo_de_texto_com_icone.dart';
 import 'package:jsvillela_app/ui/widgets/list_view_item_pesquisa.dart';
-import 'package:jsvillela_app/infra/preferencias.dart';
-import 'package:jsvillela_app/dml/materia_prima_dmo.dart';
-
-import '../tela_cadastrar_nova_materia_prima.dart';
+import 'package:jsvillela_app/ui/tela_cadastrar_nova_materia_prima.dart';
+import 'package:jsvillela_app/stores/consultar_materia_prima_store.dart';
 
 class TelaCadastroDeMateriaPrima extends StatefulWidget {
   @override
@@ -19,26 +15,13 @@ class TelaCadastroDeMateriaPrima extends StatefulWidget {
       _TelaCadastroDeMateriaPrimaState();
 }
 
-class _TelaCadastroDeMateriaPrimaState
-    extends State<TelaCadastroDeMateriaPrima> {
+class _TelaCadastroDeMateriaPrimaState extends State<TelaCadastroDeMateriaPrima> {
   //#region Atributos
 
   /// Controller utilizado no campo de texto de Busca.
   final _buscaController = TextEditingController();
 
-  List<MateriaPrimaDmo> _listaDeMP = [];
-
-  /// Última mp carregada em tela.
-  DocumentSnapshot? _ultimaMpCarregada;
-
-  /// Define se existem mais registros a serem carregados na lista.
-  bool _temMaisRegistros = true;
-
-  /// Indica que registros estão sendo carregados.
-  bool _carregandoRegistros = false;
-
-  /// Filtro utilizado na busca
-  //String filtro;
+  ConsultarMateriaPrimaStore store = ConsultarMateriaPrimaStore();
 
   /// ScrollController usado para saber se usuário scrollou a lista até o final.
   ScrollController _scrollController = ScrollController();
@@ -52,11 +35,12 @@ class _TelaCadastroDeMateriaPrimaState
     _scrollController.addListener(() {
       if (_scrollController.position.pixels ==
           _scrollController.position.maxScrollExtent) {
-        if (_temMaisRegistros) _obterMaisRegistros();
+        if (store.temMaisRegistros && store.listaDeMateriaPrima.isNotEmpty)
+          store.obterListaDeMateriaPrimaPaginada(false, _buscaController.text);
       }
     });
 
-    _obterRegistros(true);
+    store.obterListaDeMateriaPrimaPaginada(true, null);
   }
 
   @override
@@ -76,19 +60,13 @@ class _TelaCadastroDeMateriaPrimaState
                     cor: PaletaDeCor.AZUL_ESCURO,
                     campoDeSenha: false,
                     controller: _buscaController,
-                    acaoAoSubmeter: (String filtro) {
-                      setState(() {
-                        print("Submeteu");
-                        //filtro = _buscaController.text;
-                        resetarCamposDeBusca();
-                        _obterRegistros(true);
-                      });
-                    },
+                    acaoAoSubmeter: store.obterListaDeRedePaginadaComFiltro,
                     regraDeValidacao: (texto) {
                       return null;
                     },
-                  )),
-              _carregandoRegistros
+                  )
+              ),
+              store.processando
                   ? Center(
                   child: CircularProgressIndicator(
                     valueColor: AlwaysStoppedAnimation<Color>(
@@ -102,11 +80,10 @@ class _TelaCadastroDeMateriaPrimaState
                         scrollDirection: Axis.vertical,
                         shrinkWrap: true,
                         padding: EdgeInsets.only(top: 10),
-                        itemCount: _listaDeMP.length +
-                            1, // É somado um pois o último widget será um item de carregamento
-                        itemBuilder: (context, index) {
-                          if (index == _listaDeMP.length) {
-                            if (_temMaisRegistros)
+                        itemCount: store.listaDeMateriaPrima.length + 1,
+                        itemBuilder: (_, index) {
+                          if (index == store.listaDeMateriaPrima.length) {
+                            if (store.temMaisRegistros)
                               return CupertinoActivityIndicator();
                             else
                               return Divider();
@@ -114,8 +91,8 @@ class _TelaCadastroDeMateriaPrimaState
 
                           return ListViewItemPesquisa(
                             acaoAoClicar: null,
-                              textoPrincipal: _listaDeMP[index].nomeMateriaPrima!,
-                              textoSecundario: _listaDeMP[index].iconeMateriaPrima!,
+                              textoPrincipal: store.listaDeMateriaPrima[index].nomeMateriaPrima,
+                              textoSecundario: store.listaDeMateriaPrima[index].iconeMateriaPrima,
                               iconeEsquerda: Icons.person,
                               iconeDireita: Icons.search,
                               acoesDoSlidable:[
@@ -131,7 +108,14 @@ class _TelaCadastroDeMateriaPrimaState
                                   icon: Icons.edit,
                                   onTap: () {
                                     Navigator.of(context).push(
-                                        MaterialPageRoute(builder: (context) => TelaCadastrarMateriaPrima(tipoDeManutencao: TipoDeManutencao.alteracao, mpASerEditada:  _listaDeMP[index]))
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                TelaCadastrarMateriaPrima(
+                                                    tipoDeManutencao:
+                                                      TipoDeManutencao.alteracao,
+                                                      mpASerEditada:  store.listaDeMateriaPrima[index]
+                                                )
+                                        )
                                     );
                                   },
                                 )
@@ -145,54 +129,6 @@ class _TelaCadastroDeMateriaPrimaState
     ));
   }
 
-  /// Método que obtém mais registros após usuário atingir limite de Scroll da ListView.
-  void _obterMaisRegistros() {
-    _obterRegistros(false);
-  }
-
-  /// Método que obtém registros.
-  void _obterRegistros(bool resetaLista) {
-    if (resetaLista) setState(() => _carregandoRegistros = true);
-
-    MateriaPrimaModel().carregarMpPaginadas(_ultimaMpCarregada, _buscaController.text)
-        .then((snapshot) {
-      // Obter e salvar último redeiro
-      _ultimaMpCarregada = snapshot.docs.isNotEmpty ? snapshot.docs.last : null;
-
-      // Se a quantidade de registros obtidos na nova busca for menor que a quantidade
-      // de registros a se recuperar por vez, então não existem mais documentos a serem carregados.
-      if (snapshot.docs.length < Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
-        _temMaisRegistros = false;
-
-      // Adicionar na lista de mp elementos não repetidos
-      snapshot.docs.toList().forEach((element) {
-        if (!_listaDeMP.any((matPrima) => matPrima.id == element.id))
-          _listaDeMP.add(MateriaPrimaDmo.converterSnapshotEmDmo(element));
-      });
-
-      if (resetaLista)
-        setState(() => _carregandoRegistros = false);
-      else
-        setState(() {});
-    }).catchError((e) {
-      if (resetaLista)
-        setState(() => _carregandoRegistros = false);
-      else
-        setState(() {});
-    });
-
-    // setState(() {
-    //
-    // });
-  }
-
-  /// Reseta os campos de busca para iniciar nova busca.
-  void resetarCamposDeBusca() {
-    _listaDeMP = [];
-    _temMaisRegistros = true;
-    _ultimaMpCarregada = null;
-  }
-
   /// Apagar a matéria-prima.
   void _apagarMateriaPrima(int indexGrupo) async{
     Infraestrutura.confirmar(
@@ -200,27 +136,17 @@ class _TelaCadastroDeMateriaPrimaState
         titulo: "Tem certeza que quer apagar esta matéria-prima?",
         mensagem: "Esta ação não pode ser desfeita.",
         acaoAoConfirmar: () async {
+
+          final mp = store.listaDeMateriaPrima[indexGrupo];
           // Fechar diálogo de confirmação
-          Navigator.of(context).pop();
+          //Navigator.of(context).pop();
 
           Infraestrutura.mostrarDialogoDeCarregamento(
               context: context,
-              titulo: "Apagando o grupo do dia ${_listaDeMP[indexGrupo].nomeMateriaPrima}..."
+              titulo: "Apagando o grupo do dia ${store.listaDeMateriaPrima[indexGrupo].nomeMateriaPrima}..."
           );
 
-          await MateriaPrimaModel().apagarMateriaPrima(
-              idMateriaPrima: _listaDeMP[indexGrupo].id!,
-              context: context,
-              onSuccess: (){
-                // Fechar diálogo de carregamento.
-                Navigator.of(context).pop();
-                setState(() { _listaDeMP.removeAt(indexGrupo); });
-              },
-              onFail: (){
-                // Fechar diálogo de carregamento.
-                Navigator.of(context).pop();
-              }
-          );
+          await store.apagarMateriaPrima(mp.id!);
         }
     );
   }

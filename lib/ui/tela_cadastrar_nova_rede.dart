@@ -4,22 +4,26 @@ import 'package:flutter/services.dart';
 import 'package:jsvillela_app/dml/rede_dmo.dart';
 import 'package:jsvillela_app/infra/enums.dart';
 import 'package:jsvillela_app/infra/infraestrutura.dart';
-import 'package:jsvillela_app/models/rede_model.dart';
-import 'package:scoped_model/scoped_model.dart';
+import 'package:jsvillela_app/stores/cadastrar_rede_store.dart';
 
 class TelaCadastrarNovaRede extends StatefulWidget {
   //#region Atributos
 
-  /// Tipo de manutenção desta tela (inclusão ou alteração)
-  final TipoDeManutencao tipoDeManutencao;
-
-  /// Rede a ser editada.
-  final RedeDmo? redeASerEditada;
+  late final CadastrarRedeStore store;
 
   //#endregion Atributos
 
   //#region Construtor(es)
-  TelaCadastrarNovaRede({required this.tipoDeManutencao, this.redeASerEditada});
+  TelaCadastrarNovaRede({required TipoDeManutencao tipoDeManutencao , RedeDmo? redeASerEditada})
+  {
+    store =  CadastrarRedeStore(tipoDeManutencao: tipoDeManutencao, redeASerEditada: redeASerEditada);
+    // Em caso de edição, iniciar valores
+    if(tipoDeManutencao == TipoDeManutencao.alteracao && redeASerEditada != null){
+      store.nomeRede = redeASerEditada.nomeRede;
+      store.valorUnitarioRede = redeASerEditada.valorUnitarioRede!.toDouble();
+      print("Na store: " + store.valorUnitarioRede.toString());
+    }
+  }
   //#endregion Construtor(es)
 
   @override
@@ -27,6 +31,7 @@ class TelaCadastrarNovaRede extends StatefulWidget {
 }
 
 class _TelaCadastrarNovaRedeState extends State<TelaCadastrarNovaRede> {
+  //#region Atributos
   /// Chave global para o formulário de cadastro.
   final _formKey = GlobalKey<FormState>();
 
@@ -38,18 +43,19 @@ class _TelaCadastrarNovaRedeState extends State<TelaCadastrarNovaRede> {
 
   ///Controller utilizado no campo numerico "Valor Unitario".
   final _vlrUnitarioController = TextEditingController();
+  //#endregion Atributos
 
+  //#region Métodos
   @override
   void initState() {
     super.initState();
 
-    if (widget.tipoDeManutencao  ==
-        TipoDeManutencao.alteracao) {
-      _nomeRedeController.text = widget.redeASerEditada!.nome_rede!;
-      _vlrUnitarioController.text =
-          widget.redeASerEditada!.valor_unitario_rede!.toStringAsFixed(2);
+    if (widget.store.tipoDeManutencao  == TipoDeManutencao.alteracao) {
+      _nomeRedeController.text = widget.store.nomeRede;
+      _vlrUnitarioController.text = widget.store.valorUnitarioRede.toStringAsFixed(2);
     }
   }
+  //#endregion Métodos
 
   @override
   Widget build(BuildContext context) {
@@ -57,16 +63,12 @@ class _TelaCadastrarNovaRedeState extends State<TelaCadastrarNovaRede> {
         key: _chaveScaffold,
         appBar: AppBar(
             title: Text(
-                widget.tipoDeManutencao  ==
+                widget.store.tipoDeManutencao  ==
                         TipoDeManutencao.cadastro
                     ? "CADASTRAR REDE"
                     : "EDITAR REDE"),
             centerTitle: true),
-        body: ScopedModel<RedeModel>(
-          model: RedeModel(),
-          child: ScopedModelDescendant<RedeModel>(
-              builder: (context, child, model) {
-            return Form(
+        body: Form(
               key: _formKey,
               child: ListView(
                 padding: EdgeInsets.all(20),
@@ -83,6 +85,7 @@ class _TelaCadastrarNovaRedeState extends State<TelaCadastrarNovaRede> {
                       if (text!.isEmpty) return "Nome obrigatório!";
                       return null;
                     },
+                    onChanged: widget.store.setNomeRede,
                   ),
                   SizedBox(
                     height: 20,
@@ -104,13 +107,15 @@ class _TelaCadastrarNovaRedeState extends State<TelaCadastrarNovaRede> {
                       if (text!.isEmpty) return "Valor obrigatório!";
                       return null;
                     },
+                    // ignore: non_constant_identifier_names, unnecessary_statements
+                    onChanged: (String) {widget.store.setValorUnitarioRede;},
                   ),
                   SizedBox(height: 20),
                   SizedBox(
                     height: 60,
                     child: RaisedButton(
                         child: Text(
-                          widget.tipoDeManutencao ==
+                          widget.store.tipoDeManutencao ==
                                   TipoDeManutencao.cadastro
                               ? "Cadastrar Rede"
                               : "Editar rede",
@@ -118,44 +123,27 @@ class _TelaCadastrarNovaRedeState extends State<TelaCadastrarNovaRede> {
                         ),
                         textColor: Colors.white,
                         color: Theme.of(context).primaryColor,
-                        onPressed: () {
-                          if (_formKey.currentState!.validate()) {
-                            RedeDmo dadosDaRede = RedeDmo(
-                                id: widget.redeASerEditada != null
-                                    ? widget.redeASerEditada!.id
-                                    : null,
-                                nome_rede: _nomeRedeController.text,
-                                valor_unitario_rede: double.parse(
-                                    _vlrUnitarioController.text
-                                        .replaceAll(RegExp(r','), '.')));
-
-                            if (widget.tipoDeManutencao ==
-                                TipoDeManutencao.cadastro)
-                              model.cadastrarRede(
-                                  dadosDaRede: dadosDaRede,
-                                  onSuccess: _finalizarCadastroDaRede,
-                                  onFail: _informarErroDeCadastro);
-                            else
-                              model.atualizarRede(
-                                  dadosDaRede: dadosDaRede,
-                                  onSuccess: _finalizarCadastroDaRede,
-                                  onFail: _informarErroDeCadastro);
+                        onPressed: !widget.store.habilitaBotaoDeCadastro ? null : () async {
+                            if(await widget.store.cadastrarOuEditarRede() != null){
+                              _finalizarCadastroDaRede();
+                            }
+                            else{
+                            _informarErroDeCadastro();
+                            }
                           }
-                        }),
+                        ),
                   )
-                ],
-              ),
-            );
-          }),
-        ));
-  }
+              ],
+          ),
+    ));
+}
 
   /// Callback chamado quando o cadastro ou edição for realizado com sucesso.
   void _finalizarCadastroDaRede() {
     Infraestrutura.mostrarMensagemDeSucesso(
+
         context,
-        widget.tipoDeManutencao  ==
-                TipoDeManutencao.cadastro
+        widget.store.tipoDeManutencao  == TipoDeManutencao.cadastro
             ? "Rede Cadastrada com sucesso!"
             : "Rede editada com sucesso!");
 
@@ -166,8 +154,7 @@ class _TelaCadastrarNovaRedeState extends State<TelaCadastrarNovaRede> {
   void _informarErroDeCadastro() {
     Infraestrutura.mostrarMensagemDeErro(
         context,
-        widget.tipoDeManutencao  ==
-                TipoDeManutencao.cadastro
+        widget.store.tipoDeManutencao  == TipoDeManutencao.cadastro
             ? "Falha ao cadastrar rede!"
             : "Falha ao editar rede!");
   }
