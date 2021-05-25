@@ -1,21 +1,14 @@
-import 'dart:ffi';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:jsvillela_app/infra/enums.dart';
 import 'package:jsvillela_app/infra/infraestrutura.dart';
 import 'package:jsvillela_app/infra/paleta_de_cores.dart';
-import 'package:jsvillela_app/models/grupo_de_redeiros_model.dart';
 import 'package:jsvillela_app/stores/consultar_grupos_de_redeiros_store.dart';
 import 'package:jsvillela_app/ui/tela_cadastrar_novo_grupo_de_redeiros.dart';
 import 'package:jsvillela_app/ui/widgets/campo_de_texto_com_icone.dart';
 import 'package:jsvillela_app/ui/widgets/list_view_item_pesquisa.dart';
-import 'package:jsvillela_app/infra/preferencias.dart';
-import 'package:jsvillela_app/dml/grupo_de_redeiros_dmo.dart';
 
 class TelaCadastroDeGruposDeRedeiros extends StatefulWidget {
   @override
@@ -99,8 +92,7 @@ class _TelaCadastroDeGruposDeRedeirosState extends State<TelaCadastroDeGruposDeR
                                 scrollDirection: Axis.vertical,
                                 shrinkWrap: true,
                                 padding: EdgeInsets.only(top: 10),
-                                itemCount: store.listaDeGruposDeRedeiros.length +
-                                    1, // É somado um pois o último widget será um item de carregamento
+                                itemCount: store.listaDeGruposDeRedeiros.length + 1, // É somado um pois o último widget será um item de carregamento
                                 separatorBuilder: (_, __){
                                   return Divider();
                                 },

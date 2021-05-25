@@ -10,7 +10,6 @@ class ConsultarRedeStore = _ConsultarRedeStore with _$ConsultarRedeStore;
 abstract class _ConsultarRedeStore with Store{
 
   //#region Construtor(es)
-
   //#endregion Construtor(es)
 
   //#region Observables
@@ -35,7 +34,6 @@ abstract class _ConsultarRedeStore with Store{
   //#endregion Observables
 
   //#region Computed
-
   //#endregion Computed
 
   //#region Actions
@@ -91,5 +89,19 @@ abstract class _ConsultarRedeStore with Store{
     await obterListaDeRedePaginada(true, filtroNome);
   }
 
+  @action
+  Future<void> apagarRede(String idRede) async{
+    try{
+
+      // Apagar rede no Parse Server
+      await RedeParse().apagarRede(idRede);
+
+      // Remover rede apagada da lista
+      listaDeRede.removeWhere((e) => e.id == idRede);
+    }
+    catch (e){
+      erro = e.toString();
+    }
+  }
   //#endregion Actions
 }

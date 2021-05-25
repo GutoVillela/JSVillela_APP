@@ -1,8 +1,4 @@
-import 'package:jsvillela_app/dml/grupo_de_redeiros_dmo.dart';
-import 'package:jsvillela_app/dml/redeiro_dmo.dart';
 import 'package:jsvillela_app/dml/redeiro_do_recolhimento_dmo.dart';
-import 'package:jsvillela_app/infra/preferencias.dart';
-import 'package:jsvillela_app/parse_server/grupo_de_redeiros_parse.dart';
 import 'package:jsvillela_app/parse_server/recolhimento_parse.dart';
 import 'package:jsvillela_app/parse_server/redeiro_parse.dart';
 import 'package:parse_server_sdk/parse_server_sdk.dart';

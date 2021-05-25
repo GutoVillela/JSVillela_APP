@@ -109,7 +109,7 @@ class _HomeTabState extends State<HomeTab> {
                                                 itemCount: modelSolicitacoes.solicitacoes.length,
                                                 itemBuilder: (context, index){
                                                   return SlimListViewItemPesquisa(
-                                                    textoPrincipal: modelSolicitacoes.solicitacoes[index].materiasPrimasSolicitadas.first.nomeMateriaPrima ?? "",
+                                                    textoPrincipal: modelSolicitacoes.solicitacoes[index].materiasPrimasSolicitadas.first.nomeMateriaPrima,
                                                     iconeEsquerda: Icons.dns_rounded,
                                                     acaoAoClicar: () {},
                                                   );
@@ -212,7 +212,7 @@ class _HomeTabState extends State<HomeTab> {
                                                   itemCount: modelSolicitacoes.solicitacoes.length,
                                                   itemBuilder: (context, index){
                                                     return SlimListViewItemPesquisa(
-                                                      textoPrincipal: modelSolicitacoes.solicitacoes[index].materiasPrimasSolicitadas.first.nomeMateriaPrima ?? "",
+                                                      textoPrincipal: modelSolicitacoes.solicitacoes[index].materiasPrimasSolicitadas.first.nomeMateriaPrima,
                                                       iconeEsquerda: Icons.dns_rounded,
                                                       acaoAoClicar: () {},
                                                     );

@@ -61,7 +61,7 @@ class SolicitacaoDoRedeiroDmo implements BaseDmo{
         dataDaSolicitacao: new DateTime.fromMillisecondsSinceEpoch((snapshot[SolicitacaoDoRedeiroModel.CAMPO_DATA_SOLICITACAO] as Timestamp).millisecondsSinceEpoch).toLocal(),// Obter data e converter para o fuso horário local
         dataFinalizacao: new DateTime.fromMillisecondsSinceEpoch((snapshot[SolicitacaoDoRedeiroModel.CAMPO_DATA_FINALIZACAO] as Timestamp).millisecondsSinceEpoch).toLocal(),// Obter data e converter para o fuso horário local
         materiasPrimasSolicitadas: (snapshot[SolicitacaoDoRedeiroModel.CAMPO_MATERIAIS_SOLICITADOS] as List)
-          .map((e) => MateriaPrimaDmo(id: e)).toList()
+          .map((e) => MateriaPrimaDmo(id: e, iconeMateriaPrima: "", nomeMateriaPrima: "")).toList()
     );
   }
   //#endregion Métodos
