@@ -14,11 +14,11 @@ class MateriaPrimaParse{
   /// Constante que define o campo "objectId" da classe "Materia Prima" do Parse Server.
   static const String CAMPO_ID_MP = "objectId";
 
-  /// Constante que define o campo "nome_materia_prima" da classe "Materia Prima" do Parse Server.
-  static const String CAMPO_NOME_MATERIA_PRIMA = "nome_materia_prima";
+  /// Constante que define o campo "nomeMateriaPrima" da classe "Materia Prima" do Parse Server.
+  static const String CAMPO_NOME_MATERIA_PRIMA = "nomeMateriaPrima";
 
-  /// Constante que define o campo "icone_materia_prima" da classe "Materia Prima" do Parse Server.
-  static const String CAMPO_ICONE_MATERIA_PRIMA = "icone_materia_prima";
+  /// Constante que define o campo "iconeMateriaPrima" da classe "Materia Prima" do Parse Server.
+  static const String CAMPO_ICONE_MATERIA_PRIMA = "iconeMateriaPrima";
 
   //#endregion Constantes
 
@@ -26,9 +26,10 @@ class MateriaPrimaParse{
   /// Método responsável por cadastrar uma nova materia prima no Parse Server.
   Future<MateriaPrimaDmo> cadastrarMateriaPrima(MateriaPrimaDmo materia_prima) async {
 
+    print("CHEGOU AQUI ÓÓÓ");
+
     // Definir informações da materia prima a ser salva
     final dadosASalvar = ParseObject(NOME_CLASSE)
-      ..set<String?>(CAMPO_ID_MP, materia_prima.id)
       ..set<String?>(CAMPO_NOME_MATERIA_PRIMA, materia_prima.nomeMateriaPrima)
       ..set<String?>(CAMPO_ICONE_MATERIA_PRIMA, materia_prima.iconeMateriaPrima);
     // Gravar dados no Parse Server
