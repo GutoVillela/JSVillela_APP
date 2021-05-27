@@ -50,87 +50,91 @@ class _TelaCadastroDeRedesState extends State<TelaCadastroDeRedes> {
       builder: (context, constraints) {
         return Container(
           height: constraints.maxHeight,
-          child: Column(
-            children: [
-              Container(
-                padding: EdgeInsets.all(12),
-                child: CampoDeTextoComIcone(
-                  texto: "Buscar redes",
-                  icone: Icon(Icons.search, color: PaletaDeCor.AZUL_ESCURO),
-                  cor: PaletaDeCor.AZUL_ESCURO,
-                  campoDeSenha: false,
-                  controller: _buscaController,
-                  acaoAoSubmeter: store.obterListaDeRedePaginadaComFiltro,
-                  regraDeValidacao: (texto){
-                    return null;
-                  },
-                ),
-              ),
-              store.processando
-                  ? Center(
-                  child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                        Theme.of(context).primaryColor),
-                  ))
-                  : Expanded(
-                child: Container(
-                    padding: EdgeInsets.all(10),
-                    child: Observer(
-                      builder: (_){
-                        return ListView.separated(
-                          controller: _scrollController,
-                          scrollDirection: Axis.vertical,
-                          shrinkWrap: true,
-                          padding: EdgeInsets.only(top: 10),
-                          itemCount: store.listaDeRede.length + 1, // É somado um pois o último widget será um item de carregamento
-                          separatorBuilder: (_, __){
-                            return Divider();
-                          },
-                          itemBuilder: (_, index) {
-                            if (index == store.listaDeRede.length) {
-                              if (store.temMaisRegistros)
-                                return CupertinoActivityIndicator();
-                              else
-                                return Divider();
-                            }
-
-                            return ListViewItemPesquisa(
-                                acaoAoClicar: null,
-                                textoPrincipal: store.listaDeRede[index].nomeRede,
-                                textoSecundario: "R\$ " +store.listaDeRede[index].valorUnitarioRede.toString(),
-                                iconeEsquerda: Icons.person,
-                                iconeDireita: Icons.search,
-                                acoesDoSlidable: [
-                                  IconSlideAction(
-                                    caption: "Apagar",
-                                    color: Colors.redAccent,
-                                    icon: Icons.delete_forever_sharp,
-                                    onTap: () => _apagarRede(index),
-                                  ),
-                                  IconSlideAction(
-                                    caption: "Editar",
-                                    color: Colors.yellow[800],
-                                    icon: Icons.edit,
-                                    onTap: () {
-                                      Navigator.of(context).push(
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  TelaCadastrarNovaRede(
-                                                      tipoDeManutencao: TipoDeManutencao
-                                                          .alteracao,
-                                                      redeASerEditada: store.listaDeRede[index]))
-                                      );
-                                    },
-                                  )
-                                ]
-                            );
-                          }
-                        );
-                      }
-                    )
+          child: Observer(
+            builder: (_){
+              return Column(
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(12),
+                    child: CampoDeTextoComIcone(
+                      texto: "Buscar redes",
+                      icone: Icon(Icons.search, color: PaletaDeCor.AZUL_ESCURO),
+                      cor: PaletaDeCor.AZUL_ESCURO,
+                      campoDeSenha: false,
+                      controller: _buscaController,
+                      acaoAoSubmeter: store.obterListaDeRedePaginadaComFiltro,
+                      regraDeValidacao: (texto){
+                        return null;
+                      },
+                    ),
                   ),
-              )
-            ],
+                  store.processando
+                      ? Center(
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                            Theme.of(context).primaryColor),
+                      ))
+                      : Expanded(
+                    child: Container(
+                        padding: EdgeInsets.all(10),
+                        child: Observer(
+                            builder: (_){
+                              return ListView.separated(
+                                  controller: _scrollController,
+                                  scrollDirection: Axis.vertical,
+                                  shrinkWrap: true,
+                                  padding: EdgeInsets.only(top: 10),
+                                  itemCount: store.listaDeRede.length + 1, // É somado um pois o último widget será um item de carregamento
+                                  separatorBuilder: (_, __){
+                                    return Divider();
+                                  },
+                                  itemBuilder: (_, index) {
+                                    if (index == store.listaDeRede.length) {
+                                      if (store.temMaisRegistros)
+                                        return CupertinoActivityIndicator();
+                                      else
+                                        return Divider();
+                                    }
+
+                                    return ListViewItemPesquisa(
+                                        acaoAoClicar: null,
+                                        textoPrincipal: store.listaDeRede[index].nomeRede,
+                                        textoSecundario: "R\$ " +store.listaDeRede[index].valorUnitarioRede.toString(),
+                                        iconeEsquerda: Icons.person,
+                                        iconeDireita: Icons.search,
+                                        acoesDoSlidable: [
+                                          IconSlideAction(
+                                            caption: "Apagar",
+                                            color: Colors.redAccent,
+                                            icon: Icons.delete_forever_sharp,
+                                            onTap: () => _apagarRede(index),
+                                          ),
+                                          IconSlideAction(
+                                            caption: "Editar",
+                                            color: Colors.yellow[800],
+                                            icon: Icons.edit,
+                                            onTap: () {
+                                              Navigator.of(context).push(
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          TelaCadastrarNovaRede(
+                                                              tipoDeManutencao: TipoDeManutencao
+                                                                  .alteracao,
+                                                              redeASerEditada: store.listaDeRede[index]))
+                                              );
+                                            },
+                                          )
+                                        ]
+                                    );
+                                  }
+                              );
+                            }
+                        )
+                    ),
+                  )
+                ],
+              );
+            },
           ),
         );
       },

@@ -15,6 +15,8 @@ abstract class _CadastrarRedeStore with Store{
   _CadastrarRedeStore({required this.tipoDeManutencao, this.redeASerEditada}){
     autorun((_){
       print(redeASerEditada.toString());
+      print("NOME REDE: $nomeRede");
+      print("VALOR REDE: $valorUnitarioRede");
     });
 
   }
@@ -42,7 +44,7 @@ abstract class _CadastrarRedeStore with Store{
   @observable
   String nomeRede = "";
 
-  ///Atributo observável que define o email do rede definido em tela.
+  ///Atributo observável que define o valor unitário da rede definido em tela.
   @observable
   double valorUnitarioRede = 0;
 
@@ -63,7 +65,7 @@ abstract class _CadastrarRedeStore with Store{
 
   ///Action que define valor do atributo observável que define o valor unit do rede definido em tela.
   @action
-  void setValorUnitarioRede (double value) => valorUnitarioRede = value;
+  void setValorUnitarioRede (String value) => valorUnitarioRede = double.tryParse(value.replaceAll(RegExp(r','), '.')) ?? 0;
 
   /// Action que realiza processo cadastro ou edição da rede.
   @action
