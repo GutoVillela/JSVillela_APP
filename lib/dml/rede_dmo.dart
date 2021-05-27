@@ -15,7 +15,7 @@ class RedeDmo implements BaseDmo{
   String nomeRede;
 
   /// Valor da Rede
-  double? valorUnitarioRede;
+  double valorUnitarioRede;
 
   RedeDmo({required this.id, required this.nomeRede, required this.valorUnitarioRede});
 

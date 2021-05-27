@@ -87,7 +87,7 @@ mixin _$CadastrarRedeStore on _CadastrarRedeStore, Store {
   }
 
   @override
-  void setValorUnitarioRede(double value) {
+  void setValorUnitarioRede(String value) {
     final _$actionInfo = _$_CadastrarRedeStoreActionController.startAction(
         name: '_CadastrarRedeStore.setValorUnitarioRede');
     try {

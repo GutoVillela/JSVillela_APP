@@ -1,6 +1,7 @@
 import 'package:brasil_fields/brasil_fields.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:jsvillela_app/dml/rede_dmo.dart';
 import 'package:jsvillela_app/infra/enums.dart';
 import 'package:jsvillela_app/infra/infraestrutura.dart';
@@ -20,7 +21,7 @@ class TelaCadastrarNovaRede extends StatefulWidget {
     // Em caso de edição, iniciar valores
     if(tipoDeManutencao == TipoDeManutencao.alteracao && redeASerEditada != null){
       store.nomeRede = redeASerEditada.nomeRede;
-      store.valorUnitarioRede = redeASerEditada.valorUnitarioRede!.toDouble();
+      store.valorUnitarioRede = redeASerEditada.valorUnitarioRede;
       print("Na store: " + store.valorUnitarioRede.toString());
     }
   }
@@ -100,7 +101,6 @@ class _TelaCadastrarNovaRedeState extends State<TelaCadastrarNovaRede> {
                         hintText: "Valor Unitário"),
                     keyboardType: TextInputType.number,
                     inputFormatters: [
-                      FilteringTextInputFormatter.digitsOnly,
                       RealInputFormatter()
                     ],
                     validator: (text) {
@@ -108,30 +108,43 @@ class _TelaCadastrarNovaRedeState extends State<TelaCadastrarNovaRede> {
                       return null;
                     },
                     // ignore: non_constant_identifier_names, unnecessary_statements
-                    onChanged: (String) {widget.store.setValorUnitarioRede;},
+                    onChanged: widget.store.setValorUnitarioRede,
                   ),
                   SizedBox(height: 20),
-                  SizedBox(
-                    height: 60,
-                    child: RaisedButton(
-                        child: Text(
-                          widget.store.tipoDeManutencao ==
-                                  TipoDeManutencao.cadastro
-                              ? "Cadastrar Rede"
-                              : "Editar rede",
-                          style: TextStyle(fontSize: 20),
-                        ),
-                        textColor: Colors.white,
-                        color: Theme.of(context).primaryColor,
-                        onPressed: !widget.store.habilitaBotaoDeCadastro ? null : () async {
-                            if(await widget.store.cadastrarOuEditarRede() != null){
-                              _finalizarCadastroDaRede();
-                            }
-                            else{
-                            _informarErroDeCadastro();
-                            }
-                          }
-                        ),
+                  Observer(
+                      builder: (_){
+                        return SizedBox(
+                          height: 60,
+                          child: ElevatedButton(
+                              child: !widget.store.processando ?
+                              Text(
+                                widget.store.tipoDeManutencao ==
+                                    TipoDeManutencao.cadastro
+                                    ? "Cadastrar Rede"
+                                    : "Editar Rede",
+                                style: TextStyle(fontSize: 20),
+                              ) :
+                              CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                    Colors.white),
+                              ),
+                              style: ButtonStyle(
+                                  backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                                        (Set<MaterialState> states) {
+                                      return Theme.of(context).primaryColor; // Use the component's default.
+                                    },
+                                  )
+                              ),
+                              onPressed: !widget.store.habilitaBotaoDeCadastro ? null : () async {
+                                if(await widget.store.cadastrarOuEditarRede() != null){
+                                  _finalizarCadastroDaRede();
+                                }
+                                else{
+                                  _informarErroDeCadastro();
+                                }
+                              }),
+                        );
+                      }
                   )
               ],
           ),

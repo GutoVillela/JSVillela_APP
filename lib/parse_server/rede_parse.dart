@@ -15,10 +15,10 @@ class RedeParse{
   static const String CAMPO_ID_REDE = "objectId";
 
   /// Constante que define o campo "nome_rede" da classe "Rede" do Parse Server.
-  static const String CAMPO_NOME_REDE = "nome_rede";
+  static const String CAMPO_NOME_REDE = "nomeRede";
 
   /// Constante que define o campo "valor unitario" da classe "Rede" do Parse Server.
-  static const String CAMPO_VLR_UNITARIO = "vlr_unitario";
+  static const String CAMPO_VLR_UNITARIO = "vlrUnitario";
 
   //#endregion Constantes
 
@@ -28,8 +28,8 @@ class RedeParse{
 
     // Definir informações da rede a ser salva
     final dadosASalvar = ParseObject(NOME_CLASSE)
-      ..set<String?>(CAMPO_NOME_REDE, rede.nomeRede)
-      ..set<double?>(CAMPO_VLR_UNITARIO, rede.valorUnitarioRede);
+      ..set<String>(CAMPO_NOME_REDE, rede.nomeRede)
+      ..set<double>(CAMPO_VLR_UNITARIO, rede.valorUnitarioRede);
 
     print("Dados a sakvar da rede: " + dadosASalvar.toString());
 
