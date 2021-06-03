@@ -3,9 +3,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:jsvillela_app/dml/grupo_de_redeiros_dmo.dart';
 import 'package:jsvillela_app/infra/enums.dart';
 import 'package:jsvillela_app/infra/infraestrutura.dart';
-import 'package:jsvillela_app/models/grupo_de_redeiros_model.dart';
 import 'package:jsvillela_app/stores/cadastrar_grupo_de_redeiros_store.dart';
-import 'package:scoped_model/scoped_model.dart';
 
 class TelaCadastrarNovoGrupoDeRedeiros extends StatefulWidget {
   //#region Atributos

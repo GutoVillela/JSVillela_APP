@@ -114,7 +114,19 @@ class Preferencias{
         }
 
         break;
+
     }
+  }
+
+  /// Salva o usuário logado.
+  Future<void> salvarUsuarioLogado(String usuario) async{
+
+    // Salvar preferência
+    final SharedPreferences preferencias = await SharedPreferences.getInstance();
+
+    // Salvar corretamente a preferência
+    preferencias.setString(Preferencias.PREF_USUARIO_LOGADO, usuario);
+    Preferencias.idUsuarioLogado = usuario;
   }
   //#endregion Métodos
 

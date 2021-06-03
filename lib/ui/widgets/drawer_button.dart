@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:jsvillela_app/infra/enums.dart';
-import 'package:jsvillela_app/models/usuario_model.dart';
+import 'package:jsvillela_app/infra/infraestrutura.dart';
+import 'package:jsvillela_app/infra/preferencias.dart';
+import 'package:jsvillela_app/parse_server/usuario_parse.dart';
 import 'package:jsvillela_app/stores/navegacao_store.dart';
 import 'package:jsvillela_app/ui/tela_de_login.dart';
 
@@ -21,6 +23,7 @@ class ItemDeMenu extends StatelessWidget {
 
   /// Store que é utilizada para navegar entre telas.
   final NavegacaoStore navegacaoStore = GetIt.I<NavegacaoStore>();
+
   //#endregion Atributos
 
   //#region Construtores
@@ -74,7 +77,11 @@ class ItemDeMenu extends StatelessWidget {
                 pagina = 10;
                 break;
               case AppPages.login:
-                new UsuarioModel().deslogarUsuario();
+                if(Preferencias.idUsuarioLogado != null)
+                  new UsuarioParse().deslogarUsuario(Preferencias.idUsuarioLogado!);
+                else
+                  Infraestrutura.mostrarMensagemDeErro(context, "Não existe um usuário logado no sistema");
+
                 Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (BuildContext context) => TelaDeLogin()), (route) => false);
                 return;
               default:

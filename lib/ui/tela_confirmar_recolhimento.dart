@@ -1,16 +1,10 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:jsvillela_app/dml/grupo_de_redeiros_dmo.dart';
 import 'package:jsvillela_app/dml/recolhimento_dmo.dart';
 import 'package:jsvillela_app/infra/enums.dart';
 import 'package:jsvillela_app/infra/infraestrutura.dart';
-import 'package:jsvillela_app/models/recolhimento_model.dart';
-import 'package:jsvillela_app/models/redeiro_model.dart';
 import 'package:jsvillela_app/stores/agendar_recolhimento_store.dart';
 import 'package:jsvillela_app/ui/tela_principal.dart';
-import 'package:scoped_model/scoped_model.dart';
 
 class TelaConfirmarRecolhimento extends StatefulWidget {
 

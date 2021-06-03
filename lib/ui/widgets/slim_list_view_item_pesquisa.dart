@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:jsvillela_app/infra/paleta_de_cores.dart';
 
 ///Cria um item Slim para List View de Pesquisa.
 class SlimListViewItemPesquisa extends StatelessWidget {

@@ -5,7 +5,6 @@ import 'package:jsvillela_app/dml/recolhimento_dmo.dart';
 import 'package:jsvillela_app/dml/redeiro_dmo.dart';
 import 'package:jsvillela_app/dml/redeiro_do_recolhimento_dmo.dart';
 import 'package:jsvillela_app/infra/preferencias.dart';
-import 'package:jsvillela_app/models/redeiro_do_recolhimento_model.dart';
 import 'package:jsvillela_app/parse_server/grupo_de_redeiros_parse.dart';
 import 'package:jsvillela_app/parse_server/redeiro_parse.dart';
 import 'package:jsvillela_app/parse_server/redeiros_do_recolhimento_parse.dart';
@@ -139,17 +138,17 @@ class RecolhimentoParse{
           id: e[RedeirosDoRecolhimentoParse.CAMPO_ID_RELACAO_REDEIRO_GRUPO],
           redeiro: RedeiroDmo(
             id: e[RedeirosDoRecolhimentoParse.RELACAO_REDEIRO][RedeiroParse.CAMPO_ID_REDEIRO],
-            nome: e[RedeiroDoRecolhimentoModel.CAMPO_REDEIRO][RedeiroParse.CAMPO_NOME],
+            nome: e[RedeirosDoRecolhimentoParse.RELACAO_REDEIRO][RedeiroParse.CAMPO_NOME],
             endereco: EnderecoDmo(
-              logradouro: e[RedeiroDoRecolhimentoModel.CAMPO_REDEIRO][RedeiroParse.CAMPO_NOME],
-              numero: e[RedeiroDoRecolhimentoModel.CAMPO_REDEIRO][RedeiroParse.CAMPO_ENDERECO_NUMERO] ?? "",
-              bairro: e[RedeiroDoRecolhimentoModel.CAMPO_REDEIRO][RedeiroParse.CAMPO_ENDERECO_BAIRRO] ?? "",
-              cidade: e[RedeiroDoRecolhimentoModel.CAMPO_REDEIRO][RedeiroParse.CAMPO_ENDERECO_CIDADE] ?? "",
-              cep: e[RedeiroDoRecolhimentoModel.CAMPO_REDEIRO][RedeiroParse.CAMPO_ENDERECO_CEP] ?? "",
-              complemento: e[RedeiroDoRecolhimentoModel.CAMPO_REDEIRO][RedeiroParse.CAMPO_ENDERECO_COMPLEMENTO] ?? "",
+              logradouro: e[RedeirosDoRecolhimentoParse.RELACAO_REDEIRO][RedeiroParse.CAMPO_NOME],
+              numero: e[RedeirosDoRecolhimentoParse.RELACAO_REDEIRO][RedeiroParse.CAMPO_ENDERECO_NUMERO] ?? "",
+              bairro: e[RedeirosDoRecolhimentoParse.RELACAO_REDEIRO][RedeiroParse.CAMPO_ENDERECO_BAIRRO] ?? "",
+              cidade: e[RedeirosDoRecolhimentoParse.RELACAO_REDEIRO][RedeiroParse.CAMPO_ENDERECO_CIDADE] ?? "",
+              cep: e[RedeirosDoRecolhimentoParse.RELACAO_REDEIRO][RedeiroParse.CAMPO_ENDERECO_CEP] ?? "",
+              complemento: e[RedeirosDoRecolhimentoParse.RELACAO_REDEIRO][RedeiroParse.CAMPO_ENDERECO_COMPLEMENTO] ?? "",
               posicao: Position(
-                  latitude: e[RedeiroDoRecolhimentoModel.CAMPO_REDEIRO][RedeiroParse.CAMPO_ENDERECO_POSICAO]['latitude'],
-                  longitude: e[RedeiroDoRecolhimentoModel.CAMPO_REDEIRO][RedeiroParse.CAMPO_ENDERECO_POSICAO]['longitude'],
+                  latitude: e[RedeirosDoRecolhimentoParse.RELACAO_REDEIRO][RedeiroParse.CAMPO_ENDERECO_POSICAO]['latitude'],
+                  longitude: e[RedeirosDoRecolhimentoParse.RELACAO_REDEIRO][RedeiroParse.CAMPO_ENDERECO_POSICAO]['longitude'],
                   timestamp: null, accuracy: 0, altitude: 0, heading: 0, speed: 0, speedAccuracy: 0
               )
             ),
@@ -224,18 +223,18 @@ class RecolhimentoParse{
   /// Converte o JSON recebido da Cloud Function em um RedeiroDmo
   RedeiroDmo obterRedeiroDoJSON(Map<String, dynamic> json){
     return RedeiroDmo(
-        id: json[RedeirosDoRecolhimentoParse.RELACAO_REDEIRO][RedeiroParse.CAMPO_ID_REDEIRO],
-        nome: json[RedeiroDoRecolhimentoModel.CAMPO_REDEIRO][RedeiroParse.CAMPO_NOME],
+        id: json['redeiro'][RedeiroParse.CAMPO_ID_REDEIRO],
+        nome: json['redeiro'][RedeiroParse.CAMPO_NOME],
         endereco: EnderecoDmo(
-            logradouro: json[RedeiroDoRecolhimentoModel.CAMPO_REDEIRO][RedeiroParse.CAMPO_NOME],
-            numero: json[RedeiroDoRecolhimentoModel.CAMPO_REDEIRO][RedeiroParse.CAMPO_ENDERECO_NUMERO] ?? "",
-            bairro: json[RedeiroDoRecolhimentoModel.CAMPO_REDEIRO][RedeiroParse.CAMPO_ENDERECO_BAIRRO] ?? "",
-            cidade: json[RedeiroDoRecolhimentoModel.CAMPO_REDEIRO][RedeiroParse.CAMPO_ENDERECO_CIDADE] ?? "",
-            cep: json[RedeiroDoRecolhimentoModel.CAMPO_REDEIRO][RedeiroParse.CAMPO_ENDERECO_CEP] ?? "",
-            complemento: json[RedeiroDoRecolhimentoModel.CAMPO_REDEIRO][RedeiroParse.CAMPO_ENDERECO_COMPLEMENTO] ?? "",
+            logradouro: json['redeiro'][RedeiroParse.CAMPO_NOME],
+            numero: json['redeiro'][RedeiroParse.CAMPO_ENDERECO_NUMERO] ?? "",
+            bairro: json['redeiro'][RedeiroParse.CAMPO_ENDERECO_BAIRRO] ?? "",
+            cidade: json['redeiro'][RedeiroParse.CAMPO_ENDERECO_CIDADE] ?? "",
+            cep: json['redeiro'][RedeiroParse.CAMPO_ENDERECO_CEP] ?? "",
+            complemento: json['redeiro'][RedeiroParse.CAMPO_ENDERECO_COMPLEMENTO] ?? "",
             posicao: Position(
-                latitude: json[RedeiroDoRecolhimentoModel.CAMPO_REDEIRO][RedeiroParse.CAMPO_ENDERECO_POSICAO]['latitude'],
-                longitude: json[RedeiroDoRecolhimentoModel.CAMPO_REDEIRO][RedeiroParse.CAMPO_ENDERECO_POSICAO]['longitude'],
+                latitude: json['redeiro'][RedeiroParse.CAMPO_ENDERECO_POSICAO]['latitude'],
+                longitude: json['redeiro'][RedeiroParse.CAMPO_ENDERECO_POSICAO]['longitude'],
                 timestamp: null, accuracy: 0, altitude: 0, heading: 0, speed: 0, speedAccuracy: 0
             )
         ),

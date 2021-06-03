@@ -1,5 +1,3 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:jsvillela_app/infra/enums.dart';
 import 'package:jsvillela_app/parse_server/usuario_parse.dart';
 import 'package:mobx/mobx.dart';

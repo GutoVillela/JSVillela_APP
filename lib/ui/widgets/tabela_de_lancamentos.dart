@@ -1,10 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:intl/intl.dart';
 import 'package:jsvillela_app/dml/lancamento_do_caderno_dml.dart';
 import 'package:jsvillela_app/infra/infraestrutura.dart';
-import 'package:jsvillela_app/models/lancamento_no_caderno.dart';
 import 'package:jsvillela_app/stores/tabela_de_lancamentos_store.dart';
 import 'package:mobx/mobx.dart';
 

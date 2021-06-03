@@ -1,8 +1,5 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:jsvillela_app/dml/base_dmo.dart';
-import 'package:jsvillela_app/dml/endereco_dmo.dart';
 import 'package:jsvillela_app/dml/redeiro_dmo.dart';
-import 'package:jsvillela_app/models/redeiro_do_recolhimento_model.dart';
 import 'package:jsvillela_app/parse_server/redeiros_do_recolhimento_parse.dart';
 import 'package:parse_server_sdk/parse_server_sdk.dart';
 
@@ -31,27 +28,9 @@ class RedeiroDoRecolhimentoDmo implements BaseDmo{
     id = parseObject.objectId ?? "",
     dataFinalizacao = parseObject.get(RedeirosDoRecolhimentoParse.CAMPO_DATA_FINALIZADO);
 
-  @override
-  Map<String, dynamic> converterParaMapa() {
-    return {
-      RedeiroDoRecolhimentoModel.CAMPO_DATA_FINALIZACAO : dataFinalizacao,
-      RedeiroDoRecolhimentoModel.CAMPO_REDEIRO : redeiro == null ? null : redeiro!.id
-    };
-  }
   //#endregion Construtor(es)
 
   //#region Métodos
-  /// Converte um snapshot em um objeto RedeiroDoRecolhimentoDmo.
-  static RedeiroDoRecolhimentoDmo converterSnapshotEmRedeiroDoRecolhimento(DocumentSnapshot redeiroDoRecolhimento){
-    return RedeiroDoRecolhimentoDmo(
-        id: redeiroDoRecolhimento.id,
-        dataFinalizacao:  redeiroDoRecolhimento[RedeiroDoRecolhimentoModel.CAMPO_DATA_FINALIZACAO] != null ?
-          new DateTime.fromMillisecondsSinceEpoch((redeiroDoRecolhimento[RedeiroDoRecolhimentoModel.CAMPO_DATA_FINALIZACAO] as Timestamp).millisecondsSinceEpoch).toLocal() :
-          null,// Obter data e converter para o fuso horário local
-        redeiro: RedeiroDmo(id: redeiroDoRecolhimento[RedeiroDoRecolhimentoModel.CAMPO_REDEIRO], nome: "", endereco: EnderecoDmo(), gruposDoRedeiro: [])
-    );
-  }
-
   @override
   String toString() {
     return 'id: $id, '

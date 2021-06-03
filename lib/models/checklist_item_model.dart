@@ -1,5 +1,3 @@
-import 'package:flutter/cupertino.dart';
-
 /// Classe modelo utilizada nos itens de lista do tipo Checkbox.
 class CheckListItemModel{
   //#region Atributos
@@ -14,7 +12,7 @@ class CheckListItemModel{
   //#endregion Atributos
 
   //#region Contrutor(es)
-  /// Classe de modelo para os 
+  /// Classe de modelo para os
   CheckListItemModel({required this.texto, required this.checado, required this.id});
-  //#endregion Contrutor(es)
+//#endregion Contrutor(es)
 }

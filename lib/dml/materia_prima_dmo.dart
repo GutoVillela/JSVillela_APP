@@ -1,6 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:jsvillela_app/dml/base_dmo.dart';
-import 'package:jsvillela_app/models/materia_prima_model.dart';
 import 'package:jsvillela_app/parse_server/materia_prima_parse.dart';
 import 'package:parse_server_sdk/parse_server_sdk.dart';
 
@@ -30,16 +28,6 @@ class MateriaPrimaDmo implements BaseDmo{
         nomeMateriaPrima = parseObject.get(MateriaPrimaParse.CAMPO_NOME_MATERIA_PRIMA) ?? "Falha ao obter o nome da matéria prima",
         iconeMateriaPrima = parseObject.get(MateriaPrimaParse.CAMPO_ICONE_MATERIA_PRIMA);
 
-  /// Converte um snapshot em um objeto MateriaPrimaDmo.
-  static MateriaPrimaDmo converterSnapshotEmDmo(DocumentSnapshot materiaPrima){
-
-    return MateriaPrimaDmo(
-        id: materiaPrima.id,
-        nomeMateriaPrima: materiaPrima[MateriaPrimaModel.CAMPO_NM_MAT_PRIMA],
-        iconeMateriaPrima: materiaPrima[MateriaPrimaModel.CAMPO_ICONE_MAT_PRIMA]
-    );
-  }
-
   @override
   String toString() {
     return  'id : $id,'
@@ -49,12 +37,4 @@ class MateriaPrimaDmo implements BaseDmo{
   //#endregion Métodos
 
   //#region Métodos
-  @override
-  Map<String, dynamic> converterParaMapa() {
-    return {
-      MateriaPrimaModel.CAMPO_NM_MAT_PRIMA : nomeMateriaPrima,
-      MateriaPrimaModel.CAMPO_ICONE_MAT_PRIMA : iconeMateriaPrima
-    };
-  }
-
 }

@@ -1,8 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:jsvillela_app/dml/base_dmo.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:jsvillela_app/models/redeiro_model.dart';
 import 'package:jsvillela_app/parse_server/redeiro_parse.dart';
 import 'package:parse_server_sdk/parse_server_sdk.dart';
 
@@ -54,26 +51,5 @@ class EnderecoDmo implements BaseDmo{
   String toString() {
     return '${logradouro ?? ""}, ${numero ?? "S/N"}, ${bairro != null ? "$bairro," : ""} ${cidade ?? ""}${cep != null ? " - $cep" : ""}';
   }
-
-  @override
-  Map<String, dynamic> converterParaMapa() {
-    return {
-      RedeiroModel.CAMPO_ENDERECO_LOGRADOURO : this.logradouro,
-      RedeiroModel.CAMPO_ENDERECO_NUMERO : this.numero,
-      RedeiroModel.CAMPO_ENDERECO_BAIRRO : this.bairro,
-      RedeiroModel.CAMPO_ENDERECO_CIDADE : this.cidade,
-      RedeiroModel.CAMPO_ENDERECO_CEP : this.cep,
-      RedeiroModel.CAMPO_ENDERECO_COMPLEMENTO : this.complemento,
-      RedeiroModel.CAMPO_ENDERECO_POSICAO : this.posicao != null ? GeoPoint(this.posicao!.latitude, this.posicao!.longitude) : null
-    };
-  }
-
-  @override
-  converterSnapshotParaDmo(DocumentSnapshot snapshot) {
-    // TODO: implement converterSnapshotParaDmo
-    throw UnimplementedError();
-  }
-
-
   //#endregion Métodos
 }

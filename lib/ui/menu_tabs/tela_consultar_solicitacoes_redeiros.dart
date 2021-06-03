@@ -1,15 +1,10 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:jsvillela_app/dml/recolhimento_dmo.dart';
 import 'package:jsvillela_app/dml/solicitacao_do_redeiro_dmo.dart';
 import 'package:jsvillela_app/infra/paleta_de_cores.dart';
-import 'package:jsvillela_app/infra/preferencias.dart';
-import 'package:jsvillela_app/models/solicitacao_do_redeiro_model.dart';
 import 'package:jsvillela_app/ui/widgets/campo_de_texto_com_icone.dart';
 import 'package:jsvillela_app/ui/widgets/list_view_item_pesquisa.dart';
-import 'package:jsvillela_app/ui/widgets/list_view_item_solicitacao.dart';
 import 'package:jsvillela_app/ui/widgets/slim_list_view_item_pesquisa.dart';
 
 class TelaConsultarSolicitacoesRedeiros extends StatefulWidget {
@@ -28,9 +23,6 @@ class _TelaConsultarSolicitacoesRedeirosState
 
   /// Lista de solicitações a ser carregada no ListView
   List<SolicitacaoDoRedeiroDmo> _listaDeSolicitacoes = [];
-
-  /// Última solicitação carregada em tela.
-  DocumentSnapshot? _ultimaSolicitacaoCarregada;
 
   /// Define se existem mais registros a serem carregados na lista.
   bool _temMaisRegistros = true;
@@ -229,39 +221,39 @@ class _TelaConsultarSolicitacoesRedeirosState
   /// Método que obtém registros.
   void _obterRegistros(bool resetaLista) {
 
-    if(resetaLista)
-      setState(() => _carregandoRegistros = true );
-
-    SolicitacaoDoRedeiroModel().carregarSolicitacoesPaginadas(_ultimaSolicitacaoCarregada, _buscaController.text, _solicitacoesJaAtendidas).then((snapshot) async {
-
-      // Obter e salvar última solicitação
-      _ultimaSolicitacaoCarregada = snapshot.docs.isNotEmpty ? snapshot.docs.last : null;
-
-      // Se a quantidade de registros obtidos na nova busca for menor que a quantidade
-      // de registros a se recuperar por vez, então não existem mais documentos a serem carregados.
-      if(snapshot.docs.length < Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
-        _temMaisRegistros = false;
-
-      // Carregar detalhes das solicitações
-      for(DocumentSnapshot doc in snapshot.docs){
-        if(!_listaDeSolicitacoes.any((solicitacao) => solicitacao.id == doc.id)){
-          SolicitacaoDoRedeiroDmo solicitacaoDoRedeiro = SolicitacaoDoRedeiroDmo.converterSnapshotEmDmo(doc);
-          solicitacaoDoRedeiro = await SolicitacaoDoRedeiroModel().carregarDetalhesDaSolicitacao(solicitacaoDoRedeiro);
-          _listaDeSolicitacoes.add(solicitacaoDoRedeiro);
-        }
-      }
-
-      if(resetaLista)
-        setState(() => _carregandoRegistros = false );
-      else
-        setState(() { });
-
-    }).catchError((e){
-      if(resetaLista)
-        setState(() => _carregandoRegistros = false );
-      else
-        setState(() { });
-    });
+    // if(resetaLista)
+    //   setState(() => _carregandoRegistros = true );
+    //
+    // SolicitacaoDoRedeiroModel().carregarSolicitacoesPaginadas(_ultimaSolicitacaoCarregada, _buscaController.text, _solicitacoesJaAtendidas).then((snapshot) async {
+    //
+    //   // Obter e salvar última solicitação
+    //   _ultimaSolicitacaoCarregada = snapshot.docs.isNotEmpty ? snapshot.docs.last : null;
+    //
+    //   // Se a quantidade de registros obtidos na nova busca for menor que a quantidade
+    //   // de registros a se recuperar por vez, então não existem mais documentos a serem carregados.
+    //   if(snapshot.docs.length < Preferencias.QUANTIDADE_REGISTROS_LAZY_LOADING)
+    //     _temMaisRegistros = false;
+    //
+    //   // Carregar detalhes das solicitações
+    //   for(DocumentSnapshot doc in snapshot.docs){
+    //     if(!_listaDeSolicitacoes.any((solicitacao) => solicitacao.id == doc.id)){
+    //       SolicitacaoDoRedeiroDmo solicitacaoDoRedeiro = SolicitacaoDoRedeiroDmo.converterSnapshotEmDmo(doc);
+    //       solicitacaoDoRedeiro = await SolicitacaoDoRedeiroModel().carregarDetalhesDaSolicitacao(solicitacaoDoRedeiro);
+    //       _listaDeSolicitacoes.add(solicitacaoDoRedeiro);
+    //     }
+    //   }
+    //
+    //   if(resetaLista)
+    //     setState(() => _carregandoRegistros = false );
+    //   else
+    //     setState(() { });
+    //
+    // }).catchError((e){
+    //   if(resetaLista)
+    //     setState(() => _carregandoRegistros = false );
+    //   else
+    //     setState(() { });
+    // });
 
   }
 
@@ -269,7 +261,6 @@ class _TelaConsultarSolicitacoesRedeirosState
   void resetarCamposDeBusca(){
     _listaDeSolicitacoes = [];
     _temMaisRegistros = true;
-    _ultimaSolicitacaoCarregada = null;
   }
   //#endregion Métodos
 }

@@ -1,16 +1,10 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:intl/intl.dart';
-import 'package:jsvillela_app/dml/grupo_de_redeiros_dmo.dart';
 import 'package:jsvillela_app/dml/recolhimento_dmo.dart';
 import 'package:jsvillela_app/infra/enums.dart';
 import 'package:jsvillela_app/infra/infraestrutura.dart';
 import 'package:jsvillela_app/infra/paleta_de_cores.dart';
-import 'package:jsvillela_app/models/grupo_de_redeiros_model.dart';
-import 'package:jsvillela_app/models/recolhimento_model.dart';
-import 'package:jsvillela_app/models/redeiro_model.dart';
 import 'package:jsvillela_app/stores/agendar_recolhimento_store.dart';
 import 'package:jsvillela_app/ui/tela_confirmar_recolhimento.dart';
 import 'package:jsvillela_app/ui/widgets/custom_drawer.dart';

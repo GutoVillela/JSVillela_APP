@@ -1,4 +1,4 @@
-package br.com.gustavovillela.jsvillela_app;
+package br.com.jsvillela.recolhedor;
 
 import io.flutter.embedding.android.FlutterActivity;
 

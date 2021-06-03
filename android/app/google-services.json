@@ -10,7 +10,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:125937015070:android:eb0705b1de7f147431510f",
         "android_client_info": {
-          "package_name": "br.com.gustavovillela.jsvillela_app"
+          "package_name": "br.com.jsvillela.recolhedor"
         }
       },
       "oauth_client": [
@@ -18,7 +18,7 @@
           "client_id": "125937015070-rpsq7gbe1rgufj7lhp3ko7ttk7b192m1.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "br.com.gustavovillela.jsvillela_app",
+            "package_name": "br.com.jsvillela.recolhedor",
             "certificate_hash": "459ce5a51c4ded7fb25441d6bdb3436cc65f55f1"
           }
         },

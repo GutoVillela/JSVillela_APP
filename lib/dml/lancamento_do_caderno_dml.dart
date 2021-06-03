@@ -1,7 +1,5 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:jsvillela_app/dml/base_dmo.dart';
 import 'package:jsvillela_app/dml/rede_dmo.dart';
-import 'package:jsvillela_app/dml/redeiro_dmo.dart';
 import 'package:jsvillela_app/parse_server/lancamento_do_caderno_parse.dart';
 import 'package:jsvillela_app/parse_server/rede_parse.dart';
 

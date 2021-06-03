@@ -1,7 +1,5 @@
-import 'package:get_it/get_it.dart';
 import 'package:jsvillela_app/dml/grupo_de_redeiros_dmo.dart';
 import 'package:jsvillela_app/infra/enums.dart';
-import 'package:jsvillela_app/infra/infraestrutura.dart';
 import 'package:jsvillela_app/parse_server/grupo_de_redeiros_parse.dart';
 import 'package:mobx/mobx.dart';
 

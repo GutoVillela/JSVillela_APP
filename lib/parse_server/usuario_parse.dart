@@ -79,6 +79,27 @@ class UsuarioParse{
     }
   }
 
+  /// Realiza o logout do usuário no Parse Server.
+  Future<UsuarioDmo> deslogarUsuario(String usuario) async{
+
+    // Criar objeto Parse User para logar usuário
+    final parseUser = ParseUser(usuario, null, null);
+
+    // Realizar login do usuário
+    final response = await parseUser.logout();
+
+    if(response.success){
+      // Em caso de sucesso retornar objeto de usuário preenchido.
+      return _converterParseEmUsuario(response.result);
+    }
+    else{
+      if(response.error != null)
+        return Future.error(ErrosParse.obterDescricao(response.error!.code));
+      else
+        return Future.error("Aconteceu um erro inesperado!");
+    }
+  }
+
   /// Método que converte objeto do Parse Server em um objeto UsuarioDmo.
   UsuarioDmo _converterParseEmUsuario(ParseUser usuarioParse){
     return UsuarioDmo(

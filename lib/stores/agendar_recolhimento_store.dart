@@ -1,8 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 import 'package:jsvillela_app/dml/grupo_de_redeiros_dmo.dart';
 import 'package:jsvillela_app/dml/recolhimento_dmo.dart';
-import 'package:jsvillela_app/dml/redeiro_dmo.dart';
 import 'package:jsvillela_app/infra/enums.dart';
 import 'package:jsvillela_app/parse_server/recolhimento_parse.dart';
 import 'package:jsvillela_app/parse_server/redeiro_parse.dart';

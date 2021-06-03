@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:jsvillela_app/dml/usuario_dmo.dart';
 import 'package:jsvillela_app/infra/enums.dart';
 import 'package:jsvillela_app/infra/infraestrutura.dart';
 import 'package:jsvillela_app/infra/paleta_de_cores.dart';
-import 'package:jsvillela_app/models/usuario_model.dart';
-import 'package:jsvillela_app/parse_server/usuario_parse.dart';
 import 'package:jsvillela_app/stores/login_store.dart';
 import 'package:jsvillela_app/ui/tela_principal.dart';
 import 'package:jsvillela_app/ui/widgets/botao_arredondado.dart';
@@ -14,7 +11,6 @@ import 'package:jsvillela_app/ui/widgets/botao_redondo.dart';
 import 'package:jsvillela_app/ui/widgets/botao_sem_preenchimento.dart';
 import 'package:jsvillela_app/ui/widgets/campo_de_texto_com_icone.dart';
 import 'package:provider/provider.dart';
-import 'package:scoped_model/scoped_model.dart';
 import 'package:jsvillela_app/infra/preferencias.dart';
 
 class TelaDeLogin extends StatefulWidget {
@@ -131,122 +127,108 @@ class _TelaDeLoginState extends State<TelaDeLogin> {
                                     )
                                 ),
                               ),
-                              ScopedModelDescendant<UsuarioModel>(
-                                  builder: (context, child, model){
-                                    if(model.estaCarregando)
-                                      return Center(child: CircularProgressIndicator());
-
-                                    return Form(
-                                        key: _chaveFormulario,
+                              Form(
+                                  key: _chaveFormulario,
+                                  child: Column(
+                                    children: [
+                                      SizedBox(
                                         child: Column(
                                           children: [
-                                            SizedBox(
-                                              child: Column(
-                                                children: [
-                                                  Container(
-                                                    padding: EdgeInsets.all(32),
-                                                    child: CampoDeTextoComIcone(
-                                                      texto: "Usuário ou código",
-                                                      icone: Icon(Icons.person, color: PaletaDeCor.AZUL_ESCURO),
-                                                      cor: PaletaDeCor.AZUL_ESCURO,
-                                                      campoDeSenha: false,
-                                                      controller: _usuarioController,
-                                                      regraDeValidacao: (texto){
-                                                        if(texto!.isEmpty)
-                                                          return "Este campo é obrigatório";
-                                                        return null;
-                                                      },
-                                                      onChanged: _loginStore.setUsuario,
-                                                    ),
-                                                  ),
-                                                  Container(
-                                                    padding: EdgeInsets.symmetric(horizontal: 32),
-                                                    child: Observer(
-                                                      builder: (_){
-                                                        return CampoDeTextoComIcone(
-                                                          texto: "Senha",
-                                                          icone: Icon(Icons.lock, color: PaletaDeCor.AZUL_ESCURO),
-                                                          cor: PaletaDeCor.AZUL_ESCURO,
-                                                          campoDeSenha: !_loginStore.senhaVisivel,
-                                                          controller: _senhaController,
-                                                          regraDeValidacao: (texto){
-                                                            if(texto!.isEmpty)
-                                                              return "Este campo é obrigatório";
-                                                            return null;
-                                                          },
-                                                          onChanged: _loginStore.setSenha,
-                                                          sufixo: BotaoRedondo(
-                                                            icone: _loginStore.senhaVisivel ? Icons.visibility_off : Icons.visibility,
-                                                            corDoBotao: Colors.transparent,
-                                                            corDoIcone: Theme.of(context).primaryColor,
-                                                            acaoAoClicar: _loginStore.alterarVisibilidadeDaSenha,
-                                                          ),
-                                                        );
-                                                      },
-                                                    ),
-                                                  ),
-                                                  Container(
-                                                    padding: EdgeInsets.symmetric(horizontal: 32),
-                                                    child: Observer(
-                                                      builder: (_){
-                                                        return CheckboxListTile(
-                                                          title: Text("Lembrar de mim"),
-                                                          //secondary: Icon(Icons.),
-                                                          value: _loginStore.lembrarUsuario,
-                                                          onChanged: (bool? value) => _loginStore.setLembrarUsuario(value ?? false),
-                                                        );
-                                                      },
-                                                    ),
-                                                  )
-                                                ],
+                                            Container(
+                                              padding: EdgeInsets.all(32),
+                                              child: CampoDeTextoComIcone(
+                                                texto: "Usuário ou código",
+                                                icone: Icon(Icons.person, color: PaletaDeCor.AZUL_ESCURO),
+                                                cor: PaletaDeCor.AZUL_ESCURO,
+                                                campoDeSenha: false,
+                                                controller: _usuarioController,
+                                                regraDeValidacao: (texto){
+                                                  if(texto!.isEmpty)
+                                                    return "Este campo é obrigatório";
+                                                  return null;
+                                                },
+                                                onChanged: _loginStore.setUsuario,
                                               ),
                                             ),
-                                            Observer(builder: (_){
-                                              return                                             Container(
-                                                padding: EdgeInsets.all(32),
-                                                child: Column(
-                                                  children: [
-                                                    !_loginStore.processando ?
-                                                    GestureDetector(
-                                                        onTap: () async{
-                                                          if(_chaveFormulario.currentState!.validate()){
-                                                            if(await _loginStore.logarUsuario())
-                                                              _logarUsuario();
-                                                            else
-                                                              Infraestrutura.mostrarMensagemDeErro(context, _loginStore.erro ?? "Falha ao entrar!");
-
-                                                            // model.logar(
-                                                            //     email: _usuarioController.text,
-                                                            //     senha: _senhaController.text,
-                                                            //     onSuccess: _logarUsuario,
-                                                            //     onFail: _informarErroDeLogin
-                                                            // );
-                                                          }
-                                                        },
-                                                        child:  BotaoArredondado(
-                                                            textoDoBotao: "ENTRAR"
-                                                        )
-                                                    )
-                                                        : CircularProgressIndicator(),
-                                                    SizedBox(height: 10),
-                                                    GestureDetector(
-                                                        onTap: (){
-                                                          FocusScope.of(context).unfocus();// Remover foco do campo atual
-                                                          _loginStore.setEstadoDaPagina(EstadoDaPaginaDeLogin.esqueciASenha);
-                                                        },
-                                                        child: BotaoSemPreenchimento(
-                                                            textoDoBotao:"ESQUECI A SENHA"
-                                                        )
+                                            Container(
+                                              padding: EdgeInsets.symmetric(horizontal: 32),
+                                              child: Observer(
+                                                builder: (_){
+                                                  return CampoDeTextoComIcone(
+                                                    texto: "Senha",
+                                                    icone: Icon(Icons.lock, color: PaletaDeCor.AZUL_ESCURO),
+                                                    cor: PaletaDeCor.AZUL_ESCURO,
+                                                    campoDeSenha: !_loginStore.senhaVisivel,
+                                                    controller: _senhaController,
+                                                    regraDeValidacao: (texto){
+                                                      if(texto!.isEmpty)
+                                                        return "Este campo é obrigatório";
+                                                      return null;
+                                                    },
+                                                    onChanged: _loginStore.setSenha,
+                                                    sufixo: BotaoRedondo(
+                                                      icone: _loginStore.senhaVisivel ? Icons.visibility_off : Icons.visibility,
+                                                      corDoBotao: Colors.transparent,
+                                                      corDoIcone: Theme.of(context).primaryColor,
+                                                      acaoAoClicar: _loginStore.alterarVisibilidadeDaSenha,
                                                     ),
-                                                    SizedBox(height: 10)
-                                                  ],
-                                                ),
-                                              );
-                                            })
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                            Container(
+                                              padding: EdgeInsets.symmetric(horizontal: 32),
+                                              child: Observer(
+                                                builder: (_){
+                                                  return CheckboxListTile(
+                                                    title: Text("Lembrar de mim"),
+                                                    //secondary: Icon(Icons.),
+                                                    value: _loginStore.lembrarUsuario,
+                                                    onChanged: (bool? value) => _loginStore.setLembrarUsuario(value ?? false),
+                                                  );
+                                                },
+                                              ),
+                                            )
                                           ],
-                                        )
-                                    );
-                                  }
+                                        ),
+                                      ),
+                                      Observer(builder: (_){
+                                        return Container(
+                                          padding: EdgeInsets.all(32),
+                                          child: Column(
+                                            children: [
+                                              !_loginStore.processando ?
+                                              GestureDetector(
+                                                  onTap: () async{
+                                                    if(_chaveFormulario.currentState!.validate()){
+                                                      if(await _loginStore.logarUsuario())
+                                                        _logarUsuario();
+                                                      else
+                                                        Infraestrutura.mostrarMensagemDeErro(context, _loginStore.erro ?? "Falha ao entrar!");
+                                                    }
+                                                  },
+                                                  child:  BotaoArredondado(
+                                                      textoDoBotao: "ENTRAR"
+                                                  )
+                                              )
+                                                  : CircularProgressIndicator(),
+                                              SizedBox(height: 10),
+                                              GestureDetector(
+                                                  onTap: (){
+                                                    FocusScope.of(context).unfocus();// Remover foco do campo atual
+                                                    _loginStore.setEstadoDaPagina(EstadoDaPaginaDeLogin.esqueciASenha);
+                                                  },
+                                                  child: BotaoSemPreenchimento(
+                                                      textoDoBotao:"ESQUECI A SENHA"
+                                                  )
+                                              ),
+                                              SizedBox(height: 10)
+                                            ],
+                                          ),
+                                        );
+                                      })
+                                    ],
+                                  )
                               )
                             ],
                           ),
@@ -334,6 +316,9 @@ class _TelaDeLoginState extends State<TelaDeLogin> {
 
     // Salvar preferência de "Manter Logado"
     await Preferencias().salvarPreferencia(PreferenciasDoApp.manterUsuarioLogado, _loginStore.lembrarUsuario);
+
+    // Salvar Usuário Logado
+    await Preferencias().salvarUsuarioLogado(_loginStore.usuario);
     
     Navigator.pushReplacement(context, MaterialPageRoute(
         builder: (context) => TelaPrincipal())

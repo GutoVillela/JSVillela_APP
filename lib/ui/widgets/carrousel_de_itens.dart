@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jsvillela_app/dml/recolhimento_dmo.dart';
-import 'package:jsvillela_app/dml/redeiro_do_recolhimento_dmo.dart';
-import 'package:jsvillela_app/models/redeiro_do_recolhimento_model.dart';
 import 'package:jsvillela_app/ui/widgets/item_do_carrousel.dart';
-import 'package:scoped_model/scoped_model.dart';
 
 class CarrouselDeItens extends StatefulWidget {
 

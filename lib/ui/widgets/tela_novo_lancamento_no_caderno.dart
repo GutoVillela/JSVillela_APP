@@ -1,18 +1,10 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:intl/intl.dart';
 import 'package:jsvillela_app/infra/infraestrutura.dart';
 import 'package:jsvillela_app/infra/paleta_de_cores.dart';
-import 'package:jsvillela_app/models/lancamento_no_caderno.dart';
-import 'package:jsvillela_app/models/rede_model.dart';
-import 'package:jsvillela_app/models/redeiro_model.dart';
 import 'package:jsvillela_app/stores/novo_lancamento_store.dart';
-import 'package:jsvillela_app/ui/widgets/campo_de_texto_com_icone.dart';
-import 'package:scoped_model/scoped_model.dart';
 
 class TelaNovoLancamentoNoCaderno extends StatefulWidget {
   //#region Atributos

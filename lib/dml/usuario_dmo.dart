@@ -1,6 +1,4 @@
-import 'package:jsvillela_app/dml/endereco_dmo.dart';
 import 'package:jsvillela_app/infra/enums.dart';
-import 'package:parse_server_sdk/parse_server_sdk.dart';
 
 /// Classe modelo para Usuários.
 class UsuarioDmo{

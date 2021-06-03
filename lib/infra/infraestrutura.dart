@@ -9,6 +9,8 @@ import 'package:url_launcher/url_launcher.dart';
 /// Classe contendo atributos e métodos utilitários comuns entre todas a telas.
 class Infraestrutura {
 
+
+
   //#region Métodos
 
   /// Exibe uma mensagem padrão de erro em forma de SnackBar.
