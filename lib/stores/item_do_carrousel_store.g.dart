@@ -9,6 +9,31 @@ part of 'item_do_carrousel_store.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
 mixin _$ItemDoCarrouselStore on _ItemDoCarrouselStore, Store {
+  Computed<bool>? _$finalizadoComputed;
+
+  @override
+  bool get finalizado =>
+      (_$finalizadoComputed ??= Computed<bool>(() => super.finalizado,
+              name: '_ItemDoCarrouselStore.finalizado'))
+          .value;
+
+  final _$redeiroDoRecolhimentoAtom =
+      Atom(name: '_ItemDoCarrouselStore.redeiroDoRecolhimento');
+
+  @override
+  RedeiroDoRecolhimentoDmo get redeiroDoRecolhimento {
+    _$redeiroDoRecolhimentoAtom.reportRead();
+    return super.redeiroDoRecolhimento;
+  }
+
+  @override
+  set redeiroDoRecolhimento(RedeiroDoRecolhimentoDmo value) {
+    _$redeiroDoRecolhimentoAtom.reportWrite(value, super.redeiroDoRecolhimento,
+        () {
+      super.redeiroDoRecolhimento = value;
+    });
+  }
+
   final _$processandoAtom = Atom(name: '_ItemDoCarrouselStore.processando');
 
   @override
@@ -59,8 +84,10 @@ mixin _$ItemDoCarrouselStore on _ItemDoCarrouselStore, Store {
   @override
   String toString() {
     return '''
+redeiroDoRecolhimento: ${redeiroDoRecolhimento},
 processando: ${processando},
-carregandoMapa: ${carregandoMapa}
+carregandoMapa: ${carregandoMapa},
+finalizado: ${finalizado}
     ''';
   }
 }

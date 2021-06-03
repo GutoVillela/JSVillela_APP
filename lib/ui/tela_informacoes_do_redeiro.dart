@@ -147,7 +147,7 @@ class TelaInformacoesDoRedeiro extends StatelessWidget {
                           textoSecundario: "",
                           acaoAoClicar: (){
                             Navigator.of(context).push(
-                                MaterialPageRoute(builder: (context) => TelaCadernoDoRedeiro(redeiro))
+                                MaterialPageRoute(builder: (context) => TelaCadernoDoRedeiro(redeiro: redeiro))
                             );
                           }
                       ),

@@ -95,6 +95,45 @@ class RedeParse{
     }
   }
 
+  /// Método responsável por obter a lista de Redes do Parse Server.
+  Future<List<RedeDmo>> consultarTodasAsRedes() async{
+
+    // Criando consulta
+    final queryBuilder = QueryBuilder(ParseObject(NOME_CLASSE))
+      ..orderByAscending(CAMPO_NOME_REDE);
+
+
+    // Executar consulta
+    final response = await queryBuilder.query();
+
+    if(response.success){
+
+      // Em caso de sucesso retornar objeto de redeiros preenchido.
+      if(response.results != null){
+
+        print(response.result);
+
+        //Montar lista com objetos de retorno
+        List<RedeDmo> lista = [];
+
+        // Converter lista retornada para lista de RedeDmo
+        lista.addAll(response.results!.map((e) => RedeDmo.fromParse(e)));
+
+        return lista;
+      }
+      else {
+        print("rede_parse.dart -> vazio");
+        return [];
+      }
+    }
+    else{
+      if(response.error != null)
+        return Future.error(ErrosParse.obterDescricao(response.error!.code));
+      else
+        return Future.error("Aconteceu um erro inesperado!");
+    }
+  }
+
   /// Método responsável por apagar uma Rede do Parse Server.
   Future<void> apagarRede(String idRede) async {
 

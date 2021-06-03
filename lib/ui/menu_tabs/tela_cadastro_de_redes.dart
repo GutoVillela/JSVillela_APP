@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:get_it/get_it.dart';
+import 'package:intl/intl.dart';
 import 'package:jsvillela_app/infra/enums.dart';
 import 'package:jsvillela_app/infra/infraestrutura.dart';
 import 'package:jsvillela_app/infra/paleta_de_cores.dart';
@@ -25,7 +27,8 @@ class _TelaCadastroDeRedesState extends State<TelaCadastroDeRedes> {
   /// ScrollController usado para saber se usuário scrollou a lista até o final.
   ScrollController _scrollController = ScrollController();
 
-  ConsultarRedeStore store = ConsultarRedeStore();
+  /// Store que controla tela de consulta de redes.
+  ConsultarRedeStore store = GetIt.I<ConsultarRedeStore>();
   //#endregion Atributos
 
   @override
@@ -46,6 +49,10 @@ class _TelaCadastroDeRedesState extends State<TelaCadastroDeRedes> {
 
   @override
   Widget build(BuildContext context) {
+
+    // Formato de moeda
+    final formatoMoeda = new NumberFormat.simpleCurrency(locale: Localizations.localeOf(context).languageCode);
+    
     return Container(child: LayoutBuilder(
       builder: (context, constraints) {
         return Container(
@@ -99,7 +106,7 @@ class _TelaCadastroDeRedesState extends State<TelaCadastroDeRedes> {
                                     return ListViewItemPesquisa(
                                         acaoAoClicar: null,
                                         textoPrincipal: store.listaDeRede[index].nomeRede,
-                                        textoSecundario: "R\$ " +store.listaDeRede[index].valorUnitarioRede.toString(),
+                                        textoSecundario: formatoMoeda.format(store.listaDeRede[index].valorUnitarioRede),
                                         iconeEsquerda: Icons.person,
                                         iconeDireita: Icons.search,
                                         acoesDoSlidable: [

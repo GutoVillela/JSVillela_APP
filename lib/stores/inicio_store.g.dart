@@ -133,6 +133,15 @@ mixin _$InicioStore on _InicioStore, Store {
         .run(() => super.iniciarRecolhimentoDoDia());
   }
 
+  final _$terminarRecolhimentoDoDiaAsyncAction =
+      AsyncAction('_InicioStore.terminarRecolhimentoDoDia');
+
+  @override
+  Future<void> terminarRecolhimentoDoDia() {
+    return _$terminarRecolhimentoDoDiaAsyncAction
+        .run(() => super.terminarRecolhimentoDoDia());
+  }
+
   final _$_InicioStoreActionController = ActionController(name: '_InicioStore');
 
   @override
@@ -141,6 +150,17 @@ mixin _$InicioStore on _InicioStore, Store {
         name: '_InicioStore.setCidadesDoRecolhimento');
     try {
       return super.setCidadesDoRecolhimento(value);
+    } finally {
+      _$_InicioStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void verificarSeRecolhimentoFoiFinalizado() {
+    final _$actionInfo = _$_InicioStoreActionController.startAction(
+        name: '_InicioStore.verificarSeRecolhimentoFoiFinalizado');
+    try {
+      return super.verificarSeRecolhimentoFoiFinalizado();
     } finally {
       _$_InicioStoreActionController.endAction(_$actionInfo);
     }

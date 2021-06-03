@@ -16,16 +16,7 @@ class InicioStore = _InicioStore with _$InicioStore;
 abstract class _InicioStore with Store{
 
   //#region Construtor(es)
-  _InicioStore(){
-    autorun((_){
-      print("################################################# ABAIXO: ");
-      print(recolhimentoDoDia.toString());
-      print("################################################# existeRecolhimentoDoDia: $existeRecolhimentoDoDia ");
-      print("################################################# recolhimentoEmAndamento: $recolhimentoEmAndamento ");
-      print("################################################# recolhimentoDoDiaFinalizado: $recolhimentoDoDiaFinalizado ");
-
-    });
-  }
+  _InicioStore();
   //#endregion Construtor(es)
 
   //#region Observables
@@ -155,21 +146,49 @@ abstract class _InicioStore with Store{
       if (recolhimentoDoDia!.gruposDoRecolhimento.isEmpty)
         return Future.error('Não existem grupos associados ao recolhimento do dia!');
 
-
-      // Obter redeiros relacionados aos grupos do recolhimento
-      List<RedeiroDmo> redeiros = await RedeirosEGruposParse().obterRedeirosAPartirDosGrupos(recolhimentoDoDia!.gruposDoRecolhimento);
-
-      // Criar lista de redeiros do recolhimento
-      List<RedeiroDoRecolhimentoDmo> redeirosDoRecolhimento = redeiros.map((e) => RedeiroDoRecolhimentoDmo(id: "", redeiro: e, dataFinalizacao: null)).toList();
-
-      // Cadastrar redeiros do recolhimento
-      redeirosDoRecolhimento = await RedeirosDoRecolhimentoParse().cadastrarRedeirosDoRecolhimento(recolhimentoDoDia!.id!, redeirosDoRecolhimento);
-
-      // Cadastrar data de início do recolhimento
+      recolhimentoDoDia!.redeirosDoRecolhimento = await RecolhimentoParse().iniciarRecolhimento(recolhimentoDoDia!.id!);
       recolhimentoDoDia!.dataIniciado = DateTime.now();
-      recolhimentoDoDia!.redeirosDoRecolhimento = redeirosDoRecolhimento;
 
-      recolhimentoDoDia = await RecolhimentoParse().iniciarRecolhimento(recolhimentoDoDia!);
+      // Redundância para ativar o Observer
+      recolhimentoDoDia = recolhimentoDoDia;
+
+      // Indicar que classe finalizou o processamento.
+      iniciandoRecolhimento = false;
+    }
+    catch (e){
+      //erro = e.toString();
+      print("ERRO: ${e.toString()}");
+      // Indicar que classe finalizou o processamento.
+      iniciandoRecolhimento = false;
+      return null;
+    }
+  }
+
+  /// Action responsável por terminar o recolhimento do dia.
+  @action
+  Future<void> terminarRecolhimentoDoDia() async{
+
+    // Indicar que classe iniciou o processamento.
+    iniciandoRecolhimento = true;
+
+    try{
+
+      // Validar se recolhimento do dia está nulo
+      if(recolhimentoDoDia == null)
+        return Future.error('O recolhimento do dia está nulo!');
+
+      // Validar se recolhimento do dia possui grupos
+      if (recolhimentoDoDia!.gruposDoRecolhimento.isEmpty)
+        return Future.error('Não existem grupos associados ao recolhimento do dia!');
+
+      DateTime dataFinalizado = DateTime.now();
+      
+      RecolhimentoParse().terminarRecolhimento(recolhimentoDoDia!.id!, dataFinalizado);
+
+      recolhimentoDoDia!.dataFinalizado = dataFinalizado;
+
+      // Redundância para ativar o Observer
+      recolhimentoDoDia = recolhimentoDoDia;
 
       // Indicar que classe finalizou o processamento.
       iniciandoRecolhimento = false;
@@ -188,6 +207,22 @@ abstract class _InicioStore with Store{
   void setCidadesDoRecolhimento(List<String> value){
     cidadesDoRecolhimento.clear();
     cidadesDoRecolhimento.addAll(value);
+  }
+  
+  /// Action que verifica se todos os redeiros do recolhimento foram finalizados.
+  @action
+  void verificarSeRecolhimentoFoiFinalizado(){
+    if(recolhimentoDoDia == null)
+      return;
+    
+    // Se existir algum recolhimento ainda não finalizado, apenas encerrar método
+    for(int i = 0; i < recolhimentoDoDia!.redeirosDoRecolhimento.length; i++){
+      if(recolhimentoDoDia!.redeirosDoRecolhimento[i].dataFinalizacao == null)
+        return;
+    }
+    
+    // A partir deste ponto é correto assumir que todos os redeiros foram devidamente finalizados
+    terminarRecolhimentoDoDia();
   }
   //#endregion Actions
 

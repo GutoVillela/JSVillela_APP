@@ -53,7 +53,7 @@ class _ItemDoCarrouselState extends State<ItemDoCarrousel> with AutomaticKeepAli
       return Card(
         elevation: 5,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        color: widget.store.redeiroDoRecolhimento.dataFinalizacao == null ? PaletaDeCor.AZUL_BEM_CLARO : PaletaDeCor.VERMELHO_DESFOCADO,
+        color: !widget.store.finalizado ? PaletaDeCor.AZUL_BEM_CLARO : PaletaDeCor.VERMELHO_DESFOCADO,
         child: Padding(
           padding: const EdgeInsets.all(10.0),
           child: Column(
@@ -96,7 +96,7 @@ class _ItemDoCarrouselState extends State<ItemDoCarrousel> with AutomaticKeepAli
                       corDoBotao: Theme.of(context).primaryColor,
                       acaoAoClicar: (){
                         Navigator.of(context).push(
-                          MaterialPageRoute(builder: (context) => TelaCadernoDoRedeiro(widget.store.redeiroDoRecolhimento.redeiro!))
+                          MaterialPageRoute(builder: (context) => TelaCadernoDoRedeiro(redeiro: widget.store.redeiroDoRecolhimento.redeiro!))
                         );
                       },
                     );
@@ -106,7 +106,7 @@ class _ItemDoCarrouselState extends State<ItemDoCarrousel> with AutomaticKeepAli
                       icone: Icons.pin_drop,
                       tamanho: 30,
                       corDoBotao: Theme.of(context).primaryColor,
-                      acaoAoClicar: widget.store.carregandoMapa ? null : widget.store.finalizarRecolhimentoDoRedeiro,
+                      acaoAoClicar: widget.store.carregandoMapa ? null : widget.store.abrirMapa,
                       exibirIconeDeProcessamento: widget.store.carregandoMapa,
                     );
                   }),

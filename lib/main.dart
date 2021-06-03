@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:get_it/get_it.dart';
 import 'package:flutter/material.dart';
 import 'package:jsvillela_app/infra/paleta_de_cores.dart';

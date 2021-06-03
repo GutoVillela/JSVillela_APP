@@ -3,6 +3,7 @@ import 'package:jsvillela_app/dml/base_dmo.dart';
 import 'package:jsvillela_app/dml/endereco_dmo.dart';
 import 'package:jsvillela_app/dml/redeiro_dmo.dart';
 import 'package:jsvillela_app/models/redeiro_do_recolhimento_model.dart';
+import 'package:jsvillela_app/parse_server/redeiros_do_recolhimento_parse.dart';
 import 'package:parse_server_sdk/parse_server_sdk.dart';
 
 // TODO: Finalizar implementação da Classe RedeiroDoRecolhimentoDmo
@@ -27,7 +28,8 @@ class RedeiroDoRecolhimentoDmo implements BaseDmo{
 
   /// Construtor que inicializa objetos de acordo com um objeto do Parse Server.
   RedeiroDoRecolhimentoDmo.fromParse(ParseObject parseObject) :
-        id = parseObject.objectId ?? "";
+    id = parseObject.objectId ?? "",
+    dataFinalizacao = parseObject.get(RedeirosDoRecolhimentoParse.CAMPO_DATA_FINALIZADO);
 
   @override
   Map<String, dynamic> converterParaMapa() {
@@ -50,14 +52,11 @@ class RedeiroDoRecolhimentoDmo implements BaseDmo{
     );
   }
 
-  // @override
-  // String toString() {
-  //   return 'id: $id, '
-  //       'nome: $nome, '
-  //       'celular: $celular, '
-  //       'email: $email, '
-  //       'endereco: ${endereco.toString()}, '
-  //       'gruposDoRedeiro: [${gruposDoRedeiro.map((e) => "{ id: " + e.idGrupo + ", nomeGrupo: " + e.nomeGrupo + "} ")}].';
-  // }
+  @override
+  String toString() {
+    return 'id: $id, '
+        'redeiro: {${redeiro.toString()}, '
+        'dataFinalizacao: ${dataFinalizacao}';
+  }
 //#endregion Métodos
 }

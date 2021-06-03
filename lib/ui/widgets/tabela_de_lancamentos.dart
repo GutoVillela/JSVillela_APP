@@ -1,23 +1,26 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:intl/intl.dart';
 import 'package:jsvillela_app/dml/lancamento_do_caderno_dml.dart';
+import 'package:jsvillela_app/infra/infraestrutura.dart';
 import 'package:jsvillela_app/models/lancamento_no_caderno.dart';
+import 'package:jsvillela_app/stores/tabela_de_lancamentos_store.dart';
+import 'package:mobx/mobx.dart';
 
 class TabelaDeLancamentos extends StatefulWidget {
 
   //#region Atributos
 
-  /// Lista de lançamentos no caderno a serem exibidas na tabela.
-  final List<LancamentoDoCadernoDmo> listaDeLancamentos;
-
-  /// ID do Redeiro associado à lista de lançamentos.
-  final String idDoRedeiro;
+  /// Store que manipula as informações da tela.
+  late final TabelaDeLancamentosStore store;
 
   //#endregion Atributos
 
   //#region Construtor(es)
-  TabelaDeLancamentos(this.listaDeLancamentos, this.idDoRedeiro);
+  TabelaDeLancamentos({required List<LancamentoDoCadernoDmo> listaDeLancamentos, required String idDoRedeiro}) {
+    store = TabelaDeLancamentosStore(idDoRedeiro: idDoRedeiro, listaDeLancamentos: ObservableList.of(listaDeLancamentos));
+  }
   //#endregion Construtor(es)
 
   @override
@@ -26,8 +29,6 @@ class TabelaDeLancamentos extends StatefulWidget {
 
 /// Widget de construção da tabela de lançamentos usado nas telas de "Caderno do Redeiro".
 class _TabelaDeLancamentosState extends State<TabelaDeLancamentos> {
-
-  bool carregando = false;
 
   @override
   Widget build(BuildContext context) {
@@ -44,191 +45,153 @@ class _TabelaDeLancamentosState extends State<TabelaDeLancamentos> {
     // Margem à direita dos botões de pagar e status
     double margemADireita = 10;
 
-    // Calcular total
-    double total = 0;
-    widget.listaDeLancamentos.forEach((element) {
-      total += element.quantidade! * element.valorUnitario!;
-    });
-
     // Formato de moeda
-    final formatoMoeda = new NumberFormat.simpleCurrency();
+    final formatoMoeda = new NumberFormat.simpleCurrency(locale: Localizations.localeOf(context).languageCode);
 
-    // Verificar se conjunto está pago
-    bool pago = widget.listaDeLancamentos.first.pago;
-
-    // Verificar se conjunto está confirmado
-    bool confirmado = widget.listaDeLancamentos.first.dataConfirmacaoPagamento != null;
-
-    return carregando ? carregamento() : SingleChildScrollView(
+    return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
-      child: Column(
-        children: [
-          Stack(
-            overflow: Overflow.visible,
-            children: [
-              Container(
-                  decoration: BoxDecoration(
-                      border: Border.all(color: Theme.of(context).primaryColor)
-                  ),
-                  child: Column(
-                    children: [
-                      DataTable(
-                        columns: [
-                          DataColumn(label: const Text("Data")),
-                          DataColumn(label: const Text("Rede")),
-                          DataColumn(label: const Text("Qtd")),
-                          DataColumn(label: const Text("Valor"))
-                        ],
-                        rows: widget.listaDeLancamentos.map((e) {
-
-                          // Formatar para para dd/MM
-                          final formatoData = new DateFormat('dd/MM');
-                          DateTime dataLancamentoFormatada = new DateTime.fromMillisecondsSinceEpoch(e.dataLancamento!.millisecondsSinceEpoch);
-
-                          return DataRow(
-                              selected: true,
-                              cells: [
-                                DataCell(Text(formatoData.format(dataLancamentoFormatada.toLocal()))),
-                                DataCell(Text(e.nomeRede!)),
-                                DataCell(Text(e.quantidade.toString())),
-                                DataCell(Text("R\$${e.valorUnitario}")),
-                              ]);
-                        }).toList(),
-                      ),
-                      Divider(
-                        height: 20,
-                        thickness: 20,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(vertical: overflowYBotao),
-                        child: Row(
-                          children: [
-                            Text("Total: ",
-                                style: TextStyle(
-                                    fontSize: 28
-                                )
-                            ),
-                            Text("${formatoMoeda.format(total)}",
-                                style: TextStyle(
-                                    fontSize: 32,
-                                    fontWeight: FontWeight.bold
-                                )
-                            )
-                          ],
-                        ),
-                      )
-                    ],
-                  )
-              ),
-              Positioned.fill(
-                bottom: 0 - overflowYBotao,
-                right: pago ? margemADireita : 0,
-                child: Align(
-                  alignment: pago ? Alignment.bottomRight : Alignment.bottomCenter,
-                  child: FlatButton.icon(
-                    shape: RoundedRectangleBorder(
-                      side: BorderSide(
-                          color: Theme.of(context).primaryColor
-                      ),
-                      borderRadius: BorderRadius.circular(50),
+      child: Observer(builder: (context){
+        return widget.store.processando ? carregamento() :
+        Column(
+          children: [
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Container(
+                    decoration: BoxDecoration(
+                        border: Border.all(color: Theme.of(context).primaryColor)
                     ),
-                    icon: Icon(pago ? Icons.check_circle :  Icons.access_time_outlined,
-                        color: Theme.of(context).primaryColor),
-                    color: Colors.white,
-                    height: alturaDoBotao,
-                    minWidth: larguraDoBotao,
-                    label: Text(
-                      pago ? "Pago" + (confirmado ? " e confirmado" : "") : "Não pago",
-                      style: TextStyle(
+                    child: Column(
+                      children: [
+                        Observer(builder: (_){
+                          return DataTable(
+                            columns: [
+                              DataColumn(label: const Text("Data")),
+                              DataColumn(label: const Text("Rede")),
+                              DataColumn(label: const Text("Qtd")),
+                              DataColumn(label: const Text("Valor"))
+                            ],
+                            rows: widget.store.listaDeLancamentos.map((e) {
+
+                              // Formatar para para dd/MM
+                              final formatoData = new DateFormat('dd/MM');
+                              DateTime dataLancamentoFormatada = new DateTime.fromMillisecondsSinceEpoch(e.dataLancamento.millisecondsSinceEpoch);
+
+                              return DataRow(
+                                  selected: true,
+                                  cells: [
+                                    DataCell(Text(formatoData.format(dataLancamentoFormatada.toLocal()))),
+                                    DataCell(Text(e.rede.nomeRede)),
+                                    DataCell(Text(e.quantidade.toString())),
+                                    DataCell(Text(formatoMoeda.format(e.valorUnitario))),
+                                  ]);
+                            }).toList(),
+                          );
+                        }),
+                        Divider(
+                          height: 20,
+                          thickness: 20,
                           color: Theme.of(context).primaryColor,
-                          fontWeight: FontWeight.bold
+                        ),
+                        Padding(
+                          padding: EdgeInsets.symmetric(vertical: overflowYBotao),
+                          child: Row(
+                            children: [
+                              Text("Total: ",
+                                  style: TextStyle(
+                                      fontSize: 28
+                                  )
+                              ),
+                              Observer(builder: (_){
+                                return Text("${formatoMoeda.format(widget.store.total)}",
+                                    style: TextStyle(
+                                        fontSize: 32,
+                                        fontWeight: FontWeight.bold
+                                    )
+                                );
+                              })
+
+                            ],
+                          ),
+                        )
+                      ],
+                    )
+                ),
+                Observer(builder: (context){
+                  return Positioned.fill(
+                    bottom: 0 - overflowYBotao,
+                    right: widget.store.pago ? margemADireita : 0,
+                    child: Align(
+                      alignment: widget.store.pago ? Alignment.bottomRight : Alignment.bottomCenter,
+                      child: FlatButton.icon(
+                        shape: RoundedRectangleBorder(
+                          side: BorderSide(
+                              color: Theme.of(context).primaryColor
+                          ),
+                          borderRadius: BorderRadius.circular(50),
+                        ),
+                        icon: Observer(builder: (_){
+                          return Icon(widget.store.pago ? Icons.check_circle :  Icons.access_time_outlined,
+                              color: Theme.of(context).primaryColor);
+                        }),
+                        color: Colors.white,
+                        height: alturaDoBotao,
+                        minWidth: larguraDoBotao,
+                        label: Observer(builder: (_){
+                          return Text(
+                            widget.store.pago ? "Pago" + (widget.store.confirmado ? " e confirmado" : "") : "Não pago",
+                            style: TextStyle(
+                                color: Theme.of(context).primaryColor,
+                                fontWeight: FontWeight.bold
+                            ),
+                          );
+                        },
+                        ),
+                        onPressed: (){
+
+                        },
+                        //child:
                       ),
                     ),
-                    onPressed: (){
 
-                    },
-                    //child:
-                  ),
-                ),
+                  );
+                }),
 
-              ),
-              !pago ? Positioned.fill(
-                bottom: 0 - overflowYBotao,
-                right: margemADireita,
-                child: Align(
-                  alignment: Alignment.bottomRight,
-                  child: FlatButton.icon(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50)
-                    ),
-                    icon: Icon(Icons.attach_money, color: Colors.white),
-                    color: Colors.green[600],
-                    height: alturaDoBotao,
-                    minWidth: larguraDoBotao,
-                    label: Text(
-                      "Pagar",
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold
+                !widget.store.pago ? Positioned.fill(
+                  bottom: 0 - overflowYBotao,
+                  right: margemADireita,
+                  child: Align(
+                    alignment: Alignment.bottomRight,
+                    child: FlatButton.icon(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(50)
                       ),
+                      icon: Icon(Icons.attach_money, color: Colors.white),
+                      color: Colors.green[600],
+                      height: alturaDoBotao,
+                      minWidth: larguraDoBotao,
+                      label: Text(
+                        "Pagar",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold
+                        ),
+                      ),
+                      onPressed: () => processarPagamento(context),
+                      //child:
                     ),
-                    onPressed: (){
-                      confirmarERealizarPagamento(context);
-                    },
-                    //child:
                   ),
-                ),
 
-              ) : SizedBox()
-            ],
-          ),
-          SizedBox(
-            height: overflowYBotao,
-          )
-        ],
+                ) : SizedBox()
+              ],
+            ),
+            SizedBox(
+              height: overflowYBotao,
+            )
+          ],
+        );
+      },
       ),
-    );
-  }
-
-  /// Método que exibe um diálogo de confirmação e, caso usuário confirme,
-  /// execute o pagamento dos registros da tabela.
-  confirmarERealizarPagamento(BuildContext context){
-
-    // Botão de Cancelar
-    Widget botaoCancelar = TextButton(
-      child: Text("Cancelar"),
-      onPressed:  () {
-        Navigator.of(context).pop();
-      },
-    );
-
-    // Botão de confirmar
-    Widget botaoConfirmar = TextButton(
-      child: Text("Confirmar"),
-      onPressed:  () {
-        Navigator.of(context).pop();
-        processarPagamento(context);
-      },
-    );
-
-
-    // Diálogo de confirmação
-    AlertDialog alert = AlertDialog(
-      title: Text("Confirmar pagamento"),
-      content: Text("Gostaria de registrar o pagamento do grupo selecionado?"),
-      actions: [
-        botaoCancelar,
-        botaoConfirmar,
-      ],
-    );
-
-    // Exibir diálogo
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return alert;
-      },
     );
   }
 
@@ -240,27 +203,13 @@ class _TabelaDeLancamentosState extends State<TabelaDeLancamentos> {
   );
 
   /// Processa o pagamento do grupo selecionado.
-  void processarPagamento(BuildContext context) async {
+  void processarPagamento(BuildContext context) {
 
-    setState(() {
-      carregando = true;
-    });
-
-    LancamentoNoCadernoModel model = LancamentoNoCadernoModel();
-
-    // Assumir mesma data de pagamento para todos os registros
-    var dataDePagamento = Timestamp.now();
-
-    // Realizar pagamentos
-    widget.listaDeLancamentos.forEach((element) {
-      widget.listaDeLancamentos.firstWhere((e) => e.idLancamento == element.idLancamento).dataPagamento = dataDePagamento;
-      widget.listaDeLancamentos.firstWhere((e) => e.idLancamento == element.idLancamento).pago = true;
-      model.informarPagamento(idDoLancamento: element.idLancamento!, idDoRedeiro: widget.idDoRedeiro, dataDoPagamento: dataDePagamento, onSuccess: informarSucesso, onFail: informarErro);
-    });
-
-    setState(() {
-      carregando = false;
-    });
+    Infraestrutura.confirmar(context: context,
+        titulo: "Confirmar pagamento",
+        mensagem: "Gostaria de registrar o pagamento do grupo selecionado?",
+        acaoAoConfirmar: widget.store.processarPagamento
+    );
   }
 
   /// Método chamado quando o pagamento é efetuado com sucesso.

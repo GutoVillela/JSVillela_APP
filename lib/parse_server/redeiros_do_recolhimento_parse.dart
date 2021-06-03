@@ -86,7 +86,7 @@ class RedeirosDoRecolhimentoParse{
     // Gravar dados no Parse Server
     final response = await dadosACadastrar.save();
 
-    if(!response.success){
+    if(response.success){
       return RedeiroDoRecolhimentoDmo.fromParse(response.result);
     }
     else{

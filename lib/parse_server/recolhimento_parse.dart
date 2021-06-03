@@ -1,7 +1,14 @@
+import 'package:geolocator/geolocator.dart';
+import 'package:jsvillela_app/dml/endereco_dmo.dart';
 import 'package:jsvillela_app/dml/grupo_de_redeiros_dmo.dart';
 import 'package:jsvillela_app/dml/recolhimento_dmo.dart';
+import 'package:jsvillela_app/dml/redeiro_dmo.dart';
+import 'package:jsvillela_app/dml/redeiro_do_recolhimento_dmo.dart';
 import 'package:jsvillela_app/infra/preferencias.dart';
+import 'package:jsvillela_app/models/redeiro_do_recolhimento_model.dart';
 import 'package:jsvillela_app/parse_server/grupo_de_redeiros_parse.dart';
+import 'package:jsvillela_app/parse_server/redeiro_parse.dart';
+import 'package:jsvillela_app/parse_server/redeiros_do_recolhimento_parse.dart';
 import 'package:parse_server_sdk/parse_server_sdk.dart';
 import 'package:jsvillela_app/parse_server/erros_parse.dart';
 
@@ -116,21 +123,68 @@ class RecolhimentoParse{
   }
 
   /// Método responsável por iniciar um recolhimento no Parse Server.
-  Future<RecolhimentoDmo> iniciarRecolhimento(RecolhimentoDmo recolhimento) async {
+  Future<List<RedeiroDoRecolhimentoDmo>> iniciarRecolhimento(String idRecolhimento) async {
 
-    // Alterar informações do recolhimento
+    // Cloud Function responsável por processar o início do recolhimento
+    final cloudFunction = ParseCloudFunction('iniciarRecolhimento');
+    final parametros = { 'idRecolhimento' : idRecolhimento };
+
+    try{
+
+      // Executar Função pelo Servidor
+      final response = await cloudFunction.execute(parameters: parametros);
+
+      if(response.success){
+        return  (response.result as List).map((e) => RedeiroDoRecolhimentoDmo(
+          id: e[RedeirosDoRecolhimentoParse.CAMPO_ID_RELACAO_REDEIRO_GRUPO],
+          redeiro: RedeiroDmo(
+            id: e[RedeirosDoRecolhimentoParse.RELACAO_REDEIRO][RedeiroParse.CAMPO_ID_REDEIRO],
+            nome: e[RedeiroDoRecolhimentoModel.CAMPO_REDEIRO][RedeiroParse.CAMPO_NOME],
+            endereco: EnderecoDmo(
+              logradouro: e[RedeiroDoRecolhimentoModel.CAMPO_REDEIRO][RedeiroParse.CAMPO_NOME],
+              numero: e[RedeiroDoRecolhimentoModel.CAMPO_REDEIRO][RedeiroParse.CAMPO_ENDERECO_NUMERO] ?? "",
+              bairro: e[RedeiroDoRecolhimentoModel.CAMPO_REDEIRO][RedeiroParse.CAMPO_ENDERECO_BAIRRO] ?? "",
+              cidade: e[RedeiroDoRecolhimentoModel.CAMPO_REDEIRO][RedeiroParse.CAMPO_ENDERECO_CIDADE] ?? "",
+              cep: e[RedeiroDoRecolhimentoModel.CAMPO_REDEIRO][RedeiroParse.CAMPO_ENDERECO_CEP] ?? "",
+              complemento: e[RedeiroDoRecolhimentoModel.CAMPO_REDEIRO][RedeiroParse.CAMPO_ENDERECO_COMPLEMENTO] ?? "",
+              posicao: Position(
+                  latitude: e[RedeiroDoRecolhimentoModel.CAMPO_REDEIRO][RedeiroParse.CAMPO_ENDERECO_POSICAO]['latitude'],
+                  longitude: e[RedeiroDoRecolhimentoModel.CAMPO_REDEIRO][RedeiroParse.CAMPO_ENDERECO_POSICAO]['longitude'],
+                  timestamp: null, accuracy: 0, altitude: 0, heading: 0, speed: 0, speedAccuracy: 0
+              )
+            ),
+            gruposDoRedeiro: []
+          )
+        )).toList();
+      }
+      else{
+        print("ERRO QUE DEU: ${ErrosParse.obterDescricao(response.error!.code)}");
+        if(response.error != null)
+          return Future.error(ErrosParse.obterDescricao(response.error!.code));
+        else
+          return Future.error("Aconteceu um erro inesperado!");
+      }
+    }catch(ex){
+      return Future.error(ex);
+    }
+  }
+
+  /// Método responsável por terminar um recolhimento no Parse Server.
+  Future<RecolhimentoDmo> terminarRecolhimento(String idRecolhimento, DateTime dataFinalizacao) async {
+
+    // Definir informações do recolhimento
     final dadosASalvar = ParseObject(NOME_CLASSE)
-      ..objectId = recolhimento.id
-      ..set<DateTime?>(CAMPO_DATA_INICIADO, recolhimento.dataIniciado);
+      ..objectId = idRecolhimento
+      ..set<DateTime?>(CAMPO_DATA_FINALIZADO, dataFinalizacao);
 
-    // Gravar dados no Parse Server
+    // Criar usuário no Parse Server
     final response = await dadosASalvar.save();
 
     if(response.success){
-      return recolhimento;
+      // Em caso de sucesso recuperar ID do recolhimento
+      return RecolhimentoDmo.fromParse(response.result as ParseObject);
     }
     else{
-      print("ERRO QUE DEU: ${ErrosParse.obterDescricao(response.error!.code)}");
       if(response.error != null)
         return Future.error(ErrosParse.obterDescricao(response.error!.code));
       else
@@ -138,32 +192,109 @@ class RecolhimentoParse{
     }
   }
 
+  // /// Método que busca todos os recolhimentos agendados para uma data específica no Parse Server.
+  // Future<List<RecolhimentoDmo>> obterRecolhimentosNaData(DateTime data) async{
+  //   // Criando consulta
+  //   final queryBuilder = QueryBuilder(ParseObject(NOME_CLASSE))
+  //     ..whereEqualTo(CAMPO_DATA_RECOLHIMENTO, data);
+  //
+  //   // Executar consulta
+  //   final response = await queryBuilder.query();
+  //
+  //   if(response.success){
+  //     /// Em caso de sucesso recuperar lista com os recolhimentos.
+  //     List<RecolhimentoDmo> recolhimentos = response.results?.map((e) => RecolhimentoDmo.fromParse(e)).toList() ?? [];
+  //
+  //     // Buscar grupos dos recolhimentos
+  //     for(int i = 0; i < recolhimentos.length; i++){
+  //       recolhimentos[i].gruposDoRecolhimento = await obterGruposDoRecolhimento(recolhimentos[i].id!);
+  //     }
+  //
+  //     // Retornar recolhimentos com grupos preenchidos
+  //     return recolhimentos;
+  //   }
+  //   else{
+  //     if(response.error != null)
+  //       return Future.error(ErrosParse.obterDescricao(response.error!.code));
+  //     else
+  //       return Future.error("Aconteceu um erro inesperado!");
+  //   }
+  // }
+
+  /// Converte o JSON recebido da Cloud Function em um RedeiroDmo
+  RedeiroDmo obterRedeiroDoJSON(Map<String, dynamic> json){
+    return RedeiroDmo(
+        id: json[RedeirosDoRecolhimentoParse.RELACAO_REDEIRO][RedeiroParse.CAMPO_ID_REDEIRO],
+        nome: json[RedeiroDoRecolhimentoModel.CAMPO_REDEIRO][RedeiroParse.CAMPO_NOME],
+        endereco: EnderecoDmo(
+            logradouro: json[RedeiroDoRecolhimentoModel.CAMPO_REDEIRO][RedeiroParse.CAMPO_NOME],
+            numero: json[RedeiroDoRecolhimentoModel.CAMPO_REDEIRO][RedeiroParse.CAMPO_ENDERECO_NUMERO] ?? "",
+            bairro: json[RedeiroDoRecolhimentoModel.CAMPO_REDEIRO][RedeiroParse.CAMPO_ENDERECO_BAIRRO] ?? "",
+            cidade: json[RedeiroDoRecolhimentoModel.CAMPO_REDEIRO][RedeiroParse.CAMPO_ENDERECO_CIDADE] ?? "",
+            cep: json[RedeiroDoRecolhimentoModel.CAMPO_REDEIRO][RedeiroParse.CAMPO_ENDERECO_CEP] ?? "",
+            complemento: json[RedeiroDoRecolhimentoModel.CAMPO_REDEIRO][RedeiroParse.CAMPO_ENDERECO_COMPLEMENTO] ?? "",
+            posicao: Position(
+                latitude: json[RedeiroDoRecolhimentoModel.CAMPO_REDEIRO][RedeiroParse.CAMPO_ENDERECO_POSICAO]['latitude'],
+                longitude: json[RedeiroDoRecolhimentoModel.CAMPO_REDEIRO][RedeiroParse.CAMPO_ENDERECO_POSICAO]['longitude'],
+                timestamp: null, accuracy: 0, altitude: 0, heading: 0, speed: 0, speedAccuracy: 0
+            )
+        ),
+        gruposDoRedeiro: []
+    );
+  }
+
   /// Método que busca todos os recolhimentos agendados para uma data específica no Parse Server.
   Future<List<RecolhimentoDmo>> obterRecolhimentosNaData(DateTime data) async{
-    // Criando consulta
-    final queryBuilder = QueryBuilder(ParseObject(NOME_CLASSE))
-      ..whereEqualTo(CAMPO_DATA_RECOLHIMENTO, data);
 
-    // Executar consulta
-    final response = await queryBuilder.query();
+    // Cloud Function responsável por processar o início do recolhimento
+    final cloudFunction = ParseCloudFunction('buscarRecolhimentoNaData');
+    final parametros = { 'dataDoRecolhimento' :  data.toUtc().toIso8601String() };
 
-    if(response.success){
-      /// Em caso de sucesso recuperar lista com os recolhimentos.
-      List<RecolhimentoDmo> recolhimentos = response.results?.map((e) => RecolhimentoDmo.fromParse(e)).toList() ?? [];
+    try{
 
-      // Buscar grupos dos recolhimentos
-      for(int i = 0; i < recolhimentos.length; i++){
-        recolhimentos[i].gruposDoRecolhimento = await obterGruposDoRecolhimento(recolhimentos[i].id!);
+      // Executar Função pelo Servidor
+      final response = await cloudFunction.execute(parameters: parametros);
+
+      if(response.success){
+
+        if(response.result == null || response.result.length < 1)
+          return [];
+
+        print('TESXTE FEITO =============================== ${response.result['recolhimento'][RecolhimentoParse.CAMPO_DATA_RECOLHIMENTO]['iso']}');
+        DateTime teste = DateTime.parse(response.result['recolhimento'][RecolhimentoParse.CAMPO_DATA_RECOLHIMENTO]['iso']);
+        print('TESXTE DATA FEITO =============================== ${teste.toString()}');
+
+        //Montar recolhimento
+        RecolhimentoDmo recolhimento = RecolhimentoDmo(
+          id: response.result['recolhimento'][RecolhimentoParse.CAMPO_ID_RECOLHIMENTO],
+          dataDoRecolhimento: DateTime.parse(response.result['recolhimento'][RecolhimentoParse.CAMPO_DATA_RECOLHIMENTO]['iso']),
+          dataIniciado: DateTime.tryParse(response.result['recolhimento'][RecolhimentoParse.CAMPO_DATA_INICIADO]?['iso'] ?? ""),
+          dataFinalizado: DateTime.tryParse(response.result['recolhimento'][RecolhimentoParse.CAMPO_DATA_FINALIZADO]?['iso'] ?? ""),
+          gruposDoRecolhimento: (response.result[RecolhimentoParse.RELACIONAMENTO_GRUPOS_DO_RECOLHIMENTO] as List).map((e) =>
+              GrupoDeRedeirosDmo(
+                  idGrupo: e[GrupoDeRedeirosParse.CAMPO_ID_GRUPOS_DE_REDEIROS],
+                  nomeGrupo: e[GrupoDeRedeirosParse.CAMPO_NOME_GRUPO]
+              )
+          ).toList(),
+        );
+
+        recolhimento.redeirosDoRecolhimento = (response.result['redeirosDoRecolhimento'] as List).map((e) =>
+            RedeiroDoRecolhimentoDmo(
+              id: e[RedeirosDoRecolhimentoParse.CAMPO_ID_RELACAO_REDEIRO_GRUPO],
+              redeiro: obterRedeiroDoJSON(e),
+              dataFinalizacao: DateTime.tryParse(e[RedeirosDoRecolhimentoParse.CAMPO_DATA_FINALIZADO]?['iso'] ?? "")
+            ),
+        ).toList();
+        return  [recolhimento];
       }
-
-      // Retornar recolhimentos com grupos preenchidos
-      return recolhimentos;
-    }
-    else{
-      if(response.error != null)
-        return Future.error(ErrosParse.obterDescricao(response.error!.code));
-      else
-        return Future.error("Aconteceu um erro inesperado!");
+      else{
+        if(response.error != null)
+          return Future.error(ErrosParse.obterDescricao(response.error!.code));
+        else
+          return Future.error("Aconteceu um erro inesperado!");
+      }
+    }catch(ex){
+      return Future.error(ex);
     }
   }
 
@@ -173,6 +304,7 @@ class RecolhimentoParse{
     List<RecolhimentoDmo> recolhimentosDaData =
     await obterRecolhimentosNaData(data);
 
+    print('VÁLIDO ================================================== ${!recolhimentosDaData.any((element) => true)}');
     return !recolhimentosDaData.any((element) => true);
   }
 

@@ -23,7 +23,7 @@ class RedeDmo implements BaseDmo{
   RedeDmo.fromParse(ParseObject parseObject) :
         id = parseObject.objectId ?? "",
         nomeRede = parseObject.get(RedeParse.CAMPO_NOME_REDE) ?? "Falha ao obter o nome da rede",
-        valorUnitarioRede = parseObject.get(RedeParse.CAMPO_VLR_UNITARIO);
+        valorUnitarioRede = double.parse(parseObject.get(RedeParse.CAMPO_VLR_UNITARIO).toString());
 
   /// Converte um snapshot em um objeto RedeDmo.
   static RedeDmo converterSnapshotEmRede(DocumentSnapshot rede){

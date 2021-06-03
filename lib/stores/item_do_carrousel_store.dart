@@ -1,7 +1,10 @@
+import 'package:get_it/get_it.dart';
 import 'package:jsvillela_app/dml/redeiro_do_recolhimento_dmo.dart';
 import 'package:jsvillela_app/infra/infraestrutura.dart';
 import 'package:jsvillela_app/parse_server/redeiros_do_recolhimento_parse.dart';
 import 'package:mobx/mobx.dart';
+
+import 'inicio_store.dart';
 
 part 'item_do_carrousel_store.g.dart';
 
@@ -14,11 +17,16 @@ abstract class _ItemDoCarrouselStore with Store{
   //#endregion Construtor(es)
 
   //#region Atributos
-  /// Redeiro do recolhimento associado ao Card.
-  final RedeiroDoRecolhimentoDmo redeiroDoRecolhimento;
+
+  /// Store que controla tela inicial.
+  final InicioStore inicioStore = GetIt.I<InicioStore>();
   //#endregion Atributos
 
   //#region Observables
+  /// Redeiro do recolhimento associado ao Card.
+  @observable
+  RedeiroDoRecolhimentoDmo redeiroDoRecolhimento;
+
   ///Atributo observável que define se classe está processando uma tarefa.
   @observable
   bool processando = false;
@@ -32,6 +40,10 @@ abstract class _ItemDoCarrouselStore with Store{
 
   //#region Computed
 
+  /// Define se recolhimento do redeiro foi finalizado ou não
+  @computed
+  bool get finalizado => redeiroDoRecolhimento.dataFinalizacao != null;
+
   //#endregion Computed
 
   //#region Actions
@@ -44,7 +56,7 @@ abstract class _ItemDoCarrouselStore with Store{
 
     try{
 
-      // Definir data de finalização do recolhimento
+      // Definir hora de finalização
       redeiroDoRecolhimento.dataFinalizacao = DateTime.now();
 
       // Salvar recolhimento
@@ -52,6 +64,13 @@ abstract class _ItemDoCarrouselStore with Store{
           idRedeiroDoRecolhimento: redeiroDoRecolhimento.id!,
           dataFinalizacao: redeiroDoRecolhimento.dataFinalizacao!
       );
+
+      // Redundância para atualizar computed
+      redeiroDoRecolhimento = redeiroDoRecolhimento;
+
+      // Atualizar também recolhimento do dia na Store da tela de início
+      inicioStore.recolhimentoDoDia!.redeirosDoRecolhimento.firstWhere((element) => element.id == redeiroDoRecolhimento.id).dataFinalizacao =redeiroDoRecolhimento.dataFinalizacao;
+      inicioStore.verificarSeRecolhimentoFoiFinalizado();
 
       // Indicar que classe finalizou o processamento.
       processando = false;
