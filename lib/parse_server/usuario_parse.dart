@@ -1,5 +1,5 @@
 import 'package:jsvillela_app/dml/usuario_dmo.dart';
-import 'package:jsvillela_app/infra/enums.dart';
+import 'package:jsvillela_app/infra/infraestrutura.dart';
 import 'package:jsvillela_app/parse_server/erros_parse.dart';
 import 'package:parse_server_sdk/parse_server_sdk.dart';
 
@@ -44,11 +44,11 @@ class UsuarioParse{
     ..set<bool>(CAMPO_WHATSAPP, usuario.whatsapp);
 
     // Criar usuário no Parse Server
-    final response = await parseUser.signUp();
+    final response = await parseUser.signUp(allowWithoutEmail: true);
     
     if(response.success){
       // Em caso de sucesso retornar objeto de usuário preenchido.
-      return _converterParseEmUsuario(response.result);
+      return UsuarioDmo.fromParse(response.result);
     }
     else{
       if(response.error != null)
@@ -64,12 +64,18 @@ class UsuarioParse{
     // Criar objeto Parse User para logar usuário
     final parseUser = ParseUser(usuario, senha, null);
 
-    // Realizar login do usuário
+    // Realizar login do usuáriotay
     final response = await parseUser.login();
 
     if(response.success){
+
+      UsuarioDmo usuarioDmo = UsuarioDmo.fromParse(response.result);
+
+      // Configurar push notifications após login
+      await Infraestrutura.configurarPushFCM(usuarioDmo.id!);
+
       // Em caso de sucesso retornar objeto de usuário preenchido.
-      return _converterParseEmUsuario(response.result);
+      return usuarioDmo;
     }
     else{
       if(response.error != null)
@@ -90,7 +96,7 @@ class UsuarioParse{
 
     if(response.success){
       // Em caso de sucesso retornar objeto de usuário preenchido.
-      return _converterParseEmUsuario(response.result);
+      return UsuarioDmo.fromParse(response.result);
     }
     else{
       if(response.error != null)
@@ -98,18 +104,6 @@ class UsuarioParse{
       else
         return Future.error("Aconteceu um erro inesperado!");
     }
-  }
-
-  /// Método que converte objeto do Parse Server em um objeto UsuarioDmo.
-  UsuarioDmo _converterParseEmUsuario(ParseUser usuarioParse){
-    return UsuarioDmo(
-        usuario: usuarioParse.get(CAMPO_NOME_DE_USUARIO),
-        senha: usuarioParse.get(CAMPO_EMAIL),
-        telefone: usuarioParse.get(CAMPO_TELEFONE_DO_USUARIO),
-        whatsapp: usuarioParse.get(CAMPO_WHATSAPP),
-        tipoDeUsuario: TipoDeUsuario.values[usuarioParse.get(CAMPO_TIPO_DE_USUARIO)],
-        id: usuarioParse.objectId
-    );
   }
   //#endregion Métodos
 }

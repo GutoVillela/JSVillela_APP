@@ -29,6 +29,14 @@ class GrupoDeRedeirosDmo implements BaseDmo {
   String toString() {
     return "GrupoDeRedeirosDmo(idGrupo: $idGrupo, nomeGrupo: $nomeGrupo)";
   }
+
+  /// Obtém o nome do grupo para Push Notification.
+  String obterNomeCanalPush(){
+    if(idGrupo.isEmpty)
+      throw "O nome do grupo é obrigatório";
+
+    return "GrupoDeRedeiros_$idGrupo";
+  }
   //#endregion Métodos
 
 }

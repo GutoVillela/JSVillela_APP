@@ -1,10 +1,9 @@
-import 'package:jsvillela_app/dml/base_dmo.dart';
 import 'package:jsvillela_app/dml/rede_dmo.dart';
 import 'package:jsvillela_app/parse_server/lancamento_do_caderno_parse.dart';
 import 'package:jsvillela_app/parse_server/rede_parse.dart';
 
 /// Classe modelo para lançamentos do caderno.
-class LancamentoDoCadernoDmo implements BaseDmo{
+class LancamentoDoCadernoDmo{
 
   //#region Atributos
 
@@ -50,11 +49,7 @@ class LancamentoDoCadernoDmo implements BaseDmo{
   //#endregion Construtor(es)
 
   //#region Métodos
-  @override
-  Map<String, dynamic> converterParaMapa() {
-    // TODO: implement converterParaMapa
-    throw UnimplementedError();
-  }
+
   //#endregion Métodos
 
 }

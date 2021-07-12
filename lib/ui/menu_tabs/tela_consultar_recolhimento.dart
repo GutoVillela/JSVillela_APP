@@ -146,69 +146,72 @@ class _TelaConsultarRecolhimentoState extends State<TelaConsultarRecolhimento> {
                           child: Container(
                             child: Observer(
                               builder: (_){
-                                return ListView.builder(
-                                    controller: _scrollController,
-                                    scrollDirection: Axis.vertical,
-                                    shrinkWrap: true,
-                                    padding: EdgeInsets.only(top: 10),
-                                    itemCount:  store.listaDeRecolhimentos.length + 1, // É somado um pois o último widget será um item de carregamento
-                                    itemBuilder: (context, index){
+                                return RefreshIndicator(
+                                    child: ListView.builder(
+                                        controller: _scrollController,
+                                        scrollDirection: Axis.vertical,
+                                        shrinkWrap: true,
+                                        padding: EdgeInsets.only(top: 10),
+                                        itemCount:  store.listaDeRecolhimentos.length + 1, // É somado um pois o último widget será um item de carregamento
+                                        itemBuilder: (context, index){
 
-                                      if(index == store.listaDeRecolhimentos.length){
-                                        if(store.temMaisRegistros)
-                                          return CupertinoActivityIndicator();
-                                        else
-                                          return Divider();
-                                      }
-
-                                      /// Formatar para para dd/MM/yyyy
-                                      final formatoData = new DateFormat('dd/MM/yyyy');
-
-                                      return ListViewItemPesquisa(
-                                        textoPrincipal: formatoData.format(store.listaDeRecolhimentos[index].dataDoRecolhimento.toLocal()),
-                                        textoSecundario: store.listaDeRecolhimentos[index].dataFinalizado != null ? ("Finalizado em ${formatoData.format(store.listaDeRecolhimentos[index].dataFinalizado!)}.") : "Não finalizado",
-                                        iconeEsquerda: Icons.directions_car,
-                                        iconeDireita: Icons.arrow_forward_ios_sharp,
-                                        acaoAoClicar: () async {
-
-                                          // Buscar grupos do recolhimento caso não tenha sido buscado inicialmente
-                                          if(store.listaDeRecolhimentos[index].gruposDoRecolhimento.isEmpty){
-                                            Infraestrutura.mostrarDialogoDeCarregamento(
-                                                context: context,
-                                                titulo: "Buscando grupos do recolhimento..."
-                                            );
-
-                                            store.listaDeRecolhimentos[index].gruposDoRecolhimento = await store.buscarGruposDoRecolhimento(store.listaDeRecolhimentos[index].id!);
-
-                                            // Fechar diálogo de carregamento.
-                                            Navigator.of(context).pop();
+                                          if(index == store.listaDeRecolhimentos.length){
+                                            if(store.temMaisRegistros)
+                                              return CupertinoActivityIndicator();
+                                            else
+                                              return Divider();
                                           }
 
-                                          Navigator.of(context).push(
-                                              MaterialPageRoute(builder: (context) => TelaInformacoesDoRecolhimento(store.listaDeRecolhimentos[index]))
+                                          /// Formatar para para dd/MM/yyyy
+                                          final formatoData = new DateFormat('dd/MM/yyyy');
+
+                                          return ListViewItemPesquisa(
+                                            textoPrincipal: formatoData.format(store.listaDeRecolhimentos[index].dataDoRecolhimento.toLocal()),
+                                            textoSecundario: store.listaDeRecolhimentos[index].dataFinalizado != null ? ("Finalizado em ${formatoData.format(store.listaDeRecolhimentos[index].dataFinalizado!)}.") : "Não finalizado",
+                                            iconeEsquerda: Icons.directions_car,
+                                            iconeDireita: Icons.arrow_forward_ios_sharp,
+                                            acaoAoClicar: () async {
+
+                                              // Buscar grupos do recolhimento caso não tenha sido buscado inicialmente
+                                              if(store.listaDeRecolhimentos[index].gruposDoRecolhimento.isEmpty){
+                                                Infraestrutura.mostrarDialogoDeCarregamento(
+                                                    context: context,
+                                                    titulo: "Buscando grupos do recolhimento..."
+                                                );
+
+                                                store.listaDeRecolhimentos[index].gruposDoRecolhimento = await store.buscarGruposDoRecolhimento(store.listaDeRecolhimentos[index].id!);
+
+                                                // Fechar diálogo de carregamento.
+                                                Navigator.of(context).pop();
+                                              }
+
+                                              Navigator.of(context).push(
+                                                  MaterialPageRoute(builder: (context) => TelaInformacoesDoRecolhimento(store.listaDeRecolhimentos[index]))
+                                              );
+                                            },
+                                            acoesDoSlidable:
+                                            store.listaDeRecolhimentos[index].dataFinalizado == null ? [
+                                            IconSlideAction(
+                                              caption: "Apagar",
+                                              color: Colors.redAccent,
+                                              icon: Icons.delete_forever_sharp,
+                                              onTap: () => _apagarRecolhimento(index),
+                                            ),
+                                            IconSlideAction(
+                                              caption: "Editar",
+                                              color: Colors.yellow[800],
+                                              icon: Icons.edit,
+                                              onTap: () {
+                                                Navigator.of(context).push(
+                                                    MaterialPageRoute(builder: (context) => TelaAgendarRecolhimento(tipoDeManutencao: TipoDeManutencao.alteracao, recolhimentoASerEditado: store.listaDeRecolhimentos[index]))
+                                                );
+                                              },
+                                            )
+                                            ] : null,
                                           );
-                                        },
-                                        acoesDoSlidable:
-                                        store.listaDeRecolhimentos[index].dataFinalizado == null ? [
-                                        IconSlideAction(
-                                          caption: "Apagar",
-                                          color: Colors.redAccent,
-                                          icon: Icons.delete_forever_sharp,
-                                          onTap: () => _apagarRecolhimento(index),
-                                        ),
-                                        IconSlideAction(
-                                          caption: "Editar",
-                                          color: Colors.yellow[800],
-                                          icon: Icons.edit,
-                                          onTap: () {
-                                            Navigator.of(context).push(
-                                                MaterialPageRoute(builder: (context) => TelaAgendarRecolhimento(tipoDeManutencao: TipoDeManutencao.alteracao, recolhimentoASerEditado: store.listaDeRecolhimentos[index]))
-                                            );
-                                          },
-                                        )
-                                        ] : null,
-                                      );
-                                    }
+                                        }
+                                    ),
+                                    onRefresh: () async => store.obterListaPaginadaDeRecolhimentos(true)
                                 );
                               },
                             ),

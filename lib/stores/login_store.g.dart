@@ -215,7 +215,7 @@ mixin _$LoginStore on _LoginStore, Store {
   final _$logarUsuarioAsyncAction = AsyncAction('_LoginStore.logarUsuario');
 
   @override
-  Future<bool> logarUsuario() {
+  Future<UsuarioDmo?> logarUsuario() {
     return _$logarUsuarioAsyncAction.run(() => super.logarUsuario());
   }
 

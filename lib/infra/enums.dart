@@ -56,3 +56,19 @@ enum TipoDeUsuario{
     /// Usuário com privilégios de acesso de um redeiro.
     redeiro
 }
+
+/// Enum que define os tipos de avisos disponíveis.
+enum TiposDeAviso{
+
+    /// Aviso do tipo "Solicitacaçõo de Edição"
+    solicitacaoEdicao,
+
+    /// Aviso do tipo "Recolhimento Agendado".
+    recolhimentoAgendado,
+
+    /// Aviso do tipo "Pagamento Efetuado"
+    pagamentoEfetuado,
+
+    /// Aviso do tipo "Confirmação do Pagamento Efetuado"
+    confirmacaoDePagamento
+}

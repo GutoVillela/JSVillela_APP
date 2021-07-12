@@ -206,7 +206,10 @@ class _TabelaDeLancamentosState extends State<TabelaDeLancamentos> {
     Infraestrutura.confirmar(context: context,
         titulo: "Confirmar pagamento",
         mensagem: "Gostaria de registrar o pagamento do grupo selecionado?",
-        acaoAoConfirmar: widget.store.processarPagamento
+        acaoAoConfirmar: () async {
+          await widget.store.processarPagamento();
+          Navigator.of(context).pop();
+        }
     );
   }
 

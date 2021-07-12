@@ -89,6 +89,9 @@ class TelaInformacoesDoRedeiro extends StatelessWidget {
                     fontSize: 20,
                     fontWeight: FontWeight.bold
                   )),
+                  SelectableText(redeiro.id ?? "",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   Text(redeiro.endereco.toString(), textAlign: TextAlign.center),
                   SizedBox(height: 10),
                   Row(
@@ -131,7 +134,7 @@ class TelaInformacoesDoRedeiro extends StatelessWidget {
                           String numeroWpp = "55" + redeiro.celular!.replaceAll(new RegExp(r'\('), '')
                           .replaceAll(new RegExp(r'\)'), '').replaceAll(new RegExp(r'-'), '').replaceAll(' ', '');
 
-                          launch("https://wa.me/${numeroWpp}?text=${"Boa tarde, tudo bem?"}");
+                          launch("https://wa.me/$numeroWpp?text=${"Boa tarde, tudo bem?"}");
                         }
                       )
                     ],

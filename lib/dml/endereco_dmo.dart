@@ -44,6 +44,16 @@ class EnderecoDmo implements BaseDmo{
     complemento = parseObject.get(RedeiroParse.CAMPO_ENDERECO_COMPLEMENTO) ?? "",
     posicao = parseObject.get<ParseGeoPoint>(RedeiroParse.CAMPO_ENDERECO_POSICAO) == null ? null : Position(longitude: parseObject.get<ParseGeoPoint>(RedeiroParse.CAMPO_ENDERECO_POSICAO)!.longitude, latitude: parseObject.get<ParseGeoPoint>(RedeiroParse.CAMPO_ENDERECO_POSICAO)!.latitude, timestamp: null, accuracy: 0, altitude: 0, heading: 0, speed: 0, speedAccuracy: 0)
   ;
+
+  EnderecoDmo.fromMap(Map<String, dynamic> mapa) :
+        logradouro = mapa[RedeiroParse.CAMPO_ENDERECO_LOGRADOURO] ?? "",
+        numero = mapa[RedeiroParse.CAMPO_ENDERECO_NUMERO] ?? "",
+        bairro = mapa[RedeiroParse.CAMPO_ENDERECO_BAIRRO] ?? "",
+        cidade = mapa[RedeiroParse.CAMPO_ENDERECO_CIDADE] ?? "",
+        cep = mapa[RedeiroParse.CAMPO_ENDERECO_CEP] ?? "",
+        complemento = mapa[RedeiroParse.CAMPO_ENDERECO_COMPLEMENTO] ?? "",
+        posicao = Position(longitude: mapa[RedeiroParse.CAMPO_ENDERECO_POSICAO]['longitude'], latitude: mapa[RedeiroParse.CAMPO_ENDERECO_POSICAO]['latitude'], timestamp: null, accuracy: 0, altitude: 0, heading: 0, speed: 0, speedAccuracy: 0)
+  ;
   //#endregion Construtor(es)
 
   //#region Métodos

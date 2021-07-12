@@ -58,6 +58,9 @@ class RedeiroParse{
   /// Constante que define o nome da relação N para N da classe "Redeiros" com a classe "Caderno" do Parse Server.
   static const String RELACAO_CADERNO = "caderno";
 
+  /// Constante que define o campo "usuario" da classe "Redeiros" do Parse Server.
+  static const String CAMPO_USUARIO = "usuario";
+
   //#endregion Constantes
 
   //#region Métodos
@@ -89,6 +92,26 @@ class RedeiroParse{
       // Cadastrar relação entre o Redeiro e os grupos no Parse Server.
       await RedeirosEGruposParse().cadastrarRelacaoRedeiroGrupos(redeiro.id!, redeiro.gruposDoRedeiro.map((e) => e.idGrupo).toList());
 
+      // // Criar novo usuário para o redeiro
+      // UsuarioDmo usuario = UsuarioDmo(usuario: redeiro.id!, senha: "1234", telefone: redeiro.celular ?? "", whatsapp: redeiro.whatsApp, tipoDeUsuario: TipoDeUsuario.redeiro);
+      // redeiro.usuario = await UsuarioParse().cadastrarUsuario(usuario);
+      //
+      // print('REGISTROU USUARIO: ${redeiro.usuario.toString()}');
+      //
+      // // Atualizar redeiro com usuário
+      // final dadosASalvar2 = ParseObject(NOME_CLASSE)
+      //   ..objectId = redeiro.id
+      //   ..set(CAMPO_USUARIO, (ParseUser('', '', '')..objectId = redeiro.usuario!.id).toPointer());
+      //
+      // print('TÁ TENTANDO REGISTRAR O REDEIRO');
+      //
+      // // Gravar dados no Parse Server
+      // await dadosASalvar2.save();
+      //
+      //
+      // print('REGISTROU REDEIRO: ${redeiro.toString()}');
+
+
       // Retornar redeiro com ID preenchido.
       return redeiro;
     }
@@ -119,6 +142,9 @@ class RedeiroParse{
       if(!gruposARemover.any((element) => element.idGrupo == grupo.idGrupo))
         gruposAAdicionar.add(grupo);
     });
+
+    if(redeiro.email != null && redeiro.email!.isEmpty)
+      redeiro.email = null;
 
     // Alterar informações do redeiro
     final dadosASalvar = ParseObject(NOME_CLASSE)
@@ -234,7 +260,7 @@ class RedeiroParse{
     // Obter lista de redeiros
     List<RedeiroDmo> redeiros = await RedeirosEGruposParse().obterRedeirosAPartirDosGrupos(listaDeGrupos);
 
-    return redeiros.map((e) => e.endereco.cidade ?? "Cidade não cadastrada").toList();
+    return redeiros.map((e) => e.endereco.cidade ?? "Cidade não cadastrada").toSet().toList();
   }
 
   /// Método responsável por apagar um Redeiro do Parse Server.

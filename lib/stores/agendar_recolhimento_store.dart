@@ -102,9 +102,6 @@ abstract class _AgendarRecolhimentoStore with Store{
   @action
   Future<bool> validarData(DateTime? value) async{
 
-    // Informar interface que a data está sendo validada
-    validandoData = true;
-
     // Iniciar data como inválida antes das validações finalizarem.
     bool dataValida = false;
 
@@ -112,8 +109,11 @@ abstract class _AgendarRecolhimentoStore with Store{
     if(value == null)
       return dataValida;
 
+    // Informar interface que a data está sendo validada
+    validandoData = true;
+
     try{
-      print('VALIDANDO A DATA =====================');
+
       // Verificar se data é válida
       if((tipoDeManutencao == TipoDeManutencao.alteracao && value.isAtSameMomentAs(recolhimentoASerEditado!.dataDoRecolhimento))
           || await RecolhimentoParse().validarSeExisteRecolhimentoAgendadoParaAData(value)){
@@ -132,11 +132,9 @@ abstract class _AgendarRecolhimentoStore with Store{
         return Future.error("Já existe um agendamento para a data selecionada. Por favor escolha outra data!");
       }
 
-      print('DATA VÁLIDA ===================================== $dataValida');
       return dataValida;
     }
     catch(e){
-      print('deu bem ruim ===================== ${e.toString()}');
       // Informar interface que a validação da data terminou.
       validandoData = false;
 

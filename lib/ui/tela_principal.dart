@@ -100,14 +100,7 @@ class _TelaPrincipalState extends State<TelaPrincipal> {
             drawer: CustomDrawer(),
             body: TelaConsultarRecolhimento()
         ),
-        Scaffold(
-            appBar: AppBar(
-              title: Text("NOTIFICAÇÕES"),
-              centerTitle: true,
-            ),
-            drawer: CustomDrawer(),
-            body: TelaNotificacoes()
-        ),
+        TelaNotificacoes(),
         Scaffold(
             appBar: AppBar(
               title: Text("CADASTRO DE REDEIROS"),

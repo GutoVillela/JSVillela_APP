@@ -8,20 +8,12 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:125937015070:android:eb0705b1de7f147431510f",
+        "mobilesdk_app_id": "1:125937015070:android:23d4a93bea2f17cd31510f",
         "android_client_info": {
           "package_name": "br.com.jsvillela.recolhedor"
         }
       },
       "oauth_client": [
-        {
-          "client_id": "125937015070-rpsq7gbe1rgufj7lhp3ko7ttk7b192m1.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "br.com.jsvillela.recolhedor",
-            "certificate_hash": "459ce5a51c4ded7fb25441d6bdb3436cc65f55f1"
-          }
-        },
         {
           "client_id": "125937015070-t3v9s4fkgtko5enu62e0sn7p4viep3k9.apps.googleusercontent.com",
           "client_type": 3
@@ -29,7 +21,7 @@
       ],
       "api_key": [
         {
-          "current_key": ""
+          "current_key": "AIzaSyAtsWz3hEnP-lEZtJaBaV9EktLweLajEp4"
         }
       ],
       "services": {

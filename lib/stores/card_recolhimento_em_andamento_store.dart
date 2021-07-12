@@ -43,7 +43,7 @@ abstract class _CardRecolhimentoEmAndamentoStore with Store{
       DateTime dataFinalizado = DateTime.now();
 
       // Terminar recolhimento
-      await RecolhimentoParse().terminarRecolhimento(inicioStore.recolhimentoDoDia!.id!, dataFinalizado);
+      await RecolhimentoParse().terminarRecolhimento(inicioStore.recolhimentoDoDia!, dataFinalizado);
 
       // Indicar que classe finalizou o processamento.
       terminandoRecolhimento = false;

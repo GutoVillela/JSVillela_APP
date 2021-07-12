@@ -3,8 +3,6 @@ import 'package:jsvillela_app/infra/enums.dart';
 import 'package:jsvillela_app/parse_server/grupo_de_redeiros_parse.dart';
 import 'package:mobx/mobx.dart';
 
-import 'consultar_redeiros_store.dart';
-
 part 'cadastrar_grupo_de_redeiros_store.g.dart';
 
 class CadastrarGrupoDeRedeirosStore = _CadastrarGrupoDeRedeirosStore with _$CadastrarGrupoDeRedeirosStore;

@@ -11,11 +11,7 @@ class ConsultarRecolhimentosStore = _ConsultarRecolhimentosStore with _$Consulta
 
 abstract class _ConsultarRecolhimentosStore with Store{
   //#region Construtor(es)
-  _ConsultarRecolhimentosStore(){
-    autorun((_){
-      print("################################### processando: ${processando}");
-    });
-  }
+
   //#endregion Construtor(es)
 
   //#region Atributos
@@ -127,7 +123,6 @@ abstract class _ConsultarRecolhimentosStore with Store{
     }
     catch (e){
       erro = e.toString();
-      print("ERRÃO #################################: ${erro}");
       // Indicar que classe finalizou o processamento.
       if(limpaLista)
         processando = false;

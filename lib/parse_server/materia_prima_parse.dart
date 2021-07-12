@@ -24,24 +24,24 @@ class MateriaPrimaParse{
 
   //#region Métodos
   /// Método responsável por cadastrar uma nova materia prima no Parse Server.
-  Future<MateriaPrimaDmo> cadastrarMateriaPrima(MateriaPrimaDmo materia_prima) async {
+  Future<MateriaPrimaDmo> cadastrarMateriaPrima(MateriaPrimaDmo materiaPrima) async {
 
     print("CHEGOU AQUI ÓÓÓ");
 
     // Definir informações da materia prima a ser salva
     final dadosASalvar = ParseObject(NOME_CLASSE)
-      ..set<String?>(CAMPO_NOME_MATERIA_PRIMA, materia_prima.nomeMateriaPrima)
-      ..set<String?>(CAMPO_ICONE_MATERIA_PRIMA, materia_prima.iconeMateriaPrima);
+      ..set<String?>(CAMPO_NOME_MATERIA_PRIMA, materiaPrima.nomeMateriaPrima)
+      ..set<String?>(CAMPO_ICONE_MATERIA_PRIMA, materiaPrima.iconeMateriaPrima);
     print("Dados a sakvar da rede: " + dadosASalvar.toString());
     // Gravar dados no Parse Server
     final response = await dadosASalvar.save();
 
     if(response.success){
       // Em caso de sucesso recuperar id da Materia Prima cadastrada.
-      materia_prima.id = (response.result as ParseObject).objectId;
+      materiaPrima.id = (response.result as ParseObject).objectId;
 
       // Retornar redeiro com ID preenchido.
-      return materia_prima;
+      return materiaPrima;
     }
     else{
       if(response.error != null)

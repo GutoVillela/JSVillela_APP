@@ -26,7 +26,6 @@ class TelaAgendarRecolhimento extends StatefulWidget {
 
     // Em caso de edição, iniciar valores
     if(tipoDeManutencao == TipoDeManutencao.alteracao){
-      //store.recolhimentoASerEditado!.gruposDoRecolhimento = await GrupoDeRedeirosModel.of(context).carregarGruposPorId(widget.recolhimentoASerEditado!.gruposDoRecolhimento.map((e) => e.idGrupo).toList());
       store.dataDoRecolhimento = store.recolhimentoASerEditado?.dataDoRecolhimento;
       store.gruposDeRedeiros = ObservableList.of(store.recolhimentoASerEditado?.gruposDoRecolhimento ?? []);
 

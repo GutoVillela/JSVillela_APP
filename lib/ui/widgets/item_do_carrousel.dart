@@ -1,9 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:get_it/get_it.dart';
 import 'package:jsvillela_app/dml/redeiro_do_recolhimento_dmo.dart';
 import 'package:jsvillela_app/infra/infraestrutura.dart';
 import 'package:jsvillela_app/infra/paleta_de_cores.dart';
+import 'package:jsvillela_app/stores/carrousel_de_itens_store.dart';
 import 'package:jsvillela_app/stores/item_do_carrousel_store.dart';
 import 'package:jsvillela_app/ui/tela_caderno_do_redeiro.dart';
 import 'package:jsvillela_app/ui/widgets/botao_redondo.dart';
@@ -83,18 +85,16 @@ class _ItemDoCarrouselState extends State<ItemDoCarrousel> with AutomaticKeepAli
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Observer(builder: (_){
-                    return BotaoRedondo(
-                      icone: Icons.perm_contact_cal_sharp,
-                      tamanho: 30,
-                      corDoBotao: Theme.of(context).primaryColor,
-                      acaoAoClicar: (){
-                        Navigator.of(context).push(
+                  BotaoRedondo(
+                    icone: Icons.perm_contact_cal_sharp,
+                    tamanho: 30,
+                    corDoBotao: Theme.of(context).primaryColor,
+                    acaoAoClicar: (){
+                      Navigator.of(context).push(
                           MaterialPageRoute(builder: (context) => TelaCadernoDoRedeiro(redeiro: widget.store.redeiroDoRecolhimento.redeiro!))
-                        );
-                      },
-                    );
-                  }),
+                      );
+                    },
+                  ),
                   Observer(builder: (_){
                     return BotaoRedondo(
                       icone: Icons.pin_drop,
@@ -118,8 +118,10 @@ class _ItemDoCarrouselState extends State<ItemDoCarrousel> with AutomaticKeepAli
                             mensagem: "Gostaria de finalizar o recolhimento para o(a) redeiro(a) ${widget.store.redeiroDoRecolhimento.redeiro!.nome}?",
                             acaoAoConfirmar: () async {
                               Navigator.of(context).pop();//Fechar mensagem de diálogo
-
+                              final CarrouselDeItensStore store = GetIt.I<CarrouselDeItensStore>();
+                              store.proximoCard();
                               await widget.store.finalizarRecolhimentoDoRedeiro();
+
                             }
                         );
                       },
@@ -131,7 +133,8 @@ class _ItemDoCarrouselState extends State<ItemDoCarrousel> with AutomaticKeepAli
                       tamanho: 30,
                       corDoBotao: Colors.red,
                       acaoAoClicar: (){
-
+                        final CarrouselDeItensStore store = GetIt.I<CarrouselDeItensStore>();
+                        store.proximoCard();
                       },
                     );
                   })

@@ -35,7 +35,7 @@ class RedeiroDoRecolhimentoDmo implements BaseDmo{
   String toString() {
     return 'id: $id, '
         'redeiro: {${redeiro.toString()}, '
-        'dataFinalizacao: ${dataFinalizacao}';
+        'dataFinalizacao: $dataFinalizacao';
   }
 //#endregion Métodos
 }

@@ -24,6 +24,21 @@ mixin _$NavegacaoStore on _NavegacaoStore, Store {
     });
   }
 
+  final _$notificacoesAtom = Atom(name: '_NavegacaoStore.notificacoes');
+
+  @override
+  int get notificacoes {
+    _$notificacoesAtom.reportRead();
+    return super.notificacoes;
+  }
+
+  @override
+  set notificacoes(int value) {
+    _$notificacoesAtom.reportWrite(value, super.notificacoes, () {
+      super.notificacoes = value;
+    });
+  }
+
   final _$_NavegacaoStoreActionController =
       ActionController(name: '_NavegacaoStore');
 
@@ -39,9 +54,32 @@ mixin _$NavegacaoStore on _NavegacaoStore, Store {
   }
 
   @override
+  void setNotificacoes(int value) {
+    final _$actionInfo = _$_NavegacaoStoreActionController.startAction(
+        name: '_NavegacaoStore.setNotificacoes');
+    try {
+      return super.setNotificacoes(value);
+    } finally {
+      _$_NavegacaoStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void incrementarNotificacao() {
+    final _$actionInfo = _$_NavegacaoStoreActionController.startAction(
+        name: '_NavegacaoStore.incrementarNotificacao');
+    try {
+      return super.incrementarNotificacao();
+    } finally {
+      _$_NavegacaoStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     return '''
-paginaAtual: ${paginaAtual}
+paginaAtual: ${paginaAtual},
+notificacoes: ${notificacoes}
     ''';
   }
 }

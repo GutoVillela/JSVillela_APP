@@ -268,6 +268,7 @@ class _TelaCadastrarNovoRedeiroState extends State<TelaCadastrarNovoRedeiro> {
               iconeEsquerda: Icons.people_sharp,
               iconeDireita: Icons.arrow_forward_ios_sharp,
               acaoAoClicar: () {
+                FocusScope.of(context).unfocus();
                 showDialog(
                     context: context,
                     builder: (BuildContext context) {
@@ -309,6 +310,7 @@ class _TelaCadastrarNovoRedeiroState extends State<TelaCadastrarNovoRedeiro> {
                       onPressed: !widget.store.habilitaBotaoDeCadastro ? null : () async {
                         if (_formKey.currentState!.validate() &&
                             validarGruposDeRedeiros(context)) {
+                          FocusScope.of(context).unfocus();
 
                           if(await widget.store.cadastrarOuEditarRedeiro() != null){
                             _finalizarCadastroDoRedeiro();

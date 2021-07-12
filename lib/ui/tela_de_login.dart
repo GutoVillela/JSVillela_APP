@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:jsvillela_app/dml/usuario_dmo.dart';
 import 'package:jsvillela_app/infra/enums.dart';
 import 'package:jsvillela_app/infra/infraestrutura.dart';
 import 'package:jsvillela_app/infra/paleta_de_cores.dart';
@@ -201,8 +202,10 @@ class _TelaDeLoginState extends State<TelaDeLogin> {
                                               GestureDetector(
                                                   onTap: () async{
                                                     if(_chaveFormulario.currentState!.validate()){
-                                                      if(await _loginStore.logarUsuario())
-                                                        _logarUsuario();
+                                                      FocusScope.of(context).unfocus();
+                                                      UsuarioDmo? usuario = await _loginStore.logarUsuario();
+                                                      if(usuario != null)
+                                                        _logarUsuario(usuario.usuario, usuario.id!);
                                                       else
                                                         Infraestrutura.mostrarMensagemDeErro(context, _loginStore.erro ?? "Falha ao entrar!");
                                                     }
@@ -312,22 +315,19 @@ class _TelaDeLoginState extends State<TelaDeLogin> {
   }
 
   /// É chamado após o usuário ser autenticado com sucesso. Chama a tela principal.
-  void _logarUsuario() async{
+  void _logarUsuario(String usuario, String idUsuario) async{
 
     // Salvar preferência de "Manter Logado"
     await Preferencias().salvarPreferencia(PreferenciasDoApp.manterUsuarioLogado, _loginStore.lembrarUsuario);
 
-    // Salvar Usuário Logado
-    await Preferencias().salvarUsuarioLogado(_loginStore.usuario);
-    
+    if(_loginStore.lembrarUsuario){
+      // Salvar Usuário Logado
+      await Preferencias().salvarUsuarioLogado(usuario, idUsuario);
+    }
+
     Navigator.pushReplacement(context, MaterialPageRoute(
         builder: (context) => TelaPrincipal())
     );
-  }
-
-  /// Informa usuário que ocorreu uma falha no login.
-  void _informarErroDeLogin(){
-    Infraestrutura.mostrarMensagemDeErro(context, "Falha ao entrar!");
   }
 
 }

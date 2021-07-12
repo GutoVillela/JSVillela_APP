@@ -5,8 +5,6 @@ import 'package:jsvillela_app/dml/recolhimento_dmo.dart';
 import 'package:jsvillela_app/stores/card_recolhimento_em_andamento_store.dart';
 import 'package:jsvillela_app/ui/widgets/carrousel_de_itens.dart';
 
-import '../tela_caderno_do_redeiro.dart';
-
 class CardRecolhimentoEmAndamento extends StatefulWidget {
 
   //#region Atributos

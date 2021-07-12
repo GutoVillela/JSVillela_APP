@@ -1,4 +1,6 @@
+import 'package:jsvillela_app/dml/usuario_dmo.dart';
 import 'package:jsvillela_app/infra/enums.dart';
+import 'package:jsvillela_app/infra/preferencias.dart';
 import 'package:jsvillela_app/parse_server/usuario_parse.dart';
 import 'package:mobx/mobx.dart';
 
@@ -157,7 +159,7 @@ abstract class _LoginStore with Store{
 
   /// Action que realiza processo de login do usuário.
   @action
-  Future<bool> logarUsuario() async {
+  Future<UsuarioDmo?> logarUsuario() async {
 
     // Indicar que classe iniciou o processamento.
     processando = true;
@@ -166,17 +168,21 @@ abstract class _LoginStore with Store{
       // Realizar login do usuário
       final usuarioLogado = await UsuarioParse().logarUsuario(usuario, senha);
 
+      // Salvar ID do usuário logado
+      Preferencias.idUsuarioLogado = usuarioLogado.id;
+      Preferencias.nomeUsuarioLogado = usuarioLogado.usuario;
+
       // Indicar que classe finalizou o processamento.
       processando = false;
 
       // Autenticar somente usuários do tipo Recolhedor
-      return usuarioLogado.tipoDeUsuario == TipoDeUsuario.recolhedor;
+      return usuarioLogado.tipoDeUsuario == TipoDeUsuario.recolhedor ? usuarioLogado : null;
     }
     catch (e){
       erro = e.toString();
       // Indicar que classe finalizou o processamento.
       processando = false;
-      return false;
+      return null;
     }
   }
   //#endregion Actions

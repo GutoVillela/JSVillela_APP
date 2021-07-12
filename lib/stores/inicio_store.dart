@@ -1,6 +1,8 @@
 import 'package:jsvillela_app/dml/recolhimento_dmo.dart';
+import 'package:jsvillela_app/dml/solicitacao_de_materia_prima_dmo.dart';
 import 'package:jsvillela_app/parse_server/recolhimento_parse.dart';
 import 'package:jsvillela_app/parse_server/redeiro_parse.dart';
+import 'package:jsvillela_app/parse_server/solicitacao_de_materia_prima_parse.dart';
 import 'package:mobx/mobx.dart';
 
 part 'inicio_store.g.dart';
@@ -33,6 +35,9 @@ abstract class _InicioStore with Store{
 
   /// Lista que contém as cidades do recolhimento.
   ObservableList cidadesDoRecolhimento = ObservableList<String>();
+
+  /// Lista que contém as solicitações dos redeiros.
+  ObservableList solicitacoesDosRedeiros = ObservableList<SolicitacaoDeMateriaPrimaDmo>();
   //#endregion Observables
 
   //#region Computed
@@ -103,14 +108,10 @@ abstract class _InicioStore with Store{
 
     try{
 
-      // Definir dia de hoje
-      DateTime hoje = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
-
-      // Buscar recolhimentos para hoje
-      var recolhimentos = await RecolhimentoParse().obterRecolhimentosNaData(hoje);
-
-      // Atribuir recolhimento do dia
-      recolhimentoDoDia = recolhimentos.isEmpty ? null : recolhimentos.first;
+      // Buscar solicitações não atendidas
+      List<SolicitacaoDeMateriaPrimaDmo> solicitacoes = await SolicitacaoDeMateriaPrimaParse().buscarSolicitacoesNaoAtendidas(registrosAPular: 0);
+      solicitacoesDosRedeiros.clear();
+      solicitacoesDosRedeiros.addAll(solicitacoes);
 
       // Indicar que classe finalizou o processamento.
       carregandoSolicitacoes = false;
@@ -178,7 +179,7 @@ abstract class _InicioStore with Store{
 
       DateTime dataFinalizado = DateTime.now();
       
-      RecolhimentoParse().terminarRecolhimento(recolhimentoDoDia!.id!, dataFinalizado);
+      RecolhimentoParse().terminarRecolhimento(recolhimentoDoDia!, dataFinalizado);
 
       recolhimentoDoDia!.dataFinalizado = dataFinalizado;
 

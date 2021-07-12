@@ -1,4 +1,6 @@
+import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:get_it/get_it.dart';
 import 'package:jsvillela_app/infra/enums.dart';
 import 'package:jsvillela_app/infra/infraestrutura.dart';
@@ -97,6 +99,20 @@ class ItemDeMenu extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                _page == AppPages.notificacoes ?
+                Observer(
+                    builder: (_){
+                      return Badge(
+                          showBadge: navegacaoStore.notificacoes > 0,
+                          badgeContent: Observer(
+                              builder: (_){
+                                return Text(navegacaoStore.notificacoes.toString());
+                              }
+                          ),
+                          child: Icon(Icons.notifications, color: Color.fromARGB(100, 255, 255, 255))
+                      );
+                    }
+                ) :
                 Icon(_icone, size: 20, color: Color.fromARGB(100, 255, 255, 255)),
                 SizedBox(width: 32),
                 Text(_texto.toUpperCase(),

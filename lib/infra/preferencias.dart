@@ -9,8 +9,11 @@ class Preferencias{
   /// Constante que define nome da preferência "Manter usuário logado".
   static const String PREF_MANTER_LOGADO = "PREF_MANTER_LOGADO";
 
-  /// Constante que define nome da preferência que guarda a informação do usuário logado.
-  static const String PREF_USUARIO_LOGADO = "PREF_USUARIO_LOGADO";
+  /// Constante que define nome da preferência que guarda a informação do ID do usuário logado.
+  static const String PREF_ID_USUARIO_LOGADO = "PREF_ID_USUARIO_LOGADO";
+
+  /// Constante que define nome da preferência que guarda a informação do nome do usuário logado.
+  static const String PREF_NOME_USUARIO_LOGADO = "PREF_NOME_USUARIO_LOGADO";
 
   /// Constante que define nome da preferência que guarda a informação do aplicativo padrão de mapas.
   static const String PREF_APP_MAPAS = "PREF_APP_MAPAS";
@@ -25,6 +28,9 @@ class Preferencias{
 
   /// Define o ID do usuário logado.
   static String? idUsuarioLogado;
+
+  /// Define o nome do usuário logado.
+  static String? nomeUsuarioLogado;
 
   /// Define o aplicativo de mapa padrão do usuário.
   static AplicativosDeMapa aplicativosDeMapa = AplicativosDeMapa.googleMaps;
@@ -44,8 +50,10 @@ class Preferencias{
     int? appMapa = preferencias.getInt(PREF_APP_MAPAS);
     aplicativosDeMapa =  appMapa != null ? AplicativosDeMapa.values[appMapa] : AplicativosDeMapa.googleMaps;
 
-    if(manterUsuarioLogado)
-      idUsuarioLogado = preferencias.getString(PREF_USUARIO_LOGADO);
+    if(manterUsuarioLogado){
+      idUsuarioLogado = preferencias.getString(PREF_ID_USUARIO_LOGADO);
+      nomeUsuarioLogado = preferencias.getString(PREF_NOME_USUARIO_LOGADO);
+    }
   }
 
   /// Obtém localização atual do dispositivo do usuário
@@ -119,13 +127,15 @@ class Preferencias{
   }
 
   /// Salva o usuário logado.
-  Future<void> salvarUsuarioLogado(String usuario) async{
+  Future<void> salvarUsuarioLogado(String usuario, String idUsuario) async{
 
     // Salvar preferência
     final SharedPreferences preferencias = await SharedPreferences.getInstance();
 
     // Salvar corretamente a preferência
-    preferencias.setString(Preferencias.PREF_USUARIO_LOGADO, usuario);
+    preferencias.setString(Preferencias.PREF_NOME_USUARIO_LOGADO, usuario);
+    Preferencias.nomeUsuarioLogado = usuario;
+    preferencias.setString(Preferencias.PREF_ID_USUARIO_LOGADO, idUsuario);
     Preferencias.idUsuarioLogado = usuario;
   }
   //#endregion Métodos

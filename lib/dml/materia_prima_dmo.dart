@@ -28,6 +28,12 @@ class MateriaPrimaDmo implements BaseDmo{
         nomeMateriaPrima = parseObject.get(MateriaPrimaParse.CAMPO_NOME_MATERIA_PRIMA) ?? "Falha ao obter o nome da matéria prima",
         iconeMateriaPrima = parseObject.get(MateriaPrimaParse.CAMPO_ICONE_MATERIA_PRIMA);
 
+  /// Construtor que inicializa objetos de acordo com um mapa do Parse Server.
+  MateriaPrimaDmo.fromMap(Map<String, dynamic> mapa) :
+        id = mapa[MateriaPrimaParse.CAMPO_ID_MP],
+        nomeMateriaPrima = mapa[MateriaPrimaParse.CAMPO_NOME_MATERIA_PRIMA],
+        iconeMateriaPrima = mapa[MateriaPrimaParse.CAMPO_ICONE_MATERIA_PRIMA];
+
   @override
   String toString() {
     return  'id : $id,'

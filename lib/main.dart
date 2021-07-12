@@ -1,6 +1,8 @@
 import 'package:get_it/get_it.dart';
 import 'package:flutter/material.dart';
+import 'package:jsvillela_app/infra/infraestrutura.dart';
 import 'package:jsvillela_app/infra/paleta_de_cores.dart';
+import 'package:jsvillela_app/stores/carrousel_de_itens_store.dart';
 import 'package:jsvillela_app/stores/consultar_recolhimentos_store.dart';
 import 'package:jsvillela_app/stores/consultar_redeiros_store.dart';
 import 'package:jsvillela_app/stores/consultar_rede_store.dart';
@@ -9,7 +11,7 @@ import 'package:jsvillela_app/stores/inicio_store.dart';
 import 'package:jsvillela_app/stores/login_store.dart';
 import 'package:jsvillela_app/stores/navegacao_store.dart';
 import 'package:jsvillela_app/ui/tela_de_login.dart';
-import 'package:parse_server_sdk/parse_server_sdk.dart';
+import 'package:jsvillela_app/ui/tela_principal.dart';
 import 'package:provider/provider.dart';
 import 'package:jsvillela_app/infra/preferencias.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -19,7 +21,7 @@ void main() async{
   WidgetsFlutterBinding.ensureInitialized();
 
   // Inicializar o Parse Server
-  await inicializarParseServer();
+  await Infraestrutura.inicializarParseServer();
 
   // Carregar preferências do usuário
   Preferencias preferencias = Preferencias();
@@ -38,17 +40,7 @@ void setupLocators(){
   GetIt.I.registerSingleton(ConsultarRecolhimentosStore());
   GetIt.I.registerSingleton(ConsultarRedeStore());
   GetIt.I.registerSingleton(ConsultarMateriaPrimaStore());
-}
-
-/// Inicializa o Parse Server
-Future<void> inicializarParseServer() async{
-  await Parse().initialize(
-      'rpZu6QDBoxiwKS6vjHfQVC4BrB1YwD1osyIHcEph',
-      'https://parseapi.back4app.com/',
-      clientKey: '3AC9imrPtjzlLEmUHmz6kUnBVEiRvc1lVcitnzzh',
-      autoSendSessionId: true,
-      debug: true
-  );
+  GetIt.I.registerSingleton(CarrouselDeItensStore());
 }
 
 class MyApp extends StatelessWidget {
@@ -92,28 +84,15 @@ class MyApp extends StatelessWidget {
           home: Scaffold(
             resizeToAvoidBottomInset: false,
             body: Container(
-              // child: FutureBuilder<bool>(
-              //   future: new UsuarioModel().autoLogarUsuario(),
-              //   builder: (context, snapshot){
-              //
-              //     if(!snapshot.hasData)
-              //       return Center(
-              //         child: CircularProgressIndicator(
-              //           valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
-              //         ),
-              //       );
-              //
-              //     // Verifica se usuário foi autologado
-              //     if(snapshot.data != null)
-              //       return TelaPrincipal();
-              //     else
-              //       return TelaDeLogin();
-              //   },
-              // ),
-              child: TelaDeLogin(),
+              child: autoLogarUsuario() ? TelaPrincipal() : TelaDeLogin(),
             ),
           )
       ),
     );
+  }
+
+  /// Verifica se existe um usuário autolagado no sistema.
+  bool autoLogarUsuario(){
+    return Preferencias.idUsuarioLogado != null;
   }
 }

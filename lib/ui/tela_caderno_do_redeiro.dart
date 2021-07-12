@@ -66,6 +66,7 @@ class _TelaCadernoDoRedeiroState extends State<TelaCadernoDoRedeiro> {
                           return TelaNovoLancamentoNoCaderno(idDoRedeiro: widget.store.redeiro.id!);
                         }
                     ).then((lancamentoRealizado) {
+                      print('############################################### CARREGOU O NEGÓCIO');
                       widget.store.carregarCadernoDoRedeiro();
                     });
                   }
